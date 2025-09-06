@@ -551,7 +551,7 @@ export default function DashboardHome() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto w-[95%] sm:w-full px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">

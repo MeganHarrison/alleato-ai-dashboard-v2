@@ -24,6 +24,7 @@ import { User } from "@supabase/supabase-js";
 import { ChevronRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import Link from "next/link";
 import * as React from "react";
 
 const data = {
@@ -96,6 +97,10 @@ const data = {
           title: "Subcontractors",
           url: "/subcontractors",
         },
+        {
+          title: "Project Tasks",
+          url: "/project-tasks",
+        },
       ],
     },
   ],
@@ -140,14 +145,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar {...props}>
       <SidebarHeader>
         <div className="flex items-center justify-center px-4 pt-6 pb-2">
-          <Image
-            src={logoSrc}
-            alt="Alleato Group"
-            width={160}
-            height={55}
-            className="object-contain"
-            priority
-          />
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <Image
+              src={logoSrc}
+              alt="Alleato Group"
+              width={160}
+              height={55}
+              className="object-contain"
+              priority
+            />
+          </Link>
         </div>
       </SidebarHeader>
       <SidebarContent className="gap-0 px-4">

@@ -38,47 +38,16 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
 
-  // Temporarily bypass auth for testing
-  const isTestingPath = request.nextUrl.pathname === '/' ||
-                        request.nextUrl.pathname.startsWith('/dashboard') ||
-                        request.nextUrl.pathname.startsWith('/pm-assistant') || 
-                        request.nextUrl.pathname.startsWith('/pm-rag') ||
-                        request.nextUrl.pathname.startsWith('/test-employees') ||
-                        request.nextUrl.pathname.startsWith('/api/chat') ||
-                        request.nextUrl.pathname.startsWith('/api/d1') ||
-                        request.nextUrl.pathname.startsWith('/api/vector') ||
-                        request.nextUrl.pathname.startsWith('/api/fm-global-rag') ||
-                        request.nextUrl.pathname.startsWith('/api/fm-global-real-rag') ||
-                        request.nextUrl.pathname.startsWith('/api/fm-rag') ||
-                        request.nextUrl.pathname.startsWith('/api/fm-optimize') ||
-                        request.nextUrl.pathname.startsWith('/api/pm-assistant-gpt5') ||
-                        request.nextUrl.pathname.startsWith('/api/rag') ||
-                        request.nextUrl.pathname.startsWith('/api/pm-rag') ||
-                        request.nextUrl.pathname.startsWith('/test-vector-search') ||
-                        request.nextUrl.pathname.startsWith('/meetings-d1') ||
-                        request.nextUrl.pathname.startsWith('/documents-db') ||
-                        request.nextUrl.pathname.startsWith('/meeting-intelligence') ||
-                        request.nextUrl.pathname.startsWith('/meeting-insights') ||
-                        request.nextUrl.pathname.startsWith('/diagnostic') ||
-                        request.nextUrl.pathname.startsWith('/projects-dashboard') ||
-                        request.nextUrl.pathname.startsWith('/projects') ||
-                        request.nextUrl.pathname.startsWith('/create-test-data') ||
-                        request.nextUrl.pathname.startsWith('/clients') ||
-                        request.nextUrl.pathname.startsWith('/team-chat') ||
-                        request.nextUrl.pathname.startsWith('/fm-chat') ||
-                        request.nextUrl.pathname.startsWith('/fm-8-34') ||
-                        request.nextUrl.pathname.startsWith('/asrs-form') ||
-                        request.nextUrl.pathname.startsWith('/asrs-design') ||
-                        request.nextUrl.pathname.startsWith('/sitemap');
-  
+  // Check if user is authenticated
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
     !request.nextUrl.pathname.startsWith('/(pages)/auth') &&
-    !isTestingPath
+    !request.nextUrl.pathname.startsWith('/api/auth') &&
+    !request.nextUrl.pathname.startsWith('/api/health')
   ) {
-    // no user, potentially respond by redirecting the user to the login page
+    // No user session found, redirect to login page
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
