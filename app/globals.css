@@ -1,0 +1,430 @@
+/* Remove the external import that's causing issues */
+/* @import url("https://use.typekit.net/phe1cys.css"); */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Enhanced Brand Color System */
+    --brand-50: 39 100% 97%;
+    --brand-100: 39 100% 91%;
+    --brand-200: 39 100% 83%;
+    --brand-300: 39 93% 74%;
+    --brand-400: 39 89% 64%;
+    --brand-500: 28 74% 52%; /* Primary Brand #DB802D */
+    --brand-600: 25 70% 46%;
+    --brand-700: 21 65% 38%;
+    --brand-800: 18 59% 31%;
+    --brand-900: 16 56% 25%;
+    
+    /* Neutral Color Palette with warmth */
+    --background: 30 5% 99%;
+    --foreground: 210 12% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 12% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 12% 16%;
+    
+    /* Brand-integrated primary colors */
+    --primary: var(--brand-500);
+    --primary-foreground: 0 0% 100%;
+    --secondary: 28 25% 96%;
+    --secondary-foreground: 210 12% 16%;
+    --muted: 30 10% 95%;
+    --muted-foreground: 210 6% 46%;
+    --accent: var(--brand-50);
+    --accent-foreground: var(--brand-900);
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 30 8% 92%;
+    --input: 30 8% 92%;
+    --ring: var(--brand-400);
+    --radius: 0.75rem;
+    
+    /* Enhanced Sidebar with Brand Integration */
+    --sidebar-background: 30 15% 98%;
+    --sidebar-foreground: 210 12% 16%;
+    --sidebar-primary: var(--brand-500);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--brand-50);
+    --sidebar-accent-foreground: var(--brand-800);
+    --sidebar-border: 30 12% 88%;
+    --sidebar-ring: var(--brand-400);
+    
+    /* Premium effects */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-brand: 0 8px 25px -8px hsl(var(--brand-500) / 0.35);
+  }
+
+  .dark {
+    /* Dark mode with brand color integration */
+    --background: 210 20% 8%;
+    --foreground: 30 8% 95%;
+    --card: 210 15% 11%;
+    --card-foreground: 30 8% 95%;
+    --popover: 210 15% 11%;
+    --popover-foreground: 30 8% 95%;
+    
+    --primary: var(--brand-400);
+    --primary-foreground: 210 20% 8%;
+    --secondary: 210 12% 16%;
+    --secondary-foreground: 30 8% 95%;
+    --muted: 210 12% 16%;
+    --muted-foreground: 210 6% 65%;
+    --accent: 210 12% 16%;
+    --accent-foreground: var(--brand-300);
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 210 12% 20%;
+    --input: 210 12% 20%;
+    --ring: var(--brand-400);
+    
+    /* Dark sidebar with premium feel */
+    --sidebar-background: 210 18% 9%;
+    --sidebar-foreground: 30 8% 90%;
+    --sidebar-primary: var(--brand-400);
+    --sidebar-primary-foreground: 210 20% 8%;
+    --sidebar-accent: 210 15% 15%;
+    --sidebar-accent-foreground: var(--brand-300);
+    --sidebar-border: 210 12% 18%;
+    --sidebar-ring: var(--brand-400);
+    
+    /* Enhanced shadows for dark mode */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.25);
+    --shadow-brand: 0 8px 25px -8px hsl(var(--brand-400) / 0.6);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Enhanced Typography Hierarchy */
+  h1 {
+    @apply text-3xl font-bold tracking-tight;
+    font-family: var(--font-nunito-sans), sans-serif;
+    line-height: 1.2;
+  }
+  
+  h2 {
+    @apply text-2xl font-semibold tracking-tight;
+    font-family: var(--font-nunito-sans), sans-serif;
+    line-height: 1.3;
+  }
+  
+  h3 {
+    @apply text-xl font-semibold;
+    font-family: var(--font-nunito-sans), sans-serif;
+    line-height: 1.4;
+  }
+  
+  h4 {
+    @apply text-lg font-medium;
+    font-family: var(--font-nunito-sans), sans-serif;
+    line-height: 1.4;
+  }
+  
+  h5 {
+    @apply text-base font-medium;
+    font-family: var(--font-nunito-sans), sans-serif;
+  }
+  
+  h6 {
+    @apply text-sm font-medium;
+    font-family: var(--font-nunito-sans), sans-serif;
+  }
+  
+  /* Premium focus states */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--brand-500));
+    outline-offset: 2px;
+  }
+}
+
+/* Premium Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--brand-500) / 0.3);
+  border-radius: 4px;
+  border: 1px solid hsl(var(--background));
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--brand-500) / 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: hsl(var(--background));
+}
+
+/* Premium Animation System */
+.animate-in {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.slide-in-from-bottom {
+  animation-name: slideInFromBottom;
+}
+
+.slide-in-from-left {
+  animation-name: slideInFromLeft;
+}
+
+.zoom-in-95 {
+  animation-name: zoomIn95;
+}
+
+.glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes zoomIn95 {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 0 0 hsl(var(--brand-500) / 0.4);
+  }
+  to {
+    box-shadow: 0 0 20px 4px hsl(var(--brand-500) / 0.1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* Premium Sidebar Transitions */
+.sidebar-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: width;
+}
+
+.sidebar-icon {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, color;
+}
+
+.sidebar-icon:hover {
+  transform: translateX(2px);
+  color: hsl(var(--brand-500));
+}
+
+.sidebar-label {
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+
+.sidebar-expanded .sidebar-label {
+  opacity: 1;
+  transition-delay: 50ms;
+}
+
+/* Premium hover effects */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-glow:hover {
+  box-shadow: var(--shadow-brand);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Define a class for Didot-like styling */
+.font-didot {
+  font-family: "Didot", "Bodoni MT", "Bodoni 72", "Bodoni", "Baskerville", "Garamond", "Times New Roman", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Premium Component Styles */
+.glass-morphism {
+  background: hsl(var(--background) / 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+.dark .glass-morphism {
+  background: hsl(var(--background) / 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid hsl(var(--border) / 0.3);
+}
+
+/* Premium Card Styles */
+.premium-card {
+  @apply bg-card border border-border rounded-xl;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.premium-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: hsl(var(--brand-500) / 0.3);
+}
+
+/* Brand accent elements */
+.brand-accent {
+  position: relative;
+}
+
+.brand-accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to bottom, hsl(var(--brand-500)), hsl(var(--brand-400)));
+  border-radius: 2px;
+}
+
+/* Loading states */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted) / 0.5) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Premium focus and active states */
+.focus-brand:focus-visible {
+  outline: 2px solid hsl(var(--brand-500));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px hsl(var(--brand-500) / 0.1);
+}
+
+/* Utility classes */
+.text-brand {
+  color: hsl(var(--brand-500));
+}
+
+.bg-brand {
+  background-color: hsl(var(--brand-500));
+}
+
+.border-brand {
+  border-color: hsl(var(--brand-500));
+}
+
+.gradient-brand {
+  background: linear-gradient(135deg, hsl(var(--brand-500)), hsl(var(--brand-600)));
+}
+
+/* Enhanced container spacing */
+.container-padding {
+  padding-left: clamp(1rem, 5vw, 2rem);
+  padding-right: clamp(1rem, 5vw, 2rem);
+}
+
+/* Responsive grid improvements */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}

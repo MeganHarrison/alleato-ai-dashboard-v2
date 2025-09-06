@@ -1,0 +1,152 @@
+name: Deploy RAG Workers
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'workers/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'workers/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - development
+      worker:
+        description: 'Worker to deploy (all, rag-api, rag-vectorizer, rag-search)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - rag-api
+          - rag-vectorizer
+          - rag-search
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          cd workers
+          for dir in rag-api rag-vectorizer rag-search; do
+            echo "Installing dependencies for $dir..."
+            cd $dir
+            npm ci
+            cd ..
+          done
+      
+      - name: Run tests
+        run: |
+          cd workers
+          for dir in rag-api rag-vectorizer rag-search; do
+            echo "Testing $dir..."
+            cd $dir
+            npm test --if-present
+            cd ..
+          done
+      
+      - name: Type check
+        run: |
+          cd workers
+          for dir in rag-api rag-vectorizer rag-search; do
+            echo "Type checking $dir..."
+            cd $dir
+            npm run typecheck --if-present
+            cd ..
+          done
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install Wrangler
+        run: npm install -g wrangler
+      
+      - name: Deploy RAG API Worker
+        if: github.event.inputs.worker == 'all' || github.event.inputs.worker == 'rag-api' || github.event.inputs.worker == ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd workers/rag-api
+          npm ci
+          wrangler deploy --env ${{ github.event.inputs.environment || 'production' }}
+          
+          # Set secrets
+          echo "${{ secrets.SUPABASE_URL }}" | wrangler secret put SUPABASE_URL --env ${{ github.event.inputs.environment || 'production' }}
+          echo "${{ secrets.SUPABASE_SERVICE_KEY }}" | wrangler secret put SUPABASE_SERVICE_KEY --env ${{ github.event.inputs.environment || 'production' }}
+          echo "${{ secrets.OPENAI_API_KEY }}" | wrangler secret put OPENAI_API_KEY --env ${{ github.event.inputs.environment || 'production' }}
+          echo "${{ secrets.AUTH_TOKEN }}" | wrangler secret put AUTH_TOKEN --env ${{ github.event.inputs.environment || 'production' }}
+      
+      - name: Deploy Vectorizer Worker
+        if: github.event.inputs.worker == 'all' || github.event.inputs.worker == 'rag-vectorizer' || github.event.inputs.worker == ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd workers/rag-vectorizer
+          npm ci
+          wrangler deploy --env ${{ github.event.inputs.environment || 'production' }}
+          
+          # Set secrets
+          echo "${{ secrets.SUPABASE_URL }}" | wrangler secret put SUPABASE_URL --env ${{ github.event.inputs.environment || 'production' }}
+          echo "${{ secrets.SUPABASE_SERVICE_KEY }}" | wrangler secret put SUPABASE_SERVICE_KEY --env ${{ github.event.inputs.environment || 'production' }}
+          echo "${{ secrets.OPENAI_API_KEY }}" | wrangler secret put OPENAI_API_KEY --env ${{ github.event.inputs.environment || 'production' }}
+      
+      - name: Deploy Search Worker
+        if: github.event.inputs.worker == 'all' || github.event.inputs.worker == 'rag-search' || github.event.inputs.worker == ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd workers/rag-search
+          npm ci
+          wrangler deploy --env ${{ github.event.inputs.environment || 'production' }}
+          
+          # Set secrets
+          echo "${{ secrets.SUPABASE_URL }}" | wrangler secret put SUPABASE_URL --env ${{ github.event.inputs.environment || 'production' }}
+          echo "${{ secrets.SUPABASE_SERVICE_KEY }}" | wrangler secret put SUPABASE_SERVICE_KEY --env ${{ github.event.inputs.environment || 'production' }}
+          echo "${{ secrets.OPENAI_API_KEY }}" | wrangler secret put OPENAI_API_KEY --env ${{ github.event.inputs.environment || 'production' }}
+      
+      - name: Deployment Summary
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
+          echo "Worker(s): ${{ github.event.inputs.worker || 'all' }}"
+          if [[ "${{ github.event.inputs.environment || 'production' }}" == "production" ]]; then
+            echo "API URL: https://api.alleato.ai/api/health"
+          else
+            echo "API URL: https://rag-api.YOUR_SUBDOMAIN.workers.dev/api/health"
+          fi

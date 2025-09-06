@@ -1,0 +1,90 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+node_modules/
+**/node_modules/
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# MCP Configuration
+claude_project.json
+.mcp.json
+mcp-server-logs/
+
+# Testing artifacts
+test-results/
+screenshots/
+coverage/
+playwright-report/
+playwright/.cache/
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python virtual environment (if any Python scripts)
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Documentation build artifacts
+documentation/.cache/
+documentation/build/
+documentation/
+
+# Archive directory (for cleaned up files)
+.archive/
+
+# Submodules and embedded repos (these should be managed separately)
+astro-docs/
+monorepo-agents/
+temp-fm-global-pdf-backup/
+
+# Database files
+*.db
+*.sqlite
+
+# Log files
+*.log
+dev.log
+
+# Build and deployment artifacts
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# AI-related temporary files
+*.pdf
+*.txt
+*.html

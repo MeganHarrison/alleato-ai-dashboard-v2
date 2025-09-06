@@ -1,0 +1,83 @@
+#!/bin/sh
+
+# Exit on any error
+set -e
+
+echo "🔍 Running pre-commit checks..."
+
+# 1. Check for documentation in root directory (except README.md and CLAUDE.md)
+echo "📁 Checking file organization..."
+ROOT_DOCS=$(ls *.md 2>/dev/null | grep -v README.md | grep -v CLAUDE.md || true)
+if [ ! -z "$ROOT_DOCS" ]; then
+  echo "❌ Error: Documentation files found in root directory!"
+  echo "   The following files should be moved to documentation/ folder:"
+  echo "$ROOT_DOCS" | sed 's/^/     - /'
+  echo ""
+  echo "   Please move them to the appropriate subfolder:"
+  echo "     - documentation/technical/ for architecture docs"
+  echo "     - documentation/guides/ for how-to guides"
+  echo "     - documentation/changes/ for migration/change logs"
+  exit 1
+fi
+
+# 2. Clean up test artifacts
+echo "🧹 Cleaning test artifacts..."
+rm -rf test-results/* 2>/dev/null || true
+rm -rf screenshots/* 2>/dev/null || true
+echo "   ✅ Test artifacts cleaned"
+
+# 3. Check for large files (>500 lines)
+echo "📏 Checking file sizes..."
+LARGE_FILES=$(find app components features -name "*.tsx" -o -name "*.ts" 2>/dev/null | while read file; do
+  lines=$(wc -l < "$file" 2>/dev/null || echo 0)
+  if [ "$lines" -gt 500 ]; then
+    echo "$file:$lines"
+  fi
+done || true)
+
+if [ ! -z "$LARGE_FILES" ]; then
+  echo "⚠️  Warning: Large files detected (>500 lines):"
+  echo "$LARGE_FILES" | while IFS=: read file lines; do
+    echo "     - $file ($lines lines)"
+  done
+  echo "   Consider refactoring these files into smaller modules."
+fi
+
+# 4. Check for components over 200 lines
+LARGE_COMPONENTS=$(find components -name "*.tsx" 2>/dev/null | while read file; do
+  lines=$(wc -l < "$file" 2>/dev/null || echo 0)
+  if [ "$lines" -gt 200 ]; then
+    echo "$file:$lines"
+  fi
+done || true)
+
+if [ ! -z "$LARGE_COMPONENTS" ]; then
+  echo "⚠️  Warning: Large components detected (>200 lines):"
+  echo "$LARGE_COMPONENTS" | while IFS=: read file lines; do
+    echo "     - $file ($lines lines)"
+  done
+  echo "   Consider breaking these into smaller components."
+fi
+
+# 5. Check for .DS_Store files
+echo "🗑️  Removing .DS_Store files..."
+find . -name ".DS_Store" -type f -delete 2>/dev/null || true
+
+# 6. Check for console.log statements (warn only)
+echo "🔍 Checking for console.log statements..."
+CONSOLE_LOGS=$(grep -r "console\.log" --include="*.ts" --include="*.tsx" app components features 2>/dev/null | grep -v "// eslint-disable" || true)
+if [ ! -z "$CONSOLE_LOGS" ]; then
+  echo "⚠️  Warning: console.log statements found:"
+  echo "$CONSOLE_LOGS" | head -5 | sed 's/^/     /'
+  echo "   Consider removing these before production."
+fi
+
+# 7. Run linting (if it passes quickly)
+echo "🎨 Running quick lint check..."
+if [ -d "app" ]; then
+  npx eslint --max-warnings 10 --quiet app --ext .ts,.tsx 2>/dev/null || {
+    echo "⚠️  Warning: Some linting issues detected. Run 'npm run lint' to see all issues."
+  }
+fi
+
+echo "✅ Pre-commit checks completed!"

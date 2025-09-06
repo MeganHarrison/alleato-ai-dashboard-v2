@@ -1,0 +1,12 @@
+import type { ReactElement } from "react";
+
+export default function HomePage(): ReactElement {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">Alleato AI Dashboard</h1>
+        <p className="text-gray-600">Welcome to your AI-powered business intelligence platform</p>
+      </div>
+    </div>
+  );
+}

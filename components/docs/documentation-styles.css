@@ -1,0 +1,209 @@
+/* FM Global Documentation Styles */
+
+/* Content block specific styles */
+.fm-note {
+  @apply bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg;
+}
+
+.fm-note strong {
+  @apply text-blue-800 font-semibold;
+}
+
+.fm-warning {
+  @apply bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg;
+}
+
+.fm-warning strong {
+  @apply text-red-800 font-semibold;
+}
+
+.fm-important {
+  @apply bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg;
+}
+
+.fm-important strong {
+  @apply text-orange-800 font-semibold;
+}
+
+.fm-reference {
+  @apply bg-gray-50 border-l-4 border-gray-400 p-3 rounded-r-lg text-gray-700 italic;
+}
+
+.fm-caption {
+  @apply text-center font-medium text-gray-700 mt-2 mb-4 text-sm;
+}
+
+.equation-block {
+  @apply bg-gray-100 border border-gray-200 rounded-lg p-4 font-mono text-sm overflow-x-auto;
+}
+
+/* Table specific styles */
+.fm-table {
+  @apply w-full border-collapse border border-gray-300;
+}
+
+.fm-table th {
+  @apply bg-gray-100 border border-gray-300 px-4 py-2 text-left font-semibold text-gray-700;
+}
+
+.fm-table td {
+  @apply border border-gray-300 px-4 py-2 text-gray-900;
+}
+
+.fm-table tr:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.fm-table tr:hover {
+  @apply bg-blue-50;
+}
+
+.table-container {
+  @apply overflow-x-auto rounded-lg border border-gray-200;
+}
+
+.table-cell {
+  @apply px-3 py-2 text-sm;
+}
+
+/* Prose styles for content blocks */
+.prose h1 {
+  @apply text-2xl font-bold text-gray-900 mb-4;
+}
+
+.prose h2 {
+  @apply text-xl font-semibold text-gray-900 mb-3;
+}
+
+.prose h3 {
+  @apply text-lg font-medium text-gray-900 mb-2;
+}
+
+.prose h4 {
+  @apply text-base font-medium text-gray-900 mb-2;
+}
+
+.prose p {
+  @apply text-gray-700 leading-relaxed mb-4;
+}
+
+.prose ul {
+  @apply list-disc list-inside mb-4 text-gray-700;
+}
+
+.prose ol {
+  @apply list-decimal list-inside mb-4 text-gray-700;
+}
+
+.prose li {
+  @apply mb-1;
+}
+
+.prose strong {
+  @apply font-semibold text-gray-900;
+}
+
+.prose em {
+  @apply italic;
+}
+
+.prose code {
+  @apply bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.prose pre {
+  @apply bg-gray-100 text-gray-800 p-4 rounded-lg overflow-x-auto text-sm font-mono mb-4;
+}
+
+/* Custom scrollbar for sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break-inside-avoid {
+    break-inside: avoid;
+  }
+  
+  .prose {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    break-after: avoid;
+    break-inside: avoid;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .fm-table {
+    font-size: 14px;
+  }
+  
+  .fm-table th,
+  .fm-table td {
+    padding: 8px;
+  }
+}
+
+/* Search result highlighting */
+mark {
+  @apply bg-yellow-200 font-medium px-0.5 rounded;
+}
+
+/* Loading animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Focus styles for accessibility */
+.focus-visible:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Transition utilities */
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

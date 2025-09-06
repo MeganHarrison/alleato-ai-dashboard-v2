@@ -1,0 +1,85 @@
+# Exclude large directories that aren't needed for deployment
+drizzle/
+monorepo-agents/
+astro-docs/
+temp-fm-global-pdf-backup/
+agents/
+tests/
+playwright-report/
+documentation/
+workers/
+scripts/
+
+# Exclude test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+test-results/
+coverage/
+playwright.config.ts
+vitest.config.ts
+
+# Exclude development files
+*.md
+!README.md
+.env.example
+.env.local
+.env.development
+.env.test
+*.log
+*.tmp
+*.temp
+
+# Exclude IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Exclude git files
+.git/
+.gitignore
+.github/
+
+# Exclude build artifacts that will be regenerated
+tsconfig.tsbuildinfo
+.next/
+out/
+
+# Exclude MCP configurations
+claude_project.json
+.mcp.json
+mcp-server-logs/
+CLAUDE.md
+
+# Exclude screenshots and media
+screenshots/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+!public/**/*.svg
+!public/**/*.png
+!public/**/*.jpg
+
+# Exclude Python files
+*.py
+*.pyc
+__pycache__/
+.venv/
+venv/
+
+# Exclude database files
+*.db
+*.sqlite
+
+# Exclude archive
+.archive/
+
+# Exclude PDF and other documents
+*.pdf
+*.docx
+*.xlsx

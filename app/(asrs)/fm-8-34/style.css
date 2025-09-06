@@ -1,0 +1,3 @@
+:root { color-scheme: light; }
+.prose { max-width: 75ch; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

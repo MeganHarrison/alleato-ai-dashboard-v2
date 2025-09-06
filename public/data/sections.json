@@ -1,0 +1,2906 @@
+{
+  "1.0": {
+    "number": "1.0",
+    "title": "SCOPE ............................................................................................................................... ...................... 7",
+    "parent": "1",
+    "children": [],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "1": {
+    "number": "1",
+    "title": "",
+    "parent": null,
+    "children": [
+      "1.0",
+      "1.1",
+      "1.2"
+    ],
+    "start_page": null,
+    "end_page": null
+  },
+  "1.1": {
+    "number": "1.1",
+    "title": "Changes ..................................................................................................................... ....................... 7",
+    "parent": "1",
+    "children": [],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "1.2": {
+    "number": "1.2",
+    "title": "How to Use this Data Sheet ....................................................................................................... ....... 7",
+    "parent": "1",
+    "children": [],
+    "start_page": 1,
+    "end_page": null
+  },
+  "2.0": {
+    "number": "2.0",
+    "title": "LOSS PREVENTION RECOMMENDATIONS ........................................................................................ 9",
+    "parent": "2",
+    "children": [],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "2": {
+    "number": "2",
+    "title": "",
+    "parent": null,
+    "children": [
+      "2.0",
+      "2.1",
+      "2.2",
+      "2.3",
+      "2.4"
+    ],
+    "start_page": null,
+    "end_page": null
+  },
+  "2.1": {
+    "number": "2.1",
+    "title": "General Recommendations for All Automatic Storage and Retrieval Systems ................................ 9",
+    "parent": "2",
+    "children": [
+      "2.1.1",
+      "2.1.3",
+      "2.1.4",
+      "2.1.5",
+      "2.1.6",
+      "2.1.2",
+      "2.1.7"
+    ],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "2.1.1": {
+    "number": "2.1.1",
+    "title": "FM Approved Equipment, Materials, and Services ................................................................. 92.1.2 Construction and Location ................................................................................................... ... 9",
+    "parent": "2.1",
+    "children": [],
+    "start_page": 1,
+    "end_page": 9
+  },
+  "2.1.3": {
+    "number": "2.1.3",
+    "title": "Occupancy ................................................................................................................. .............. 9",
+    "parent": "2.1",
+    "children": [
+      "2.1.3.1.1",
+      "2.1.3.1.2",
+      "2.1.3.1.3",
+      "2.1.3.2"
+    ],
+    "start_page": 1,
+    "end_page": 9
+  },
+  "2.1.4": {
+    "number": "2.1.4",
+    "title": "Protection ................................................................................................................ .............. 10",
+    "parent": "2.1",
+    "children": [
+      "2.1.4.1",
+      "2.1.4.2",
+      "2.1.4.3",
+      "2.1.4.4",
+      "2.1.4.5"
+    ],
+    "start_page": 1,
+    "end_page": 10
+  },
+  "2.1.5": {
+    "number": "2.1.5",
+    "title": "Final Extinguishment ....................................................................................................... ...... 12",
+    "parent": "2.1",
+    "children": [],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "2.1.6": {
+    "number": "2.1.6",
+    "title": "Electrical Systems for ASRS Storage Arrangements ............................................................ 132.1.7 Control Systems for ASRS Storage Arrangements .............................................................. 13",
+    "parent": "2.1",
+    "children": [
+      "2.1.6.1",
+      "2.1.6.2",
+      "2.1.6.3",
+      "2.1.6.4",
+      "2.1.6.5",
+      "2.1.6.6",
+      "2.1.6.7",
+      "2.1.6.8"
+    ],
+    "start_page": 1,
+    "end_page": 13
+  },
+  "2.2": {
+    "number": "2.2",
+    "title": "Horizontal-Loading Automatic Storage and Retrieval Systems (ASRS) Using Small",
+    "parent": "2",
+    "children": [
+      "2.2.1",
+      "2.2.3",
+      "2.2.4",
+      "2.2.5",
+      "2.2.6",
+      "2.2.7",
+      "2.2.2"
+    ],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "2.2.1": {
+    "number": "2.2.1",
+    "title": "General Guidelines for Horizontal-Loading ASRS Storage Arrangements ........................... 142.2.2 Protection of Horizontal-Loading Shuttle ASRS Storage Arrangements Where",
+    "parent": "2.2",
+    "children": [
+      "2.2.1.1.1",
+      "2.2.1.1.2",
+      "2.2.1.1.3",
+      "2.2.1.1.4",
+      "2.2.1.2",
+      "2.2.1.3",
+      "2.2.1.4",
+      "2.2.1.5",
+      "2.2.1.6",
+      "2.2.1.7",
+      "2.2.1.8"
+    ],
+    "start_page": 1,
+    "end_page": 14
+  },
+  "2.2.3": {
+    "number": "2.2.3",
+    "title": "Protection of Horizontal-Loading Shuttle ASRS Storage Arrangements Using (1)",
+    "parent": "2.2",
+    "children": [
+      "2.2.3.1",
+      "2.2.3.2",
+      "2.2.3.1.1",
+      "2.2.3.2.1",
+      "2.2.3.2.2",
+      "2.2.3.2.3"
+    ],
+    "start_page": 1,
+    "end_page": 20
+  },
+  "2.2.4": {
+    "number": "2.2.4",
+    "title": "Protection of Horizontal-Loading Shuttle ASRS Storage Arrangements Where",
+    "parent": "2.2",
+    "children": [
+      "2.2.4.1",
+      "2.2.4.2",
+      "2.2.4.1.1",
+      "2.2.4.2.1",
+      "2.2.4.2.2",
+      "2.2.4.2.3"
+    ],
+    "start_page": 1,
+    "end_page": 48
+  },
+  "2.2.5": {
+    "number": "2.2.5",
+    "title": "Protection of Horizontal-Loading, Mini-Load ASRS Storage Arrangements Where",
+    "parent": "2.2",
+    "children": [
+      "2.2.5.1",
+      "2.2.5.2"
+    ],
+    "start_page": 1,
+    "end_page": 61
+  },
+  "2.2.6": {
+    "number": "2.2.6",
+    "title": "Protection of Horizontal-Loading Mini-Load ASRS Storage Arrangements Using (1)",
+    "parent": "2.2",
+    "children": [
+      "2.2.6.1",
+      "2.2.6.2",
+      "2.2.6.1.1",
+      "2.2.6.2.1",
+      "2.2.6.2.2",
+      "2.2.6.2.3"
+    ],
+    "start_page": 1,
+    "end_page": 61
+  },
+  "2.2.7": {
+    "number": "2.2.7",
+    "title": "Protection of Horizontal-Loading, Mini-Load ASRS Storage Arrangements Where",
+    "parent": "2.2",
+    "children": [
+      "2.2.7.1",
+      "2.2.7.2",
+      "2.2.7.1.1",
+      "2.2.7.2.1",
+      "2.2.7.2.2",
+      "2.2.7.2.3"
+    ],
+    "start_page": 1,
+    "end_page": 75
+  },
+  "2.3": {
+    "number": "2.3",
+    "title": "Top-Loading Automatic Storage and Retrieval Systems (TL-ASRS) .............................................. 88",
+    "parent": "2",
+    "children": [
+      "2.3.1",
+      "2.3.3",
+      "2.3.5",
+      "2.3.4",
+      "2.3.2",
+      "2.3.6",
+      "2.3.7"
+    ],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "2.3.1": {
+    "number": "2.3.1",
+    "title": "General Guidelines for TL-ASRS Storage Arrangements ..................................................... 882.3.2 Drainage .................................................................................................................. .............. 88",
+    "parent": "2.3",
+    "children": [
+      "2.3.1.1",
+      "2.3.1.2"
+    ],
+    "start_page": 1,
+    "end_page": 88
+  },
+  "2.3.3": {
+    "number": "2.3.3",
+    "title": "Robots and Robot Holding Areas ......................................................................................... 882.3.4 Fire Detection ............................................................................................................. ........... 88",
+    "parent": "2.3",
+    "children": [
+      "2.3.3.2"
+    ],
+    "start_page": 1,
+    "end_page": 88
+  },
+  "2.3.5": {
+    "number": "2.3.5",
+    "title": "Protection of Noncombustible Solid-Walled Containers ....................................................... 892.3.6 Protection of Combustible Solid-Walled Containers ............................................................. 922.3.7 Protection of Non-Solid-Walled Containers ......................................................................... 103",
+    "parent": "2.3",
+    "children": [
+      "2.3.5.1.1",
+      "2.3.5.1.2",
+      "2.3.5.1.3",
+      "2.3.5.1.4",
+      "2.3.5.1.5",
+      "2.3.5.1.6",
+      "2.3.5.1.7",
+      "2.3.5.2",
+      "2.3.5.3"
+    ],
+    "start_page": 1,
+    "end_page": 89
+  },
+  "2.4": {
+    "number": "2.4",
+    "title": "Vertically Enclosed Automatic Storage and Retrieval System Storage Arrangements ................ 107",
+    "parent": "2",
+    "children": [
+      "2.4.1",
+      "2.4.2",
+      "2.4.1.1",
+      "2.4.1.2",
+      "2.4.3",
+      "2.4.4"
+    ],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "2.4.1": {
+    "number": "2.4.1",
+    "title": "General ................................................................................................................... ............. 107",
+    "parent": "2.4",
+    "children": [],
+    "start_page": 1,
+    "end_page": 107
+  },
+  "2.4.2": {
+    "number": "2.4.2",
+    "title": "Storage Trays for Vertically Enclosed Storage Units .......................................................... 1072.4.3 Protection Options for Vertically Enclosed Storage Units ................................................... 1082.4.4 Final Extinguishment \u2013 Small Hose Connection Stations ................................................... 110",
+    "parent": "2.4",
+    "children": [
+      "2.4.2.1",
+      "2.4.2.2"
+    ],
+    "start_page": 1,
+    "end_page": 107
+  },
+  "3.0": {
+    "number": "3.0",
+    "title": "SUPPORT FOR RECOMMENDATIONS ............................................................................................ 110",
+    "parent": "3",
+    "children": [],
+    "start_page": 1,
+    "end_page": 1
+  },
+  "3": {
+    "number": "3",
+    "title": "",
+    "parent": null,
+    "children": [
+      "3.0",
+      "3.1",
+      "3.2"
+    ],
+    "start_page": null,
+    "end_page": null
+  },
+  "3.1": {
+    "number": "3.1",
+    "title": "Description of Automatic Storage and Retrieval Systems (ASRS) .............................................. 110FM Global",
+    "parent": "3",
+    "children": [
+      "3.1.1",
+      "3.1.2",
+      "3.1.3"
+    ],
+    "start_page": 1,
+    "end_page": 2
+  },
+  "3.1.1": {
+    "number": "3.1.1",
+    "title": "Mini-Load ASRS Storage Arrangements ............................................................................. 110",
+    "parent": "3.1",
+    "children": [
+      "3.1.1.1",
+      "3.1.1.2",
+      "3.1.1.3"
+    ],
+    "start_page": 2,
+    "end_page": 111
+  },
+  "3.1.2": {
+    "number": "3.1.2",
+    "title": "Top-Loading ASRS Storage Arrangements ......................................................................... 1113.1.3 Vertically Enclosed ASRS Storage Arrangements .............................................................. 114",
+    "parent": "3.1",
+    "children": [
+      "3.1.2.1",
+      "3.1.2.2",
+      "3.1.2.3"
+    ],
+    "start_page": 2,
+    "end_page": 114
+  },
+  "3.2": {
+    "number": "3.2",
+    "title": "Loss History of Automatic Storage and Retrieval Systems (ASRS) ............................................. 114",
+    "parent": "3",
+    "children": [],
+    "start_page": 2,
+    "end_page": null
+  },
+  "4.0": {
+    "number": "4.0",
+    "title": "REFERENCES ............................................................................................................................... ..... 115",
+    "parent": "4",
+    "children": [],
+    "start_page": 2,
+    "end_page": 2
+  },
+  "4": {
+    "number": "4",
+    "title": "",
+    "parent": null,
+    "children": [
+      "4.0",
+      "4.1",
+      "4.2"
+    ],
+    "start_page": null,
+    "end_page": null
+  },
+  "4.1": {
+    "number": "4.1",
+    "title": "FM Global .................................................................................................................... ................ 115",
+    "parent": "4",
+    "children": [],
+    "start_page": 2,
+    "end_page": 2
+  },
+  "4.2": {
+    "number": "4.2",
+    "title": "Other ....................................................................................................................... ....................... 115",
+    "parent": "4",
+    "children": [],
+    "start_page": 2,
+    "end_page": null
+  },
+  "2.3.4": {
+    "number": "2.3.4",
+    "title": "for general",
+    "parent": "2.3",
+    "children": [
+      "2.3.4.1",
+      "2.3.4.2",
+      "2.3.4.3",
+      "2.3.4.4",
+      "2.3.4.5"
+    ],
+    "start_page": 8,
+    "end_page": 88
+  },
+  "2.1.2": {
+    "number": "2.1.2",
+    "title": "Construction and Location",
+    "parent": "2.1",
+    "children": [
+      "2.1.2.1",
+      "2.1.2.2",
+      "2.1.2.3",
+      "2.1.2.4",
+      "2.1.2.5"
+    ],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.2.1": {
+    "number": "2.1.2.1",
+    "title": "Construct storage facilities in accordance with the relevant FM Global property loss prevention data",
+    "parent": "2.1.2",
+    "children": [],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.2.2": {
+    "number": "2.1.2.2",
+    "title": "Adhere to the recommendations in the relevant data sheet to ensure the construction features of",
+    "parent": "2.1.2",
+    "children": [],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.2.3": {
+    "number": "2.1.2.3",
+    "title": "Building Structural Steel Protection",
+    "parent": "2.1.2",
+    "children": [],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.2.4": {
+    "number": "2.1.2.4",
+    "title": "See Data Sheet 2-0, Installation Guidelines for Automatic Sprinklers , for guidelines specific to:",
+    "parent": "2.1.2",
+    "children": [],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.2.5": {
+    "number": "2.1.2.5",
+    "title": "Additional Weight Due to Collection of Sprinkler Discharge",
+    "parent": "2.1.2",
+    "children": [],
+    "start_page": 9,
+    "end_page": 1
+  },
+  "2.1.3.1.1": {
+    "number": "2.1.3.1.1",
+    "title": "Use FM Global Property Loss Prevention Data Sheet (i.e., Data Sheet) 8-1, Commodity",
+    "parent": "2.1.3",
+    "children": [],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.3.1.2": {
+    "number": "2.1.3.1.2",
+    "title": "Protection guidelines offered in this data sheet are limited to commodities that are indicated by",
+    "parent": "2.1.3",
+    "children": [],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.3.1.3": {
+    "number": "2.1.3.1.3",
+    "title": "Design the sprinkler protection for the ASRS storage arrangement using the most severe commodity",
+    "parent": "2.1.3",
+    "children": [],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.3.2": {
+    "number": "2.1.3.2",
+    "title": "Clearances Between Storage and Sprinkler Deflectors",
+    "parent": "2.1.3",
+    "children": [
+      "2.1.3.2.1",
+      "2.1.3.2.2",
+      "2.1.3.2.3"
+    ],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.3.2.1": {
+    "number": "2.1.3.2.1",
+    "title": "Maintain a minimum 3 ft (0.9 m) clearance between the top of the storage and the deflectors of",
+    "parent": "2.1.3.2",
+    "children": [],
+    "start_page": 9,
+    "end_page": 9
+  },
+  "2.1.3.2.2": {
+    "number": "2.1.3.2.2",
+    "title": "Maintain a minimum 5 ft (1.5 m) clearance between the top of the storage and the deflectors of",
+    "parent": "2.1.3.2",
+    "children": [],
+    "start_page": 9,
+    "end_page": 10
+  },
+  "2.1.3.2.3": {
+    "number": "2.1.3.2.3",
+    "title": "Maintain a minimum 4 in. (100 mm) clearance between the top of the storage and the deflectors",
+    "parent": "2.1.3.2",
+    "children": [],
+    "start_page": 10,
+    "end_page": 1
+  },
+  "2.1.4.1": {
+    "number": "2.1.4.1",
+    "title": "In addition to the recommendations in this data sheet, follow the sprinkler, ceiling and in-rack,",
+    "parent": "2.1.4",
+    "children": [],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.2": {
+    "number": "2.1.4.2",
+    "title": "For facilities located in earthquake-prone regions, refer to FM Global Property Loss Prevention Data",
+    "parent": "2.1.4",
+    "children": [],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.3": {
+    "number": "2.1.4.3",
+    "title": "In addition, see Data Sheet 3-0, Hydraulics of Fire Protection Systems, for guidelines on calculating",
+    "parent": "2.1.4",
+    "children": [],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.4": {
+    "number": "2.1.4.4",
+    "title": "The units for sprinkler K-factor used throughout this data sheet are gpm/psi",
+    "parent": "2.1.4",
+    "children": [],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.5": {
+    "number": "2.1.4.5",
+    "title": "Ceiling Sprinkler Designs2.1.4.5.1 Ceiling-Level Sprinkler Protection Design Format",
+    "parent": "2.1.4",
+    "children": [
+      "2.1.4.5.2",
+      "2.1.4.5.3",
+      "2.1.4.5.4"
+    ],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.5.2": {
+    "number": "2.1.4.5.2",
+    "title": "Minimum Ceiling Design Area",
+    "parent": "2.1.4.5",
+    "children": [
+      "2.1.4.5.2.1",
+      "2.1.4.5.2.2"
+    ],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.5.2.1": {
+    "number": "2.1.4.5.2.1",
+    "title": "Unobstructed Ceiling ConstructionThe minimum design area (i.e., the number of sprinklers in the design multiplied by the spacing of the",
+    "parent": "2.1.4.5.2",
+    "children": [],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.5.2.2": {
+    "number": "2.1.4.5.2.2",
+    "title": "Obstructed Ceiling ConstructionWhen ceiling sprinklers can be installed under the ceiling structural members in the presence of obstructed",
+    "parent": "2.1.4.5.2",
+    "children": [],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.5.3": {
+    "number": "2.1.4.5.3",
+    "title": "Non-ASRS Areas Adjacent to an ASRS Storage Area",
+    "parent": "2.1.4.5",
+    "children": [
+      "2.1.4.5.3.1",
+      "2.1.4.5.3.2"
+    ],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.5.3.1": {
+    "number": "2.1.4.5.3.1",
+    "title": "Provide separation between the ASRS storage area and any adjacent non-ASRS areas by either",
+    "parent": "2.1.4.5.3",
+    "children": [],
+    "start_page": 10,
+    "end_page": 10
+  },
+  "2.1.4.5.3.2": {
+    "number": "2.1.4.5.3.2",
+    "title": "Separation between the ASRS storage area and any adjacent non-ASRS areas, as recommended",
+    "parent": "2.1.4.5.3",
+    "children": [],
+    "start_page": 10,
+    "end_page": 11
+  },
+  "2.1.4.5.4": {
+    "number": "2.1.4.5.4",
+    "title": "Number of Sprinklers per Branch Line for Ceiling-Level Sprinkler System Calculations",
+    "parent": "2.1.4.5",
+    "children": [],
+    "start_page": 11,
+    "end_page": 1
+  },
+  "2.1.6.1": {
+    "number": "2.1.6.1",
+    "title": "Design the robot\u2019s overall electrical system in accordance with the applicable international electrical",
+    "parent": "2.1.6",
+    "children": [],
+    "start_page": 13,
+    "end_page": 13
+  },
+  "2.1.6.2": {
+    "number": "2.1.6.2",
+    "title": "If lithium ion batteries are used in the robot\u2019s system, use batteries that have passed a thermal runaway",
+    "parent": "2.1.6",
+    "children": [],
+    "start_page": 13,
+    "end_page": 13
+  },
+  "2.1.6.3": {
+    "number": "2.1.6.3",
+    "title": "Follow the manufacturer\u2019s periodic maintenance and testing program of the battery charging contacts,",
+    "parent": "2.1.6",
+    "children": [],
+    "start_page": 13,
+    "end_page": 13
+  },
+  "2.1.6.4": {
+    "number": "2.1.6.4",
+    "title": "Replace the battery-charging contacts when they approach the end of cycle life to remove the potential",
+    "parent": "2.1.6",
+    "children": [],
+    "start_page": 13,
+    "end_page": 13
+  },
+  "2.1.6.5": {
+    "number": "2.1.6.5",
+    "title": "At a minimum, on an annual basis conduct infrared scanning for all ASRS electrical components while",
+    "parent": "2.1.6",
+    "children": [],
+    "start_page": 13,
+    "end_page": 13
+  },
+  "2.1.6.6": {
+    "number": "2.1.6.6",
+    "title": "Establish an alarm management program in accordance with FM Global Property Loss Prevention",
+    "parent": "2.1.6",
+    "children": [],
+    "start_page": 13,
+    "end_page": 13
+  },
+  "2.1.6.7": {
+    "number": "2.1.6.7",
+    "title": "For robots powered by batteries, establish a robot battery system replacement program for aged",
+    "parent": "2.1.6",
+    "children": [],
+    "start_page": 13,
+    "end_page": 13
+  },
+  "2.1.6.8": {
+    "number": "2.1.6.8",
+    "title": "Implement a Management of Change (MOC) procedure in accordance with FM Global Property Loss",
+    "parent": "2.1.6",
+    "children": [],
+    "start_page": 13,
+    "end_page": 13
+  },
+  "2.1.7": {
+    "number": "2.1.7",
+    "title": "Control Systems for ASRS Storage Arrangements",
+    "parent": "2.1",
+    "children": [],
+    "start_page": 13,
+    "end_page": 1
+  },
+  "2.2.1.1.1": {
+    "number": "2.2.1.1.1",
+    "title": "Section 2.2 provides protection guidelines for horizontal-loading automatic storage and retrieval",
+    "parent": "2.2.1",
+    "children": [],
+    "start_page": 14,
+    "end_page": 15
+  },
+  "2.2.1.1.2": {
+    "number": "2.2.1.1.2",
+    "title": "What differentiates horizontal-loading ASRS storage arrangements from traditional pallet load",
+    "parent": "2.2.1",
+    "children": [],
+    "start_page": 15,
+    "end_page": 15
+  },
+  "2.2.1.1.3": {
+    "number": "2.2.1.1.3",
+    "title": "To determine recommendations for the protection of products stored within a horizontal-loading",
+    "parent": "2.2.1",
+    "children": [],
+    "start_page": 15,
+    "end_page": 16
+  },
+  "2.2.1.1.4": {
+    "number": "2.2.1.1.4",
+    "title": "The protection of expanded plastic trays or expanded plastic containers in a mini-load type of",
+    "parent": "2.2.1",
+    "children": [],
+    "start_page": 16,
+    "end_page": 16
+  },
+  "2.2.1.2": {
+    "number": "2.2.1.2",
+    "title": "Information Needed",
+    "parent": "2.2.1",
+    "children": [],
+    "start_page": 16,
+    "end_page": 16
+  },
+  "2.2.1.3": {
+    "number": "2.2.1.3",
+    "title": "General Construction Features for Horizontal-Loading ASRS Storage Arrangements",
+    "parent": "2.2.1",
+    "children": [
+      "2.2.1.3.1",
+      "2.2.1.3.2"
+    ],
+    "start_page": 16,
+    "end_page": 16
+  },
+  "2.2.1.3.1": {
+    "number": "2.2.1.3.1",
+    "title": "Properly anchor all horizontal-loading ASRS rack structures to prevent them from falling over and",
+    "parent": "2.2.1.3",
+    "children": [],
+    "start_page": 16,
+    "end_page": 16
+  },
+  "2.2.1.3.2": {
+    "number": "2.2.1.3.2",
+    "title": "Design horizontal-loading ASRS rack-supported structures taking into consideration the effects of",
+    "parent": "2.2.1.3",
+    "children": [],
+    "start_page": 16,
+    "end_page": 16
+  },
+  "2.2.1.4": {
+    "number": "2.2.1.4",
+    "title": "General Occupancy Features for Horizontal-Loading ASRS Storage Arrangements \u2013",
+    "parent": "2.2.1",
+    "children": [
+      "2.2.1.4.1",
+      "2.2.1.4.2",
+      "2.2.1.4.3",
+      "2.2.1.4.4",
+      "2.2.1.4.5",
+      "2.2.1.4.6"
+    ],
+    "start_page": 16,
+    "end_page": 16
+  },
+  "2.2.1.4.1": {
+    "number": "2.2.1.4.1",
+    "title": "When measuring for the net width of a transverse flue space, account for the width of any angle",
+    "parent": "2.2.1.4",
+    "children": [],
+    "start_page": 16,
+    "end_page": 16
+  },
+  "2.2.1.4.2": {
+    "number": "2.2.1.4.2",
+    "title": "Transverse Flue Spaces a Nominal 2 ft (0.6 m) Apart: Where the horizontal distance between",
+    "parent": "2.2.1.4",
+    "children": [],
+    "start_page": 16,
+    "end_page": 17
+  },
+  "2.2.1.4.3": {
+    "number": "2.2.1.4.3",
+    "title": "Transverse Flue Spaces a Nominal 4 ft (1.2 m) Apart: Where the horizontal distance between",
+    "parent": "2.2.1.4",
+    "children": [],
+    "start_page": 17,
+    "end_page": 17
+  },
+  "2.2.1.4.4": {
+    "number": "2.2.1.4.4",
+    "title": "Transverse Flue Spaces a Nominal 10 ft (3.0 m) Apart: Where the horizontal distance between",
+    "parent": "2.2.1.4",
+    "children": [],
+    "start_page": 17,
+    "end_page": 17
+  },
+  "2.2.1.4.5": {
+    "number": "2.2.1.4.5",
+    "title": "In-rack sprinklers and vertical barriers are needed when the guidelines indicated in Sections",
+    "parent": "2.2.1.4",
+    "children": [],
+    "start_page": 17,
+    "end_page": 17
+  },
+  "2.2.1.4.6": {
+    "number": "2.2.1.4.6",
+    "title": "When Section 2.2.1.4.5 indicates that vertical barriers are needed, install the vertical barriers at",
+    "parent": "2.2.1.4",
+    "children": [],
+    "start_page": 17,
+    "end_page": 17
+  },
+  "2.2.1.5": {
+    "number": "2.2.1.5",
+    "title": "General Protection Guidelines for Horizontal-Loading ASRS Storage Arrangements2.2.1.5.1 Sprinkler System Types",
+    "parent": "2.2.1",
+    "children": [
+      "2.2.1.5.1.1",
+      "2.2.1.5.1.2",
+      "2.2.1.5.2"
+    ],
+    "start_page": 17,
+    "end_page": 17
+  },
+  "2.2.1.5.1.1": {
+    "number": "2.2.1.5.1.1",
+    "title": "Ceiling-Level Sprinkler System Types",
+    "parent": "2.2.1.5",
+    "children": [],
+    "start_page": 17,
+    "end_page": 18
+  },
+  "2.2.1.5.1.2": {
+    "number": "2.2.1.5.1.2",
+    "title": "In-Rack Sprinkler System Types",
+    "parent": "2.2.1.5",
+    "children": [],
+    "start_page": 18,
+    "end_page": 18
+  },
+  "2.2.1.5.2": {
+    "number": "2.2.1.5.2",
+    "title": "Sprinklers",
+    "parent": "2.2.1.5",
+    "children": [
+      "2.2.1.5.2.1",
+      "2.2.1.5.2.2"
+    ],
+    "start_page": 18,
+    "end_page": 18
+  },
+  "2.2.1.5.2.1": {
+    "number": "2.2.1.5.2.1",
+    "title": "Ceiling-Level SprinklersInstall FM Approved, Storage ceiling-level sprinklers having the attributes indicated in the applicable",
+    "parent": "2.2.1.5.2",
+    "children": [],
+    "start_page": 18,
+    "end_page": 18
+  },
+  "2.2.1.5.2.2": {
+    "number": "2.2.1.5.2.2",
+    "title": "In-Rack SprinklersWhen in-rack sprinklers are required, install FM Approved, quick-response, 160\u00baF (70\u00baC) nominally rated,",
+    "parent": "2.2.1.5.2",
+    "children": [],
+    "start_page": 18,
+    "end_page": 18
+  },
+  "2.2.1.6": {
+    "number": "2.2.1.6",
+    "title": "Hose Demand Design and Water Supply Duration for Horizontal-Loading ASRS Storage",
+    "parent": "2.2.1",
+    "children": [],
+    "start_page": 18,
+    "end_page": 19
+  },
+  "2.2.1.7": {
+    "number": "2.2.1.7",
+    "title": "Fire Detection for Horizontal-Loading ASRS Storage Arrangements",
+    "parent": "2.2.1",
+    "children": [
+      "2.2.1.7.1",
+      "2.2.1.7.2",
+      "2.2.1.7.3",
+      "2.2.1.7.4"
+    ],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.7.1": {
+    "number": "2.2.1.7.1",
+    "title": "Install a FM Approved ceiling-level fire detection system over the horizontal-loading ASRS storage",
+    "parent": "2.2.1.7",
+    "children": [],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.7.2": {
+    "number": "2.2.1.7.2",
+    "title": "When the ceiling construction over the storage area is considered obstructed per Data Sheet 2-0,",
+    "parent": "2.2.1.7",
+    "children": [],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.7.3": {
+    "number": "2.2.1.7.3",
+    "title": "Arrange the fire detection system upon activation to:",
+    "parent": "2.2.1.7",
+    "children": [],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.7.4": {
+    "number": "2.2.1.7.4",
+    "title": "A ceiling-level fire detection system over the horizontal-loading ASRS storage area is not needed",
+    "parent": "2.2.1.7",
+    "children": [],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.8": {
+    "number": "2.2.1.8",
+    "title": "Final Extinguishment: Small Hose Connection Stations",
+    "parent": "2.2.1",
+    "children": [
+      "2.2.1.8.1",
+      "2.2.1.8.2",
+      "2.2.1.8.3",
+      "2.2.1.8.4"
+    ],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.8.1": {
+    "number": "2.2.1.8.1",
+    "title": "To aid in manual firefighting efforts and after-extinguishment mop-up operations, install small hose",
+    "parent": "2.2.1.8",
+    "children": [],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.8.2": {
+    "number": "2.2.1.8.2",
+    "title": "Design the small hose connection station system to provide a minimum flow of 50 gpm (190 L/min)",
+    "parent": "2.2.1.8",
+    "children": [],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.8.3": {
+    "number": "2.2.1.8.3",
+    "title": "Arrange the water supplies feeding these stations in one of the following ways:",
+    "parent": "2.2.1.8",
+    "children": [],
+    "start_page": 19,
+    "end_page": 19
+  },
+  "2.2.1.8.4": {
+    "number": "2.2.1.8.4",
+    "title": "The installation of small hose connection stations can be avoided:",
+    "parent": "2.2.1.8",
+    "children": [],
+    "start_page": 19,
+    "end_page": 20
+  },
+  "2.2.2": {
+    "number": "2.2.2",
+    "title": "Protection of Horizontal-Loading Shuttle ASRS Storage Arrangements Where Closed-Top,",
+    "parent": "2.2",
+    "children": [
+      "2.2.2.1",
+      "2.2.2.2"
+    ],
+    "start_page": 20,
+    "end_page": 20
+  },
+  "2.2.2.1": {
+    "number": "2.2.2.1",
+    "title": "Protection of Horizontal-Loading Shuttle ASRS Storage Arrangements Where Closed-Top,",
+    "parent": "2.2.2",
+    "children": [
+      "2.2.2.1.1",
+      "2.2.2.1.2"
+    ],
+    "start_page": 20,
+    "end_page": 20
+  },
+  "2.2.2.1.1": {
+    "number": "2.2.2.1.1",
+    "title": "Automatic sprinkler protection can be designed for the surrounding occupancy hazard when",
+    "parent": "2.2.2.1",
+    "children": [],
+    "start_page": 20,
+    "end_page": 20
+  },
+  "2.2.2.1.2": {
+    "number": "2.2.2.1.2",
+    "title": "Where closed-top, noncombustible, solid-walled containers are being used, but not throughout the",
+    "parent": "2.2.2.1",
+    "children": [],
+    "start_page": 20,
+    "end_page": 20
+  },
+  "2.2.2.2": {
+    "number": "2.2.2.2",
+    "title": "Protection of Horizontal-Loading, Shuttle ASRS Storage Arrangements Where FM Approved,",
+    "parent": "2.2.2",
+    "children": [],
+    "start_page": 20,
+    "end_page": 1
+  },
+  "2.2.3.1": {
+    "number": "2.2.3.1",
+    "title": "Ceiling-Only Sprinkler System Design Criteria for Closed-Top Combustible Containers, or",
+    "parent": "2.2.3",
+    "children": [
+      "2.2.3.1.1",
+      "2.2.3.1.2",
+      "2.2.3.1.3",
+      "2.2.3.1.4"
+    ],
+    "start_page": 20,
+    "end_page": 20
+  },
+  "2.2.3.1.1": {
+    "number": "2.2.3.1.1",
+    "title": "A ceiling-only sprinkler system protection scheme is possible when:",
+    "parent": "2.2.3.1",
+    "children": [],
+    "start_page": 20,
+    "end_page": 21
+  },
+  "2.2.3.1.2": {
+    "number": "2.2.3.1.2",
+    "title": "When a ceiling-only protection scheme is acceptable per items (1) through (5) in Section 2.2.3.1.1,",
+    "parent": "2.2.3.1",
+    "children": [],
+    "start_page": 21,
+    "end_page": 21
+  },
+  "2.2.3.1.3": {
+    "number": "2.2.3.1.3",
+    "title": "See Section 2.2.1.6 to determine the ceiling sprinkler\u2019s hose demand design and water supply",
+    "parent": "2.2.3.1",
+    "children": [],
+    "start_page": 21,
+    "end_page": 21
+  },
+  "2.2.3.1.4": {
+    "number": "2.2.3.1.4",
+    "title": "See Section 2.1.4.5.4 to determine the number of sprinklers per branch line for ceiling-level sprinkler",
+    "parent": "2.2.3.1",
+    "children": [],
+    "start_page": 21,
+    "end_page": 31
+  },
+  "2.2.3.2": {
+    "number": "2.2.3.2",
+    "title": "Ceiling and In-Rack Sprinkler System Design Criteria for Closed-Top Combustible Containers,",
+    "parent": "2.2.3",
+    "children": [],
+    "start_page": 31,
+    "end_page": 31
+  },
+  "2.2.3.2.1": {
+    "number": "2.2.3.2.1",
+    "title": "Horizontal Arrangement of In-Rack Sprinklers for the Protection of Closed-Top Combustible",
+    "parent": "2.2.3",
+    "children": [],
+    "start_page": 31,
+    "end_page": 36
+  },
+  "2.2.3.2.2": {
+    "number": "2.2.3.2.2",
+    "title": "Vertical Location of In-Rack Sprinklers and In-Rack Sprinkler System Designs for the",
+    "parent": "2.2.3",
+    "children": [
+      "2.2.3.2.2.1",
+      "2.2.3.2.2.2"
+    ],
+    "start_page": 36,
+    "end_page": 36
+  },
+  "2.2.3.2.2.1": {
+    "number": "2.2.3.2.2.1",
+    "title": "Storage Racks Not Requiring Vertical Barriers",
+    "parent": "2.2.3.2.2",
+    "children": [],
+    "start_page": 36,
+    "end_page": 36
+  },
+  "2.2.3.2.2.2": {
+    "number": "2.2.3.2.2.2",
+    "title": "Storage Racks Requiring Vertical BarriersWhen Section 2.2.1.4 indicates that vertical barriers are required due to the lack of acceptable transverse",
+    "parent": "2.2.3.2.2",
+    "children": [],
+    "start_page": 36,
+    "end_page": 44
+  },
+  "2.2.3.2.3": {
+    "number": "2.2.3.2.3",
+    "title": "Ceiling Sprinkler System Designs in Combination with In-Rack Sprinklers for the Protection",
+    "parent": "2.2.3",
+    "children": [
+      "2.2.3.2.3.1",
+      "2.2.3.2.3.2",
+      "2.2.3.2.3.3",
+      "2.2.3.2.3.4",
+      "2.2.3.2.3.5"
+    ],
+    "start_page": 44,
+    "end_page": 44
+  },
+  "2.2.3.2.3.1": {
+    "number": "2.2.3.2.3.1",
+    "title": "For wet ceiling sprinkler systems, when Table 15 or Section 2.2.3.2.2.2 indicates the storage height",
+    "parent": "2.2.3.2.3",
+    "children": [],
+    "start_page": 44,
+    "end_page": 44
+  },
+  "2.2.3.2.3.2": {
+    "number": "2.2.3.2.3.2",
+    "title": "For wet ceiling sprinkler systems, when Section 2.2.3.2.2.2 is not applicable and Table 15 does",
+    "parent": "2.2.3.2.3",
+    "children": [],
+    "start_page": 44,
+    "end_page": 44
+  },
+  "2.2.3.2.3.3": {
+    "number": "2.2.3.2.3.3",
+    "title": "For dry ceiling sprinkler systems, use Table 18 to determine how to obtain the ceiling sprinkler",
+    "parent": "2.2.3.2.3",
+    "children": [],
+    "start_page": 44,
+    "end_page": 44
+  },
+  "2.2.3.2.3.4": {
+    "number": "2.2.3.2.3.4",
+    "title": "See Section 2.2.1.6 to determine the ceiling sprinkler\u2019s hose demand design and water supply",
+    "parent": "2.2.3.2.3",
+    "children": [],
+    "start_page": 44,
+    "end_page": 44
+  },
+  "2.2.3.2.3.5": {
+    "number": "2.2.3.2.3.5",
+    "title": "See Section 2.1.4.5.4 to determine the number of sprinklers per branch line for ceiling-level",
+    "parent": "2.2.3.2.3",
+    "children": [],
+    "start_page": 44,
+    "end_page": 1
+  },
+  "2.2.4.1": {
+    "number": "2.2.4.1",
+    "title": "Ceiling-Only Sprinkler System Design Criteria for Horizontal-Loading Shuttle ASRS Storage",
+    "parent": "2.2.4",
+    "children": [
+      "2.2.4.1.1",
+      "2.2.4.1.2",
+      "2.2.4.1.3",
+      "2.2.4.1.4"
+    ],
+    "start_page": 48,
+    "end_page": 48
+  },
+  "2.2.4.1.1": {
+    "number": "2.2.4.1.1",
+    "title": "A ceiling-only sprinkler system protection scheme is possible when:",
+    "parent": "2.2.4.1",
+    "children": [],
+    "start_page": 48,
+    "end_page": 48
+  },
+  "2.2.4.1.2": {
+    "number": "2.2.4.1.2",
+    "title": "When a ceiling-only protection scheme is acceptable per items (1) through (4) in Section 2.2.4.1.1,",
+    "parent": "2.2.4.1",
+    "children": [],
+    "start_page": 48,
+    "end_page": 50
+  },
+  "2.2.4.1.3": {
+    "number": "2.2.4.1.3",
+    "title": "See Section 2.2.1.6 to determine the ceiling sprinkler\u2019s hose demand design and water supply",
+    "parent": "2.2.4.1",
+    "children": [],
+    "start_page": 50,
+    "end_page": 50
+  },
+  "2.2.4.1.4": {
+    "number": "2.2.4.1.4",
+    "title": "See Section 2.1.4.5.4 to determine the number of sprinklers per branch line for ceiling-level sprinkler",
+    "parent": "2.2.4.1",
+    "children": [],
+    "start_page": 50,
+    "end_page": 50
+  },
+  "2.2.4.2": {
+    "number": "2.2.4.2",
+    "title": "Ceiling and In-Rack Sprinkler System Design Criteria for Horizontal-Loading Shuttle ASRS",
+    "parent": "2.2.4",
+    "children": [],
+    "start_page": 50,
+    "end_page": 50
+  },
+  "2.2.4.2.1": {
+    "number": "2.2.4.2.1",
+    "title": "Horizontal Arrangement of In-Rack Sprinklers for the Protection of Open-Top, Combustible",
+    "parent": "2.2.4",
+    "children": [],
+    "start_page": 50,
+    "end_page": 50
+  },
+  "2.2.4.2.2": {
+    "number": "2.2.4.2.2",
+    "title": "Vertical Location of In-Rack Sprinklers and In-Rack Sprinkler System Designs for the",
+    "parent": "2.2.4",
+    "children": [
+      "2.2.4.2.2.1",
+      "2.2.4.2.2.2"
+    ],
+    "start_page": 50,
+    "end_page": 50
+  },
+  "2.2.4.2.2.1": {
+    "number": "2.2.4.2.2.1",
+    "title": "Storage Racks Not Requiring Vertical Barriers",
+    "parent": "2.2.4.2.2",
+    "children": [],
+    "start_page": 50,
+    "end_page": 52
+  },
+  "2.2.4.2.2.2": {
+    "number": "2.2.4.2.2.2",
+    "title": "Storage Racks Requiring Vertical Barriers",
+    "parent": "2.2.4.2.2",
+    "children": [],
+    "start_page": 52,
+    "end_page": 59
+  },
+  "2.2.4.2.3": {
+    "number": "2.2.4.2.3",
+    "title": "Ceiling Sprinkler System Designs in Combination with In-Rack Sprinklers for the Protection",
+    "parent": "2.2.4",
+    "children": [
+      "2.2.4.2.3.1",
+      "2.2.4.2.3.2",
+      "2.2.4.2.3.3",
+      "2.2.4.2.3.4",
+      "2.2.4.2.3.5"
+    ],
+    "start_page": 59,
+    "end_page": 59
+  },
+  "2.2.4.2.3.1": {
+    "number": "2.2.4.2.3.1",
+    "title": "Use Table 24 to determine the wet ceiling-level sprinkler system designs in combination with",
+    "parent": "2.2.4.2.3",
+    "children": [],
+    "start_page": 59,
+    "end_page": 59
+  },
+  "2.2.4.2.3.2": {
+    "number": "2.2.4.2.3.2",
+    "title": "Use Table 25 to determine the dry ceiling-level sprinkler system designs in combination with in-rack",
+    "parent": "2.2.4.2.3",
+    "children": [],
+    "start_page": 59,
+    "end_page": 59
+  },
+  "2.2.4.2.3.3": {
+    "number": "2.2.4.2.3.3",
+    "title": "The ceiling-level sprinkler system designs in Tables 24 and 25 are determined using the vertical",
+    "parent": "2.2.4.2.3",
+    "children": [],
+    "start_page": 59,
+    "end_page": 59
+  },
+  "2.2.4.2.3.4": {
+    "number": "2.2.4.2.3.4",
+    "title": "See Section 2.2.1.6 to determine the ceiling sprinkler\u2019s hose demand design and water supply",
+    "parent": "2.2.4.2.3",
+    "children": [],
+    "start_page": 59,
+    "end_page": 59
+  },
+  "2.2.4.2.3.5": {
+    "number": "2.2.4.2.3.5",
+    "title": "See Section 2.1.4.5.4 to determine the number of sprinklers per branch line for ceiling-level",
+    "parent": "2.2.4.2.3",
+    "children": [],
+    "start_page": 59,
+    "end_page": 1
+  },
+  "11.2": {
+    "number": "11.2",
+    "title": "(160) 16.8 (240) 25.2 (360) 33.6 (480)",
+    "parent": "11",
+    "children": [],
+    "start_page": 61,
+    "end_page": 119
+  },
+  "11": {
+    "number": "11",
+    "title": "",
+    "parent": null,
+    "children": [
+      "11.2"
+    ],
+    "start_page": null,
+    "end_page": null
+  },
+  "2.2.5.1": {
+    "number": "2.2.5.1",
+    "title": "Protection of Horizontal-Loading, Mini-Load ASRS Storage Arrangements Where Closed-Top,",
+    "parent": "2.2.5",
+    "children": [
+      "2.2.5.1.1",
+      "2.2.5.1.2"
+    ],
+    "start_page": 61,
+    "end_page": 61
+  },
+  "2.2.5.1.1": {
+    "number": "2.2.5.1.1",
+    "title": "Automatic sprinkler protection can be designed for the surrounding occupancy hazard when",
+    "parent": "2.2.5.1",
+    "children": [],
+    "start_page": 61,
+    "end_page": 61
+  },
+  "2.2.5.1.2": {
+    "number": "2.2.5.1.2",
+    "title": "Where closed-top, noncombustible, solid-walled containers are to be used, but not throughout the",
+    "parent": "2.2.5.1",
+    "children": [],
+    "start_page": 61,
+    "end_page": 61
+  },
+  "2.2.5.2": {
+    "number": "2.2.5.2",
+    "title": "Protection of Horizontal-Loading, Mini-Load ASRS Storage Arrangements Where FM Approved,",
+    "parent": "2.2.5",
+    "children": [],
+    "start_page": 61,
+    "end_page": 1
+  },
+  "2.2.6.1": {
+    "number": "2.2.6.1",
+    "title": "Ceiling-Only Sprinkler System Design Criteria for Closed-Top Combustible Containers, or",
+    "parent": "2.2.6",
+    "children": [
+      "2.2.6.1.1",
+      "2.2.6.1.2",
+      "2.2.6.1.3",
+      "2.2.6.1.4"
+    ],
+    "start_page": 61,
+    "end_page": 61
+  },
+  "2.2.6.1.1": {
+    "number": "2.2.6.1.1",
+    "title": "A ceiling-only sprinkler system protection scheme is possible when:",
+    "parent": "2.2.6.1",
+    "children": [],
+    "start_page": 61,
+    "end_page": 62
+  },
+  "2.2.6.1.2": {
+    "number": "2.2.6.1.2",
+    "title": "When a ceiling-only protection scheme is acceptable per items (1) through (6) in Section 2.2.6.1.1,",
+    "parent": "2.2.6.1",
+    "children": [],
+    "start_page": 62,
+    "end_page": 62
+  },
+  "2.2.6.1.3": {
+    "number": "2.2.6.1.3",
+    "title": "See Section 2.2.1.6 to determine the ceiling sprinkler\u2019s hose demand design and water supply",
+    "parent": "2.2.6.1",
+    "children": [],
+    "start_page": 62,
+    "end_page": 62
+  },
+  "2.2.6.1.4": {
+    "number": "2.2.6.1.4",
+    "title": "See Section 2.1.4.5.4 to determine the number of sprinklers per branch line for ceiling-level sprinkler",
+    "parent": "2.2.6.1",
+    "children": [],
+    "start_page": 62,
+    "end_page": 66
+  },
+  "2.2.6.2": {
+    "number": "2.2.6.2",
+    "title": "Ceiling and In-Rack Sprinkler System Design Criteria for Closed-Top Containers, or Storage",
+    "parent": "2.2.6",
+    "children": [],
+    "start_page": 66,
+    "end_page": 66
+  },
+  "2.2.6.2.1": {
+    "number": "2.2.6.2.1",
+    "title": "Horizontal Arrangement of In-Rack Sprinklers for Closed-Top Containers, or Storage on Trays",
+    "parent": "2.2.6",
+    "children": [],
+    "start_page": 66,
+    "end_page": 70
+  },
+  "2.2.6.2.2": {
+    "number": "2.2.6.2.2",
+    "title": "Vertical Location of In-Rack Sprinklers and In-Rack Sprinkler System Designs for the",
+    "parent": "2.2.6",
+    "children": [
+      "2.2.6.2.2.1",
+      "2.2.6.2.2.2"
+    ],
+    "start_page": 70,
+    "end_page": 70
+  },
+  "2.2.6.2.2.1": {
+    "number": "2.2.6.2.2.1",
+    "title": "Storage Racks Not Requiring Vertical Barriers1. When Section 2.2.1.4 indicates that vertical barriers are not required due to transverse flue spaces being",
+    "parent": "2.2.6.2.2",
+    "children": [],
+    "start_page": 70,
+    "end_page": 70
+  },
+  "2.2.6.2.2.2": {
+    "number": "2.2.6.2.2.2",
+    "title": "Storage Racks Requiring Vertical BarriersWhen Section 2.2.1.4 indicates that vertical barriers are required due to the lack of acceptable transverse",
+    "parent": "2.2.6.2.2",
+    "children": [],
+    "start_page": 70,
+    "end_page": 73
+  },
+  "2.2.6.2.3": {
+    "number": "2.2.6.2.3",
+    "title": "Ceiling Sprinkler System Designs in Combination with In-Rack Sprinklers for the Protection",
+    "parent": "2.2.6",
+    "children": [
+      "2.2.6.2.3.1",
+      "2.2.6.2.3.2",
+      "2.2.6.2.3.3",
+      "2.2.6.2.3.4"
+    ],
+    "start_page": 73,
+    "end_page": 73
+  },
+  "2.2.6.2.3.1": {
+    "number": "2.2.6.2.3.1",
+    "title": "Use Table 34 to determine how to obtain the ceiling sprinkler system design for a wet ceiling",
+    "parent": "2.2.6.2.3",
+    "children": [],
+    "start_page": 73,
+    "end_page": 73
+  },
+  "2.2.6.2.3.2": {
+    "number": "2.2.6.2.3.2",
+    "title": "Use Table 35 to determine how to obtain the ceiling sprinkler system design for a dry ceiling",
+    "parent": "2.2.6.2.3",
+    "children": [],
+    "start_page": 73,
+    "end_page": 73
+  },
+  "2.2.6.2.3.3": {
+    "number": "2.2.6.2.3.3",
+    "title": "See Section 2.2.1.6 to determine the ceiling sprinkler\u2019s hose demand design and water supply",
+    "parent": "2.2.6.2.3",
+    "children": [],
+    "start_page": 73,
+    "end_page": 73
+  },
+  "2.2.6.2.3.4": {
+    "number": "2.2.6.2.3.4",
+    "title": "See Section 2.1.4.5.4 to determine the number of sprinklers per branch line for ceiling-level",
+    "parent": "2.2.6.2.3",
+    "children": [],
+    "start_page": 73,
+    "end_page": 1
+  },
+  "2.2.7.1": {
+    "number": "2.2.7.1",
+    "title": "Ceiling-Only Sprinkler System Design Criteria for Horizontal-Loading, Mini-Load ASRS Storage",
+    "parent": "2.2.7",
+    "children": [
+      "2.2.7.1.1",
+      "2.2.7.1.2",
+      "2.2.7.1.3",
+      "2.2.7.1.4"
+    ],
+    "start_page": 75,
+    "end_page": 75
+  },
+  "2.2.7.1.1": {
+    "number": "2.2.7.1.1",
+    "title": "A ceiling-only sprinkler system protection scheme is possible when:",
+    "parent": "2.2.7.1",
+    "children": [],
+    "start_page": 75,
+    "end_page": 76
+  },
+  "2.2.7.1.2": {
+    "number": "2.2.7.1.2",
+    "title": "When a ceiling-only protection scheme is acceptable per items (1) through (4) in Section 2.2.7.1.1,",
+    "parent": "2.2.7.1",
+    "children": [],
+    "start_page": 76,
+    "end_page": 78
+  },
+  "2.2.7.1.3": {
+    "number": "2.2.7.1.3",
+    "title": "See Section 2.2.1.6 to determine the ceiling sprinkler\u2019s hose demand design and water supply",
+    "parent": "2.2.7.1",
+    "children": [],
+    "start_page": 78,
+    "end_page": 78
+  },
+  "2.2.7.1.4": {
+    "number": "2.2.7.1.4",
+    "title": "See Section 2.1.4.5.4 to determine the number of sprinklers per branch line for ceiling-level sprinkler",
+    "parent": "2.2.7.1",
+    "children": [],
+    "start_page": 78,
+    "end_page": 78
+  },
+  "2.2.7.2": {
+    "number": "2.2.7.2",
+    "title": "Ceiling and In-Rack Sprinkler System Design Criteria for Horizontal-Loading, Mini-Load ASRS",
+    "parent": "2.2.7",
+    "children": [],
+    "start_page": 78,
+    "end_page": 78
+  },
+  "2.2.7.2.1": {
+    "number": "2.2.7.2.1",
+    "title": "Horizontal Arrangement of In-Rack Sprinklers for the Protection of Open-Top, Combustible",
+    "parent": "2.2.7",
+    "children": [],
+    "start_page": 78,
+    "end_page": 79
+  },
+  "2.2.7.2.2": {
+    "number": "2.2.7.2.2",
+    "title": "Vertical Location of In-Rack Sprinklers and In-Rack Sprinkler System Designs for the",
+    "parent": "2.2.7",
+    "children": [
+      "2.2.7.2.2.1",
+      "2.2.7.2.2.2"
+    ],
+    "start_page": 79,
+    "end_page": 79
+  },
+  "2.2.7.2.2.1": {
+    "number": "2.2.7.2.2.1",
+    "title": "Storage Racks Not Requiring Vertical Barriers",
+    "parent": "2.2.7.2.2",
+    "children": [],
+    "start_page": 79,
+    "end_page": 80
+  },
+  "2.2.7.2.2.2": {
+    "number": "2.2.7.2.2.2",
+    "title": "Storage Racks Requiring Vertical BarriersWhen Section 2.2.1.4 indicates that vertical barriers are required due to the lack of acceptable transverse",
+    "parent": "2.2.7.2.2",
+    "children": [],
+    "start_page": 80,
+    "end_page": 86
+  },
+  "2.2.7.2.3": {
+    "number": "2.2.7.2.3",
+    "title": "Ceiling Sprinkler System Designs in Combination with In-Rack Sprinklers for the Protection",
+    "parent": "2.2.7",
+    "children": [
+      "2.2.7.2.3.1",
+      "2.2.7.2.3.2",
+      "2.2.7.2.3.3",
+      "2.2.7.2.3.4",
+      "2.2.7.2.3.5"
+    ],
+    "start_page": 86,
+    "end_page": 86
+  },
+  "2.2.7.2.3.1": {
+    "number": "2.2.7.2.3.1",
+    "title": "Use Table 41 to determine the wet ceiling-level sprinkler system designs in combination with",
+    "parent": "2.2.7.2.3",
+    "children": [],
+    "start_page": 86,
+    "end_page": 86
+  },
+  "2.2.7.2.3.2": {
+    "number": "2.2.7.2.3.2",
+    "title": "Use Table 42 to determine the dry ceiling-level sprinkler system designs in combination with in-rack",
+    "parent": "2.2.7.2.3",
+    "children": [],
+    "start_page": 86,
+    "end_page": 86
+  },
+  "2.2.7.2.3.3": {
+    "number": "2.2.7.2.3.3",
+    "title": "The ceiling-level sprinkler system designs in Tables 41 and 42 are determined using the vertical",
+    "parent": "2.2.7.2.3",
+    "children": [],
+    "start_page": 86,
+    "end_page": 86
+  },
+  "2.2.7.2.3.4": {
+    "number": "2.2.7.2.3.4",
+    "title": "See Section 2.2.1.6 to determine the ceiling sprinkler\u2019s hose demand design and water supply",
+    "parent": "2.2.7.2.3",
+    "children": [],
+    "start_page": 86,
+    "end_page": 86
+  },
+  "2.2.7.2.3.5": {
+    "number": "2.2.7.2.3.5",
+    "title": "See Section 2.1.4.5.4 to determine the number of sprinklers per branch line for ceiling-level",
+    "parent": "2.2.7.2.3",
+    "children": [],
+    "start_page": 86,
+    "end_page": 1
+  },
+  "2.3.1.1": {
+    "number": "2.3.1.1",
+    "title": "This section provides protection guidelines for TL-ASRS storage arrangements that use open-top,",
+    "parent": "2.3.1",
+    "children": [],
+    "start_page": 88,
+    "end_page": 88
+  },
+  "2.3.1.2": {
+    "number": "2.3.1.2",
+    "title": "What differentiates this storage arrangement from other ASRS storage arrangements is that the",
+    "parent": "2.3.1",
+    "children": [],
+    "start_page": 88,
+    "end_page": 88
+  },
+  "2.3.2": {
+    "number": "2.3.2",
+    "title": "Drainage",
+    "parent": "2.3",
+    "children": [
+      "2.3.2.1",
+      "2.3.2.2"
+    ],
+    "start_page": 88,
+    "end_page": 88
+  },
+  "2.3.2.1": {
+    "number": "2.3.2.1",
+    "title": "Due to the expected water application duration during a fire event, when possible provide minimum",
+    "parent": "2.3.2",
+    "children": [],
+    "start_page": 88,
+    "end_page": 88
+  },
+  "2.3.2.2": {
+    "number": "2.3.2.2",
+    "title": "The guidelines for drainage in Section 2.3.2.1 are not required when noncombustible solid-walled",
+    "parent": "2.3.2",
+    "children": [],
+    "start_page": 88,
+    "end_page": 1
+  },
+  "2.3.3.2": {
+    "number": "2.3.3.2",
+    "title": "Robot Holding Areas",
+    "parent": "2.3.3",
+    "children": [
+      "2.3.3.2.1",
+      "2.3.3.2.2"
+    ],
+    "start_page": 88,
+    "end_page": 88
+  },
+  "2.3.3.2.1": {
+    "number": "2.3.3.2.1",
+    "title": "Establish designated \u201cRobot Holding Areas\u201d anywhere on the storage grid to which all robots can",
+    "parent": "2.3.3.2",
+    "children": [],
+    "start_page": 88,
+    "end_page": 88
+  },
+  "2.3.3.2.2": {
+    "number": "2.3.3.2.2",
+    "title": "Do not designate areas directly above storage grid area access points as Robot Holding Areas.2.3.3.2.3 Maintain the storage columns directly below the Robot Holding Areas free of combustible storage.2.3.3.2.4 The guidelines for Robot Holding Areas are not required when noncombustible solid-walled",
+    "parent": "2.3.3.2",
+    "children": [],
+    "start_page": 88,
+    "end_page": 8
+  },
+  "2.3.4.1": {
+    "number": "2.3.4.1",
+    "title": "Install a FM Approved ceiling-level very early warning fire detection system over the storage array",
+    "parent": "2.3.4",
+    "children": [],
+    "start_page": 88,
+    "end_page": 89
+  },
+  "2.3.4.2": {
+    "number": "2.3.4.2",
+    "title": "When the ceiling construction over the storage array is considered unobstructed per Data Sheet 2-0,",
+    "parent": "2.3.4",
+    "children": [],
+    "start_page": 89,
+    "end_page": 89
+  },
+  "2.3.4.3": {
+    "number": "2.3.4.3",
+    "title": "When the ceiling construction over the storage array is considered obstructed per Data Sheet 2-0,",
+    "parent": "2.3.4",
+    "children": [],
+    "start_page": 89,
+    "end_page": 89
+  },
+  "2.3.4.4": {
+    "number": "2.3.4.4",
+    "title": "Arrange the fire detection system upon activation to:",
+    "parent": "2.3.4",
+    "children": [],
+    "start_page": 89,
+    "end_page": 89
+  },
+  "2.3.4.5": {
+    "number": "2.3.4.5",
+    "title": "The guidelines for fire detection as outlined in Sections 2.3.4.1 through 2.3.4.4 are not required when",
+    "parent": "2.3.4",
+    "children": [],
+    "start_page": 89,
+    "end_page": 1
+  },
+  "2.3.5.1.1": {
+    "number": "2.3.5.1.1",
+    "title": "Depending on the ambient temperature of the ASRS area being protected, ceiling-level sprinkler",
+    "parent": "2.3.5",
+    "children": [],
+    "start_page": 89,
+    "end_page": 90
+  },
+  "2.3.5.1.2": {
+    "number": "2.3.5.1.2",
+    "title": "The maximum water delivery time for all dry-pipe and similar sprinkler systems is 40 seconds upon",
+    "parent": "2.3.5",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.1.3": {
+    "number": "2.3.5.1.3",
+    "title": "When installing a preaction or refrigerated area sprinkler system, see Data Sheet 5-48, Automatic",
+    "parent": "2.3.5",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.1.4": {
+    "number": "2.3.5.1.4",
+    "title": "Ceiling sprinkler designs for single-interlocked preaction sprinkler systems can be either classified",
+    "parent": "2.3.5",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.1.5": {
+    "number": "2.3.5.1.5",
+    "title": "A ceiling-level sprinkler system consisting of 20% to 30% concentration of propylene glycol in water",
+    "parent": "2.3.5",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.1.6": {
+    "number": "2.3.5.1.6",
+    "title": "When installing an antifreeze sprinkler system consisting of a 20% to 30% concentration of",
+    "parent": "2.3.5",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.1.7": {
+    "number": "2.3.5.1.7",
+    "title": "See Data Sheet 2-0 for additional recommendations related to the installation of all sprinkler system",
+    "parent": "2.3.5",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.2": {
+    "number": "2.3.5.2",
+    "title": "Ceiling-Level Sprinklers",
+    "parent": "2.3.5",
+    "children": [
+      "2.3.5.2.1",
+      "2.3.5.2.2",
+      "2.3.5.2.3"
+    ],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.2.1": {
+    "number": "2.3.5.2.1",
+    "title": "For ceiling heights up to 55 ft (16.8 m), install FM Approved Storage ceiling-level sprinklers in",
+    "parent": "2.3.5.2",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.2.2": {
+    "number": "2.3.5.2.2",
+    "title": "For ceiling heights over 55 ft (16.8 m), install a flat, continuous noncombustible false ceiling over",
+    "parent": "2.3.5.2",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.2.3": {
+    "number": "2.3.5.2.3",
+    "title": "When elevated mezzanines are present, provide sprinkler protection under them in accordance",
+    "parent": "2.3.5.2",
+    "children": [],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.3": {
+    "number": "2.3.5.3",
+    "title": "Ceiling-Level Sprinkler System Design Criteria",
+    "parent": "2.3.5",
+    "children": [
+      "2.3.5.3.1",
+      "2.3.5.3.2",
+      "2.3.5.3.3"
+    ],
+    "start_page": 90,
+    "end_page": 90
+  },
+  "2.3.5.3.1": {
+    "number": "2.3.5.3.1",
+    "title": "Use Table 43 to determine the ceiling-level sprinkler system designs for TL-ASRS storage",
+    "parent": "2.3.5.3",
+    "children": [],
+    "start_page": 90,
+    "end_page": 92
+  },
+  "2.3.5.3.2": {
+    "number": "2.3.5.3.2",
+    "title": "Hose Demand Design Guidelines",
+    "parent": "2.3.5.3",
+    "children": [],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.5.3.3": {
+    "number": "2.3.5.3.3",
+    "title": "Water Supply Duration",
+    "parent": "2.3.5.3",
+    "children": [],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6": {
+    "number": "2.3.6",
+    "title": "Protection of Combustible Solid-Walled Containers2.3.6.1 Final Extinguishment",
+    "parent": "2.3",
+    "children": [
+      "2.3.6.1.1",
+      "2.3.6.1.2",
+      "2.3.6.1.4",
+      "2.3.6.1.5",
+      "2.3.6.1.6",
+      "2.3.6.1.7",
+      "2.3.6.1.8",
+      "2.3.6.1.9",
+      "2.3.6.2",
+      "2.3.6.3",
+      "2.3.6.4"
+    ],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6.1.1": {
+    "number": "2.3.6.1.1",
+    "title": "General2.3.6.1.1.1 Due to the lack of direct access by the local fire service to the fire area, review the",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.1.1.2",
+      "2.3.6.1.1.3",
+      "2.3.6.1.1.4"
+    ],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6.1.1.2": {
+    "number": "2.3.6.1.1.2",
+    "title": "At a minimum, implement the recommendations in Sections 2.3.6.1.2, 2.3.6.1.3, and 2.3.6.1.4,",
+    "parent": "2.3.6.1.1",
+    "children": [],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6.1.1.3": {
+    "number": "2.3.6.1.1.3",
+    "title": "See Section 2.3.6.1.5 for ceiling-level protection options that will allow for the elimination of some",
+    "parent": "2.3.6.1.1",
+    "children": [],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6.1.1.4": {
+    "number": "2.3.6.1.1.4",
+    "title": "When the guidelines of Section 2.3.6.1.5 are not met, see Sections 2.3.6.1.6 through 2.3.6.1.9",
+    "parent": "2.3.6.1.1",
+    "children": [],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6.1.2": {
+    "number": "2.3.6.1.2",
+    "title": "Pre-Incident Plan2.3.6.1.2.1 For TL-ASRS storage arrangements that use solid-walled containers, establish a pre-incident",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.1.2.2"
+    ],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6.1.2.2": {
+    "number": "2.3.6.1.2.2",
+    "title": "See Section 2.1.5 for additional guidance on pre-incident planning.2.3.6.1.3 Storage ArrangementTo allow local fire service access to the fire area, arrange the TL-ASRS storage arrangement as follows:",
+    "parent": "2.3.6.1.2",
+    "children": [],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6.1.4": {
+    "number": "2.3.6.1.4",
+    "title": "Mezzanines and/or Platforms2.3.6.1.4.1 To allow local fire service access adjacent to the top of the storage grid where strategic planning",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.1.4.2",
+      "2.3.6.1.4.3",
+      "2.3.6.1.4.4"
+    ],
+    "start_page": 92,
+    "end_page": 92
+  },
+  "2.3.6.1.4.2": {
+    "number": "2.3.6.1.4.2",
+    "title": "If the horizontal distances between the ends of the storage array will exceed 100 ft (30 m) in",
+    "parent": "2.3.6.1.4",
+    "children": [],
+    "start_page": 92,
+    "end_page": 93
+  },
+  "2.3.6.1.4.3": {
+    "number": "2.3.6.1.4.3",
+    "title": "The installation of elevated mezzanines can be avoided when:",
+    "parent": "2.3.6.1.4",
+    "children": [],
+    "start_page": 93,
+    "end_page": 93
+  },
+  "2.3.6.1.4.4": {
+    "number": "2.3.6.1.4.4",
+    "title": "The installation of mezzanines and/or platforms, as well as elevated mezzanines, can be avoided",
+    "parent": "2.3.6.1.4",
+    "children": [],
+    "start_page": 93,
+    "end_page": 93
+  },
+  "2.3.6.1.5": {
+    "number": "2.3.6.1.5",
+    "title": "Alternative Ceiling-Level Sprinkler Protection Options for Final Extinguishment2.3.6.1.5.1 The recommendations offered in Section 2.3.6.1.4.2 regarding elevated mezzanines as well as",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.1.5.2",
+      "2.3.6.1.5.3",
+      "2.3.6.1.5.4",
+      "2.3.6.1.5.5",
+      "2.3.6.1.5.6",
+      "2.3.6.1.5.7",
+      "2.3.6.1.5.8"
+    ],
+    "start_page": 93,
+    "end_page": 93
+  },
+  "2.3.6.1.5.2": {
+    "number": "2.3.6.1.5.2",
+    "title": "Install a wet ceiling sprinkler system. Dry, pre-action, and anti-freeze solution sprinkler systems",
+    "parent": "2.3.6.1.5",
+    "children": [],
+    "start_page": 93,
+    "end_page": 93
+  },
+  "2.3.6.1.5.3": {
+    "number": "2.3.6.1.5.3",
+    "title": "Install FM Approved storage ceiling-level sprinklers in accordance with the design guidelines",
+    "parent": "2.3.6.1.5",
+    "children": [],
+    "start_page": 93,
+    "end_page": 94
+  },
+  "2.3.6.1.5.4": {
+    "number": "2.3.6.1.5.4",
+    "title": "Include a minimum flow of 250 gpm (950 L/min) for hose demand design.",
+    "parent": "2.3.6.1.5",
+    "children": [],
+    "start_page": 94,
+    "end_page": 94
+  },
+  "2.3.6.1.5.5": {
+    "number": "2.3.6.1.5.5",
+    "title": "Size the water supply feeding the ceiling sprinkler system for a minimum duration of two hours.",
+    "parent": "2.3.6.1.5",
+    "children": [],
+    "start_page": 94,
+    "end_page": 94
+  },
+  "2.3.6.1.5.6": {
+    "number": "2.3.6.1.5.6",
+    "title": "For ceiling sprinkler designs from Table 44 that consist of six sprinklers, base the hydraulic",
+    "parent": "2.3.6.1.5",
+    "children": [],
+    "start_page": 94,
+    "end_page": 94
+  },
+  "2.3.6.1.5.7": {
+    "number": "2.3.6.1.5.7",
+    "title": "As part of the Pre-Incident Plan, arrange for the local fire service and facility personnel to allow",
+    "parent": "2.3.6.1.5",
+    "children": [],
+    "start_page": 94,
+    "end_page": 94
+  },
+  "2.3.6.1.5.8": {
+    "number": "2.3.6.1.5.8",
+    "title": "See Data Sheet 2-0, Installation Guidelines for Automatic Sprinklers , for additional",
+    "parent": "2.3.6.1.5",
+    "children": [],
+    "start_page": 94,
+    "end_page": 95
+  },
+  "2.3.6.1.6": {
+    "number": "2.3.6.1.6",
+    "title": "Small Hose Connection Stations",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.1.6.1",
+      "2.3.6.1.6.2",
+      "2.3.6.1.6.3",
+      "2.3.6.1.6.4"
+    ],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.6.1": {
+    "number": "2.3.6.1.6.1",
+    "title": "To aid in manual fire-fighting efforts and after-extinguishment mop-up operations, consider the",
+    "parent": "2.3.6.1.6",
+    "children": [],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.6.2": {
+    "number": "2.3.6.1.6.2",
+    "title": "Design the small hose connection station system to provide a minimum flow of 50 gpm (190 L/min)",
+    "parent": "2.3.6.1.6",
+    "children": [],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.6.3": {
+    "number": "2.3.6.1.6.3",
+    "title": "Arrange the water supplies feeding these stations in one of the following ways:",
+    "parent": "2.3.6.1.6",
+    "children": [],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.6.4": {
+    "number": "2.3.6.1.6.4",
+    "title": "The installation of small hose connection stations can be avoided (if so chosen by the end user)",
+    "parent": "2.3.6.1.6",
+    "children": [],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.7": {
+    "number": "2.3.6.1.7",
+    "title": "Vertical Barriers2.3.6.1.7.1 To assist with firefighting efforts, consider the installation of vertical barriers throughout the ASRS",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.1.7.2",
+      "2.3.6.1.7.3",
+      "2.3.6.1.7.4",
+      "2.3.6.1.7.5"
+    ],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.7.2": {
+    "number": "2.3.6.1.7.2",
+    "title": "Arrange the vertical barriers to limit the subdivided storage area to a maximum size of 1,000 ft",
+    "parent": "2.3.6.1.7",
+    "children": [],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.7.3": {
+    "number": "2.3.6.1.7.3",
+    "title": "Maintain one row of storage on one side and adjacent to each of the vertical barriers free of",
+    "parent": "2.3.6.1.7",
+    "children": [],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.7.4": {
+    "number": "2.3.6.1.7.4",
+    "title": "To aid with access to the fire area, limit the number of vertical barriers for each subdivided area",
+    "parent": "2.3.6.1.7",
+    "children": [],
+    "start_page": 95,
+    "end_page": 95
+  },
+  "2.3.6.1.7.5": {
+    "number": "2.3.6.1.7.5",
+    "title": "Vertical barriers would be considered redundant with protection installed in accordance with",
+    "parent": "2.3.6.1.7",
+    "children": [],
+    "start_page": 95,
+    "end_page": 96
+  },
+  "2.3.6.1.8": {
+    "number": "2.3.6.1.8",
+    "title": "Fixed-In-Place Monitor Nozzle Protection",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.1.8.1",
+      "2.3.6.1.8.2",
+      "2.3.6.1.8.3",
+      "2.3.6.1.8.4",
+      "2.3.6.1.8.5",
+      "2.3.6.1.8.6",
+      "2.3.6.1.8.7"
+    ],
+    "start_page": 96,
+    "end_page": 96
+  },
+  "2.3.6.1.8.1": {
+    "number": "2.3.6.1.8.1",
+    "title": "To assist with firefighting efforts, consider the installation of fixed-in-place monitor nozzles",
+    "parent": "2.3.6.1.8",
+    "children": [],
+    "start_page": 96,
+    "end_page": 96
+  },
+  "2.3.6.1.8.2": {
+    "number": "2.3.6.1.8.2",
+    "title": "The monitor nozzles can be fixed-in-place either to the mezzanines and/or to the overhead ceiling",
+    "parent": "2.3.6.1.8",
+    "children": [],
+    "start_page": 96,
+    "end_page": 96
+  },
+  "2.3.6.1.8.3": {
+    "number": "2.3.6.1.8.3",
+    "title": "Space the monitor nozzles horizontally as follows:",
+    "parent": "2.3.6.1.8",
+    "children": [],
+    "start_page": 96,
+    "end_page": 97
+  },
+  "2.3.6.1.8.4": {
+    "number": "2.3.6.1.8.4",
+    "title": "Arrange the monitor nozzles to be capable of:",
+    "parent": "2.3.6.1.8",
+    "children": [],
+    "start_page": 97,
+    "end_page": 97
+  },
+  "2.3.6.1.8.5": {
+    "number": "2.3.6.1.8.5",
+    "title": "Design the monitor nozzle system to provide a minimum flow of 200 gpm (760 L/min) from each",
+    "parent": "2.3.6.1.8",
+    "children": [],
+    "start_page": 97,
+    "end_page": 97
+  },
+  "2.3.6.1.8.6": {
+    "number": "2.3.6.1.8.6",
+    "title": "Water supplies for the monitor nozzles can be arranged in one of the following methods:",
+    "parent": "2.3.6.1.8",
+    "children": [],
+    "start_page": 97,
+    "end_page": 97
+  },
+  "2.3.6.1.8.7": {
+    "number": "2.3.6.1.8.7",
+    "title": "Fixed-in-place monitor nozzles would be considered redundant with ceiling sprinkler protection",
+    "parent": "2.3.6.1.8",
+    "children": [],
+    "start_page": 97,
+    "end_page": 97
+  },
+  "2.3.6.1.9": {
+    "number": "2.3.6.1.9",
+    "title": "Visible or Infrared Camera Installation for Fixed-In-Place Monitor Nozzle Operation2.3.6.1.9.1 To allow for guided discharge of the monitor nozzles to the point of fire origin, install infrared (IR)",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.1.9.2",
+      "2.3.6.1.9.3",
+      "2.3.6.1.9.4",
+      "2.3.6.1.9.5"
+    ],
+    "start_page": 97,
+    "end_page": 97
+  },
+  "2.3.6.1.9.2": {
+    "number": "2.3.6.1.9.2",
+    "title": "Arrange the IR cameras as follows:Fig. 50. Example of TL-ASRS arrangement protected by fixed-in-place monitor nozzles installed on the mezzaninesTop-Loading ASRS Grid AreaMezzanine Level",
+    "parent": "2.3.6.1.9",
+    "children": [],
+    "start_page": 97,
+    "end_page": 98
+  },
+  "2.3.6.1.9.3": {
+    "number": "2.3.6.1.9.3",
+    "title": "The installation of visible imaging cameras can be used in lieu of infrared cameras when:Fig. 51. Example of TL-ASRS arrangement protected by fixed-in-place monitor nozzles installed at ceiling levelTop-Loading ASRS Grid Area",
+    "parent": "2.3.6.1.9",
+    "children": [],
+    "start_page": 98,
+    "end_page": 99
+  },
+  "2.3.6.1.9.4": {
+    "number": "2.3.6.1.9.4",
+    "title": "When permitted by Section 2.3.6.1.8.3, install visible imaging cameras over the entire storage",
+    "parent": "2.3.6.1.9",
+    "children": [],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.1.9.5": {
+    "number": "2.3.6.1.9.5",
+    "title": "When fixed-in-place monitor nozzles are being installed, the installation of IR or visible cameras",
+    "parent": "2.3.6.1.9",
+    "children": [],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.2": {
+    "number": "2.3.6.2",
+    "title": "Ceiling-Level Sprinkler System Types",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.2.1",
+      "2.3.6.2.2",
+      "2.3.6.2.3",
+      "2.3.6.2.4",
+      "2.3.6.2.5"
+    ],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.2.1": {
+    "number": "2.3.6.2.1",
+    "title": "Depending on the ambient temperature of the ASRS area being protected, ceiling-level sprinkler",
+    "parent": "2.3.6.2",
+    "children": [],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.2.2": {
+    "number": "2.3.6.2.2",
+    "title": "When installing a single-interlocked preaction sprinkler system, install the detection system used",
+    "parent": "2.3.6.2",
+    "children": [],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.2.3": {
+    "number": "2.3.6.2.3",
+    "title": "A ceiling-level sprinkler system consisting of 20% to 30% concentration of propylene glycol in water",
+    "parent": "2.3.6.2",
+    "children": [],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.2.4": {
+    "number": "2.3.6.2.4",
+    "title": "When installing an antifreeze sprinkler system consisting of a 20% to 30% concentration of",
+    "parent": "2.3.6.2",
+    "children": [],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.2.5": {
+    "number": "2.3.6.2.5",
+    "title": "See Data Sheet 2-0 for additional recommendations related to the installation of all sprinkler system",
+    "parent": "2.3.6.2",
+    "children": [],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.3": {
+    "number": "2.3.6.3",
+    "title": "Ceiling-Level Sprinklers",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.3.1",
+      "2.3.6.3.2",
+      "2.3.6.3.3"
+    ],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.3.1": {
+    "number": "2.3.6.3.1",
+    "title": "For ceiling heights up to 45 ft (13.7 m), install FM Approved, Storage ceiling-level sprinklers in",
+    "parent": "2.3.6.3",
+    "children": [],
+    "start_page": 99,
+    "end_page": 99
+  },
+  "2.3.6.3.2": {
+    "number": "2.3.6.3.2",
+    "title": "For ceiling heights over 45 ft (13.7 m), install a flat, continuous noncombustible false ceiling over",
+    "parent": "2.3.6.3",
+    "children": [],
+    "start_page": 99,
+    "end_page": 100
+  },
+  "2.3.6.3.3": {
+    "number": "2.3.6.3.3",
+    "title": "When elevated mezzanines are present, provide sprinkler protection under them in accordance",
+    "parent": "2.3.6.3",
+    "children": [],
+    "start_page": 100,
+    "end_page": 100
+  },
+  "2.3.6.4": {
+    "number": "2.3.6.4",
+    "title": "Ceiling-Level Sprinkler System Design Criteria",
+    "parent": "2.3.6",
+    "children": [
+      "2.3.6.4.1",
+      "2.3.6.4.2",
+      "2.3.6.4.3",
+      "2.3.6.4.4"
+    ],
+    "start_page": 100,
+    "end_page": 100
+  },
+  "2.3.6.4.1": {
+    "number": "2.3.6.4.1",
+    "title": "Use Table 45 to determine the ceiling-level sprinkler system designs for TL-ASRS storage",
+    "parent": "2.3.6.4",
+    "children": [],
+    "start_page": 100,
+    "end_page": 100
+  },
+  "2.3.6.4.2": {
+    "number": "2.3.6.4.2",
+    "title": "Use Table 46 to determine the ceiling-level sprinkler system designs for TL-ASRS storage",
+    "parent": "2.3.6.4",
+    "children": [],
+    "start_page": 100,
+    "end_page": 103
+  },
+  "2.3.6.4.3": {
+    "number": "2.3.6.4.3",
+    "title": "Hose Demand Design Guidelines",
+    "parent": "2.3.6.4",
+    "children": [],
+    "start_page": 103,
+    "end_page": 103
+  },
+  "2.3.6.4.4": {
+    "number": "2.3.6.4.4",
+    "title": "Water Supply DurationSize the water supply feeding the ceiling sprinkler system, the monitor nozzles, and the hose stream demand",
+    "parent": "2.3.6.4",
+    "children": [],
+    "start_page": 103,
+    "end_page": 103
+  },
+  "2.3.7": {
+    "number": "2.3.7",
+    "title": "Protection of Non-Solid-Walled Containers2.3.7.1 Storage Arrangement",
+    "parent": "2.3",
+    "children": [
+      "2.3.7.1.1",
+      "2.3.7.1.3",
+      "2.3.7.1.4",
+      "2.3.7.2",
+      "2.3.7.3",
+      "2.3.7.4",
+      "2.3.7.5",
+      "2.3.7.6",
+      "2.3.7.7"
+    ],
+    "start_page": 103,
+    "end_page": 103
+  },
+  "2.3.7.1.1": {
+    "number": "2.3.7.1.1",
+    "title": "Create individual storage subdivisions within the ASRS storage array whose storage footprints are",
+    "parent": "2.3.7",
+    "children": [],
+    "start_page": 103,
+    "end_page": 103
+  },
+  "2.3.7.1.3": {
+    "number": "2.3.7.1.3",
+    "title": "Arrange the void spaces between storage subdivisions so ceiling sprinklers are aligned, as close",
+    "parent": "2.3.7",
+    "children": [],
+    "start_page": 103,
+    "end_page": 103
+  },
+  "2.3.7.1.4": {
+    "number": "2.3.7.1.4",
+    "title": "Limit the storage within each subdivision to a maximum height of 25 ft (7.6 m).",
+    "parent": "2.3.7",
+    "children": [],
+    "start_page": 103,
+    "end_page": 103
+  },
+  "2.3.7.2": {
+    "number": "2.3.7.2",
+    "title": "Ceiling-Level Sprinkler System Types",
+    "parent": "2.3.7",
+    "children": [
+      "2.3.7.2.1",
+      "2.3.7.2.2",
+      "2.3.7.2.3",
+      "2.3.7.2.4"
+    ],
+    "start_page": 103,
+    "end_page": 103
+  },
+  "2.3.7.2.1": {
+    "number": "2.3.7.2.1",
+    "title": "Depending on the ambient temperature of the ASRS area being protected, ceiling-level sprinkler",
+    "parent": "2.3.7.2",
+    "children": [],
+    "start_page": 103,
+    "end_page": 103
+  },
+  "2.3.7.2.2": {
+    "number": "2.3.7.2.2",
+    "title": "A ceiling-level sprinkler system consisting of 20% to 30% concentration of propylene glycol in water",
+    "parent": "2.3.7.2",
+    "children": [],
+    "start_page": 103,
+    "end_page": 104
+  },
+  "2.3.7.2.3": {
+    "number": "2.3.7.2.3",
+    "title": "When installing an antifreeze sprinkler system consisting of a 20% to 30% concentration of",
+    "parent": "2.3.7.2",
+    "children": [],
+    "start_page": 104,
+    "end_page": 104
+  },
+  "2.3.7.2.4": {
+    "number": "2.3.7.2.4",
+    "title": "See Data Sheet 2-0 for additional recommendations related to the installation of these type sprinkler",
+    "parent": "2.3.7.2",
+    "children": [],
+    "start_page": 104,
+    "end_page": 105
+  },
+  "2.3.7.3": {
+    "number": "2.3.7.3",
+    "title": "Ceiling-Level Sprinklers",
+    "parent": "2.3.7",
+    "children": [
+      "2.3.7.3.1",
+      "2.3.7.3.2",
+      "2.3.7.3.3",
+      "2.3.7.3.4"
+    ],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.3.1": {
+    "number": "2.3.7.3.1",
+    "title": "For ceiling heights up to 40 ft (12.2 m), install FM Approved, quick-response, minimum K14.0 (K200)",
+    "parent": "2.3.7.3",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.3.2": {
+    "number": "2.3.7.3.2",
+    "title": "For ceiling heights over 40 ft (12.2 m) and up to 45 ft (13.7 m), install FM Approved, quick-response,",
+    "parent": "2.3.7.3",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.3.3": {
+    "number": "2.3.7.3.3",
+    "title": "For ceiling heights over 45 ft (13.7 m), install a flat, continuous noncombustible false ceiling over",
+    "parent": "2.3.7.3",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.3.4": {
+    "number": "2.3.7.3.4",
+    "title": "When elevated mezzanines are present, provide sprinkler protection under them in accordance",
+    "parent": "2.3.7.3",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.4": {
+    "number": "2.3.7.4",
+    "title": "Ceiling-Level Sprinkler System Design Criteria",
+    "parent": "2.3.7",
+    "children": [
+      "2.3.7.4.1",
+      "2.3.7.4.2",
+      "2.3.7.4.3"
+    ],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.4.1": {
+    "number": "2.3.7.4.1",
+    "title": "For ceiling heights up to and including 45 ft (13.7 m), provide a minimum flow of 120 gpm (455",
+    "parent": "2.3.7.4",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.4.2": {
+    "number": "2.3.7.4.2",
+    "title": "Size the ceiling sprinkler demand area as follows:",
+    "parent": "2.3.7.4",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.4.3": {
+    "number": "2.3.7.4.3",
+    "title": "When determining the ceiling sprinkler demand area in accordance with Section 2.3.7.4.2, sprinklers",
+    "parent": "2.3.7.4",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.5": {
+    "number": "2.3.7.5",
+    "title": "Hose Demand Design Guidelines",
+    "parent": "2.3.7",
+    "children": [
+      "2.3.7.5.1"
+    ],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.5.1": {
+    "number": "2.3.7.5.1",
+    "title": "Include a minimum flow of 500 gpm (1,900 L/min) for the hose demand design.2.3.7.5.2 When small hose connection stations are provided in accordance with Section 2.3.7.6.2, account",
+    "parent": "2.3.7.5",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.6": {
+    "number": "2.3.7.6",
+    "title": "Water Supply Duration",
+    "parent": "2.3.7",
+    "children": [],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.7": {
+    "number": "2.3.7.7",
+    "title": "Final Extinguishment",
+    "parent": "2.3.7",
+    "children": [
+      "2.3.7.7.1",
+      "2.3.7.7.2",
+      "2.3.7.7.3"
+    ],
+    "start_page": 105,
+    "end_page": 105
+  },
+  "2.3.7.7.1": {
+    "number": "2.3.7.7.1",
+    "title": "Storage Arrangement and Mezzanines",
+    "parent": "2.3.7.7",
+    "children": [],
+    "start_page": 105,
+    "end_page": 106
+  },
+  "2.3.7.7.2": {
+    "number": "2.3.7.7.2",
+    "title": "Small Hose Connection Stations",
+    "parent": "2.3.7.7",
+    "children": [],
+    "start_page": 106,
+    "end_page": 107
+  },
+  "2.3.7.7.3": {
+    "number": "2.3.7.7.3",
+    "title": "Pre-Incident Plan",
+    "parent": "2.3.7.7",
+    "children": [],
+    "start_page": 107,
+    "end_page": 1
+  },
+  "2.4.1.1": {
+    "number": "2.4.1.1",
+    "title": "Section 2.4 provides protection guidelines for vertically enclosed automatic storage and retrieval",
+    "parent": "2.4",
+    "children": [],
+    "start_page": 107,
+    "end_page": 107
+  },
+  "2.4.1.2": {
+    "number": "2.4.1.2",
+    "title": "The protection options in this section for a vertically enclosed ASRS storage unit focus solely on the",
+    "parent": "2.4",
+    "children": [],
+    "start_page": 107,
+    "end_page": 1
+  },
+  "2.4.2.1": {
+    "number": "2.4.2.1",
+    "title": "To help reduce the fire load within a vertically enclosed ASRS storage unit, use trays that are",
+    "parent": "2.4.2",
+    "children": [],
+    "start_page": 107,
+    "end_page": 108
+  },
+  "2.4.2.2": {
+    "number": "2.4.2.2",
+    "title": "To aid in water penetration throughout the vertical height of the vertically enclosed ASRS unit, consider",
+    "parent": "2.4.2",
+    "children": [],
+    "start_page": 108,
+    "end_page": 108
+  },
+  "2.4.3": {
+    "number": "2.4.3",
+    "title": "Protection Options for Vertically Enclosed Storage Units2.4.3.1 General",
+    "parent": "2.4",
+    "children": [
+      "2.4.3.1.1",
+      "2.4.3.1.2",
+      "2.4.3.2",
+      "2.4.3.3",
+      "2.4.3.4"
+    ],
+    "start_page": 108,
+    "end_page": 108
+  },
+  "2.4.3.1.1": {
+    "number": "2.4.3.1.1",
+    "title": "Arrange the vertically enclosed ASRS storage unit for automatic shutdown upon fire/smoke detection",
+    "parent": "2.4.3",
+    "children": [],
+    "start_page": 108,
+    "end_page": 108
+  },
+  "2.4.3.1.2": {
+    "number": "2.4.3.1.2",
+    "title": "If the materials being maintained within the vertically enclosed ASRS storage unit are (a) of high",
+    "parent": "2.4.3",
+    "children": [],
+    "start_page": 108,
+    "end_page": 108
+  },
+  "2.4.3.2": {
+    "number": "2.4.3.2",
+    "title": "Sprinkler System Types",
+    "parent": "2.4.3",
+    "children": [
+      "2.4.3.2.1",
+      "2.4.3.2.2",
+      "2.4.3.2.3"
+    ],
+    "start_page": 108,
+    "end_page": 108
+  },
+  "2.4.3.2.1": {
+    "number": "2.4.3.2.1",
+    "title": "Depending on the ambient temperature of the area being protected, the sprinkler system protecting",
+    "parent": "2.4.3.2",
+    "children": [],
+    "start_page": 108,
+    "end_page": 108
+  },
+  "2.4.3.2.2": {
+    "number": "2.4.3.2.2",
+    "title": "When installing a dry-pipe or similar ceiling-level sprinkler system, the maximum water delivery",
+    "parent": "2.4.3.2",
+    "children": [],
+    "start_page": 108,
+    "end_page": 108
+  },
+  "2.4.3.2.3": {
+    "number": "2.4.3.2.3",
+    "title": "See Data Sheet 2-0 for additional recommendations related to the installation of the sprinkler system.",
+    "parent": "2.4.3.2",
+    "children": [],
+    "start_page": 108,
+    "end_page": 108
+  },
+  "2.4.3.3": {
+    "number": "2.4.3.3",
+    "title": "Protection of Vertically Enclosed ASRS Units2.4.3.3.1 Vertically Enclosed ASRS Storage Units up to 25 ft (7.6 m) Tall",
+    "parent": "2.4.3",
+    "children": [
+      "2.4.3.3.2"
+    ],
+    "start_page": 108,
+    "end_page": 109
+  },
+  "2.4.3.3.2": {
+    "number": "2.4.3.3.2",
+    "title": "Vertically Enclosed ASRS Storage Units Over 25 ft (7.6 m) Tall",
+    "parent": "2.4.3.3",
+    "children": [],
+    "start_page": 109,
+    "end_page": 109
+  },
+  "2.4.3.4": {
+    "number": "2.4.3.4",
+    "title": "Hose Demand and System Duration2.4.3.4.1 Hose Demand Design",
+    "parent": "2.4.3",
+    "children": [
+      "2.4.3.4.2"
+    ],
+    "start_page": 109,
+    "end_page": 110
+  },
+  "2.4.3.4.2": {
+    "number": "2.4.3.4.2",
+    "title": "System Duration",
+    "parent": "2.4.3.4",
+    "children": [],
+    "start_page": 110,
+    "end_page": 110
+  },
+  "2.4.4": {
+    "number": "2.4.4",
+    "title": "Final Extinguishment \u2013 Small Hose Connection Stations",
+    "parent": "2.4",
+    "children": [
+      "2.4.4.1",
+      "2.4.4.2",
+      "2.4.4.3",
+      "2.4.4.4"
+    ],
+    "start_page": 110,
+    "end_page": 110
+  },
+  "2.4.4.1": {
+    "number": "2.4.4.1",
+    "title": "To aid in manual fire fighting efforts and after-extinguishment mop-up operations, install small hose",
+    "parent": "2.4.4",
+    "children": [],
+    "start_page": 110,
+    "end_page": 110
+  },
+  "2.4.4.2": {
+    "number": "2.4.4.2",
+    "title": "Design the small hose connection stations system to provide a minimum flow of 50 gpm (190 L/min)",
+    "parent": "2.4.4",
+    "children": [],
+    "start_page": 110,
+    "end_page": 110
+  },
+  "2.4.4.3": {
+    "number": "2.4.4.3",
+    "title": "Arrange the water supplies feeding these stations in one of the following ways:",
+    "parent": "2.4.4",
+    "children": [],
+    "start_page": 110,
+    "end_page": 110
+  },
+  "2.4.4.4": {
+    "number": "2.4.4.4",
+    "title": "The installation of small hose connection stations can be avoided at the documented discretion of",
+    "parent": "2.4.4",
+    "children": [],
+    "start_page": 110,
+    "end_page": null
+  },
+  "3.1.1.1": {
+    "number": "3.1.1.1",
+    "title": "Noncombustible Containers",
+    "parent": "3.1.1",
+    "children": [],
+    "start_page": 111,
+    "end_page": 111
+  },
+  "3.1.1.2": {
+    "number": "3.1.1.2",
+    "title": "Cellulosic Containers",
+    "parent": "3.1.1",
+    "children": [],
+    "start_page": 111,
+    "end_page": 111
+  },
+  "3.1.1.3": {
+    "number": "3.1.1.3",
+    "title": "Unexpanded Plastic Containers",
+    "parent": "3.1.1",
+    "children": [],
+    "start_page": 111,
+    "end_page": 2
+  },
+  "3.1.2.1": {
+    "number": "3.1.2.1",
+    "title": "General",
+    "parent": "3.1.2",
+    "children": [],
+    "start_page": 114,
+    "end_page": 114
+  },
+  "3.1.2.2": {
+    "number": "3.1.2.2",
+    "title": "Robot Charging Systems",
+    "parent": "3.1.2",
+    "children": [],
+    "start_page": 114,
+    "end_page": 114
+  },
+  "3.1.2.3": {
+    "number": "3.1.2.3",
+    "title": "Batteries",
+    "parent": "3.1.2",
+    "children": [],
+    "start_page": 114,
+    "end_page": 114
+  },
+  "3.1.3": {
+    "number": "3.1.3",
+    "title": "Vertically Enclosed ASRS Storage Arrangements",
+    "parent": "3.1",
+    "children": [],
+    "start_page": 114,
+    "end_page": 2
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm build",
+  "outputDirectory": ".next",
+  "installCommand": "pnpm install --production=false",
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "app/**/*.tsx": {
+      "maxDuration": 30
+    }
+  },
+  "regions": ["iad1"],
+  "build": {
+    "env": {
+      "NODE_OPTIONS": "--max-old-space-size=7168",
+      "NEXT_TELEMETRY_DISABLED": "1",
+      "NEXT_SHARP_PATH": "/tmp/node_modules/sharp"
+    }
+  },
+  "github": {
+    "silent": true
+  }
+}

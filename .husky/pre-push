@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Exit on any error
+set -e
+
+echo "🚀 Running pre-push quality checks..."
+
+# 1. TypeScript type checking
+echo "📝 Type checking TypeScript..."
+npx tsc --noEmit || {
+  echo "❌ TypeScript type errors detected!"
+  echo "   Please fix type errors before pushing."
+  exit 1
+}
+echo "   ✅ TypeScript check passed"
+
+# 2. Linting
+echo "🎨 Running ESLint..."
+npm run lint || {
+  echo "❌ Linting errors detected!"
+  echo "   Please fix linting issues before pushing."
+  exit 1
+}
+echo "   ✅ Linting passed"
+
+# 3. Build test (optional - comment out if too slow)
+echo "🏗️  Testing build..."
+npm run build || {
+  echo "❌ Build failed!"
+  echo "   Please ensure the project builds before pushing."
+  exit 1
+}
+echo "   ✅ Build successful"
+
+# 4. Check for TODO comments (optional warning)
+echo "📋 Checking for TODOs..."
+TODOS=$(grep -r "TODO\|FIXME\|HACK" --include="*.ts" --include="*.tsx" app components features 2>/dev/null || true)
+if [ ! -z "$TODOS" ]; then
+  TODO_COUNT=$(echo "$TODOS" | wc -l)
+  echo "⚠️  Warning: $TODO_COUNT TODO/FIXME/HACK comments found"
+  echo "   Consider addressing these before release:"
+  echo "$TODOS" | head -3 | sed 's/^/     /'
+fi
+
+# 5. Security check for exposed secrets
+echo "🔐 Checking for exposed secrets..."
+SECRET_PATTERNS="api_key\|apiKey\|API_KEY\|secret\|SECRET\|password\|PASSWORD\|token\|TOKEN"
+EXPOSED=$(grep -r "$SECRET_PATTERNS" --include="*.ts" --include="*.tsx" app components | grep -v "process.env" | grep -v "// " || true)
+if [ ! -z "$EXPOSED" ]; then
+  echo "⚠️  Warning: Potential secrets detected in code:"
+  echo "$EXPOSED" | head -3 | sed 's/^/     /'
+  echo "   Ensure these are environment variables, not hardcoded values."
+fi
+
+echo "✅ All pre-push checks passed! Ready to push."
