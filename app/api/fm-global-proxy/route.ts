@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
     
-    const response = await fetch('https://fm-global-asrs-expert.onrender.com/api/fm-global/chat', {
+    const response = await fetch('https://rag-agent-asrs.onrender.com/api/fm-global/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

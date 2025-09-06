@@ -15,9 +15,11 @@ interface Message {
 }
 
 interface ChatResponse {
-  response?: string;
+  content?: string;
   error?: string;
-  details?: string;
+  sources?: any[];
+  recommendations?: any[];
+  tables?: any[];
 }
 
 export default function FMGlobalChatPage(): ReactElement {
@@ -48,14 +50,22 @@ export default function FMGlobalChatPage(): ReactElement {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/fm-global-proxy', {
+      const response = await fetch('/api/fm-global-rag', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: inputMessage.trim(),
-          sessionId: `session-${Date.now()}`,
+          query: inputMessage.trim(),
+          context: {
+            asrsType: 'general',
+            storageHeight: 25,
+            commodityClass: 'Class II',
+            containerType: 'mixed',
+            systemType: 'wet'
+          },
+          includeOptimizations: true,
+          limit: 5
         }),
       });
 
@@ -69,7 +79,7 @@ export default function FMGlobalChatPage(): ReactElement {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.response || data.error || 'No response received',
+        content: data.content || data.error || 'No response received',
         timestamp: new Date(),
       };
 
@@ -113,7 +123,7 @@ export default function FMGlobalChatPage(): ReactElement {
             </CardTitle>
             <CardDescription className="flex items-center gap-2">
               <Badge variant="secondary" className="text-xs">
-                Connected to Render
+                Connected to Local RAG
               </Badge>
             </CardDescription>
           </CardHeader>

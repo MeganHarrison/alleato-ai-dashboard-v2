@@ -1,0 +1,50 @@
+name: TypeScript Type Check
+
+on:
+  push:
+    branches: [ main, develop, deployment-optimizations ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  typecheck:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run TypeScript type check
+      run: |
+        echo "🔧 Running TypeScript compilation check..."
+        npm run typecheck
+        
+    - name: Count TypeScript errors (if any)
+      if: failure()
+      run: |
+        echo "📊 TypeScript Error Summary:"
+        ERROR_COUNT=$(npm run type:count)
+        echo "Total errors: $ERROR_COUNT"
+        echo "First 20 errors:"
+        npm run type:errors
+        exit 1
+        
+    - name: Run ESLint
+      run: |
+        echo "🎨 Running ESLint..."
+        npm run lint
+        
+    - name: Check build
+      run: |
+        echo "🏗️ Testing production build..."
+        npm run build

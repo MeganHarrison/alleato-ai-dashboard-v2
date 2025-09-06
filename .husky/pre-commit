@@ -72,7 +72,21 @@ if [ ! -z "$CONSOLE_LOGS" ]; then
   echo "   Consider removing these before production."
 fi
 
-# 7. Run linting (if it passes quickly)
+# 7. Run TypeScript type checking
+echo "🔧 Running TypeScript type check..."
+if [ -f "tsconfig.json" ]; then
+  echo "   Checking TypeScript compilation..."
+  if ! npx tsc --noEmit --skipLibCheck 2>/dev/null; then
+    echo "❌ TypeScript errors detected!"
+    echo "   Run 'npm run typecheck' or 'npx tsc --noEmit' to see detailed errors."
+    echo "   Fix TypeScript errors before committing."
+    exit 1
+  else
+    echo "   ✅ TypeScript compilation passed"
+  fi
+fi
+
+# 8. Run linting (if it passes quickly)
 echo "🎨 Running quick lint check..."
 if [ -d "app" ]; then
   npx eslint --max-warnings 10 --quiet app --ext .ts,.tsx 2>/dev/null || {
