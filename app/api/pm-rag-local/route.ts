@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -88,7 +88,7 @@ Recent action items and decisions have been tracked across these meetings.
 
     // Generate AI response
     const { text } = await generateText({
-      model: openai('gpt-4-turbo') as any,
+      model: openai('gpt-4-turbo'),
       system: `You are a helpful PM Assistant. Use the provided context to answer questions about meetings, projects, and insights. Be concise and specific.
       
 Context:

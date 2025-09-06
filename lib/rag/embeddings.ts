@@ -1,6 +1,5 @@
 // Embedding utilities for RAG system
 
-import { openai } from '@ai-sdk/openai';
 import { EmbeddingConfig } from './types';
 
 export const DEFAULT_EMBEDDING_CONFIG: EmbeddingConfig = {

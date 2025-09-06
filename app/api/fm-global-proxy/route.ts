@@ -22,8 +22,33 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Render service error:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        body: errorText.substring(0, 500) + (errorText.length > 500 ? '...' : '')
+      });
+
+      // Check if it's HTML (502/503 error page)
+      const isHtml = errorText.trim().startsWith('<!DOCTYPE html>') || errorText.trim().startsWith('<html');
+      
+      if (isHtml) {
+        return NextResponse.json(
+          { 
+            error: `Render service is currently unavailable (HTTP ${response.status})`,
+            details: 'The service may be starting up from a cold state or experiencing issues. Please wait a moment and try again.',
+            renderStatus: response.status,
+            isHtmlError: true
+          },
+          { status: 503 } // Service Unavailable
+        );
+      }
+
       return NextResponse.json(
-        { error: `Remote server error: ${response.status} - ${errorText}` },
+        { 
+          error: `Remote server error: ${response.status} - ${errorText.substring(0, 200)}`,
+          renderStatus: response.status 
+        },
         { status: response.status }
       );
     }

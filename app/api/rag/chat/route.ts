@@ -1,8 +1,8 @@
 // Chat API endpoint with RAG retrieval and streaming
 
 import { NextRequest, NextResponse } from 'next/server';
-import { openai } from '@ai-sdk/openai';
 import { streamText, convertToCoreMessages } from 'ai';
+import { openai } from '@ai-sdk/openai';
 import { generateEmbedding } from '@/lib/rag/embeddings';
 import { chatOperations } from '@/lib/rag/supabase-client';
 import { ChatRequest, SearchResult } from '@/lib/rag/types';
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     if (stream) {
       // Stream the response
       const result = await streamText({
-        model: openai('gpt-4-turbo-preview') as any,
+        model: openai('gpt-4-turbo-preview'),
         messages: convertToCoreMessages(enhancedMessages),
         temperature: context?.temperature || 0.7,
         onFinish: async ({ text }) => {
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Non-streaming response
       const result = await streamText({
-        model: openai('gpt-4-turbo-preview') as any,
+        model: openai('gpt-4-turbo-preview'),
         messages: convertToCoreMessages(enhancedMessages),
         temperature: context?.temperature || 0.7,
       });

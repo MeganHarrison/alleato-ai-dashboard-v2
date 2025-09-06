@@ -1,3 +1,5 @@
+import { createHash } from 'crypto';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -82,15 +84,14 @@ const nextConfig = {
       '.jsx': ['.tsx', '.jsx'],
     };
     
-    // Aggressive memory optimization for production builds
-    if (!dev) {
+    // Simplified memory optimization for production builds
+    if (!dev && !isServer) {
       config.optimization = {
         ...config.optimization,
         minimize: true,
-        moduleIds: 'deterministic',
-        splitChunks: isServer ? false : {
+        splitChunks: {
           chunks: 'all',
-          maxSize: 200000, // Even smaller chunks for Vercel
+          maxSize: 244000,
           cacheGroups: {
             default: false,
             vendors: false,
@@ -102,15 +103,8 @@ const nextConfig = {
               enforce: true,
             },
             lib: {
-              test(module) {
-                return module.size() > 160000 &&
-                  /node_modules[\\/]/.test(module.identifier());
-              },
-              name(module) {
-                const hash = require('crypto').createHash('sha1');
-                hash.update(module.identifier());
-                return hash.digest('hex').substring(0, 8);
-              },
+              test: /[\\/]node_modules[\\/]/,
+              name: 'lib',
               priority: 30,
               minChunks: 1,
               reuseExistingChunk: true,
@@ -120,38 +114,9 @@ const nextConfig = {
               minChunks: 2,
               priority: 20,
             },
-            shared: {
-              name(module, chunks) {
-                return require('crypto')
-                  .createHash('sha1')
-                  .update(chunks.reduce((acc, chunk) => acc + chunk.name, ''))
-                  .digest('hex').substring(0, 8);
-              },
-              priority: 10,
-              minChunks: 2,
-              reuseExistingChunk: true,
-            },
           },
-          maxAsyncRequests: 30,
-          maxInitialRequests: 25,
         },
       };
-      
-      // Reduce memory usage during terser minification
-      if (config.optimization.minimizer) {
-        config.optimization.minimizer.forEach((minimizer) => {
-          if (minimizer.constructor.name === 'TerserPlugin') {
-            minimizer.options.parallel = 1;
-            minimizer.options.terserOptions = {
-              ...minimizer.options.terserOptions,
-              compress: {
-                ...minimizer.options.terserOptions?.compress,
-                drop_console: true,
-              },
-            };
-          }
-        });
-      }
     }
     
     // Optimize for memory usage in serverless environment

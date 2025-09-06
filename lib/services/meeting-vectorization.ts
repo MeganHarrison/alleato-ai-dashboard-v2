@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { openai } from '@ai-sdk/openai'
 import { embed, generateText, embedMany } from 'ai'
+import { openai } from '@ai-sdk/openai'
 
 interface MeetingMetadata {
   title: string

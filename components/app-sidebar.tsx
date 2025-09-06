@@ -42,6 +42,10 @@ const data = {
           url: "/fm-global-chat",
         },
         {
+          title: "FM Global Render Chat",
+          url: "/fm-global-render-chat",
+        },
+        {
           title: "Tables & Figures",
           url: "/fm-global-tables",
         },
