@@ -17,6 +17,10 @@ export interface RagDocument {
   updated_at: string;
   processed_at?: string;
   user_id?: string;
+  summary?: string;
+  project_id?: string;
+  project?: { id: string; name: string };
+  meeting_date?: string;
 }
 
 export interface RagChunk {

@@ -3,6 +3,7 @@
 import { useChat } from 'ai/react';
 import { useEffect, useRef } from 'react';
 import { Paperclip, Send, Mic } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 export default function FMGlobalChat() {
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
@@ -81,10 +82,25 @@ export default function FMGlobalChat() {
                           <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-white font-semibold text-sm">AI</span>
                           </div>
-                          <div className="flex-1">
-                            <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                          <div className="flex-1 prose prose-sm max-w-none text-gray-800">
+                            <ReactMarkdown
+                              components={{
+                                h1: ({children}) => <h1 className="text-xl font-bold mt-4 mb-2 text-gray-900">{children}</h1>,
+                                h2: ({children}) => <h2 className="text-lg font-bold mt-3 mb-2 text-gray-900">{children}</h2>,
+                                h3: ({children}) => <h3 className="text-base font-bold mt-2 mb-1 text-gray-900">{children}</h3>,
+                                p: ({children}) => <p className="mb-2 text-gray-800">{children}</p>,
+                                ul: ({children}) => <ul className="list-disc pl-5 mb-2 text-gray-800">{children}</ul>,
+                                ol: ({children}) => <ol className="list-decimal pl-5 mb-2 text-gray-800">{children}</ol>,
+                                li: ({children}) => <li className="mb-1 text-gray-800">{children}</li>,
+                                strong: ({children}) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                                em: ({children}) => <em className="italic">{children}</em>,
+                                code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-gray-800">{children}</code>,
+                                pre: ({children}) => <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto mb-2 text-sm">{children}</pre>,
+                                blockquote: ({children}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic my-2">{children}</blockquote>,
+                              }}
+                            >
                               {message.content}
-                            </p>
+                            </ReactMarkdown>
                           </div>
                         </div>
                       )}

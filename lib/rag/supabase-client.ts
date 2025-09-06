@@ -76,7 +76,10 @@ export const documentOperations = {
     const { page = 1, limit = 20, status, search, user_id } = params;
     const offset = (page - 1) * limit;
 
-    let query = supabase.from('documents').select('*', { count: 'exact' });
+    let query = supabase.from('documents').select(`
+      *,
+      project:projects(id, name)
+    `, { count: 'exact' });
 
     if (status) query = query.eq('status', status);
     if (user_id) query = query.eq('user_id', user_id);

@@ -205,23 +205,21 @@ export default function DocumentsManagementPage() {
             </div>
 
             {/* Documents Table */}
-            <div className="rounded-lg overflow-hidden">
+            <div className="overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Title</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Chunks</TableHead>
-                    <TableHead>Size</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Project</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Summary</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {documents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
+                      <TableCell colSpan={5} className="text-center py-8">
                         <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                         <p className="text-muted-foreground">
                           No documents found
@@ -232,93 +230,23 @@ export default function DocumentsManagementPage() {
                     documents.map((doc) => (
                       <TableRow key={doc.id}>
                         <TableCell className="font-medium">
-                          <div>
-                            <p>{doc.title}</p>
-                            {doc.tags && doc.tags.length > 0 && (
-                              <div className="flex gap-1 mt-1">
-                                {doc.tags.slice(0, 3).map((tag, i) => (
-                                  <Badge
-                                    key={i}
-                                    variant="outline"
-                                    className="text-xs"
-                                  >
-                                    {tag}
-                                  </Badge>
-                                ))}
-                                {doc.tags.length > 3 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{doc.tags.length - 3}
-                                  </Badge>
-                                )}
-                              </div>
-                            )}
-                          </div>
+                          {doc.title}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary">
-                            {doc.file_type?.toUpperCase()}
-                          </Badge>
+                          {doc.meeting_date 
+                            ? format(new Date(doc.meeting_date), "MMM d, yyyy")
+                            : format(new Date(doc.created_at), "MMM d, yyyy")}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={getStatusBadgeVariant(doc.status)}>
-                            {doc.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{doc.chunks_count || 0}</TableCell>
-                        <TableCell>
-                          {doc.file_size
-                            ? `${(doc.file_size / 1024 / 1024).toFixed(2)} MB`
-                            : "-"}
+                          {doc.project?.name || "-"}
                         </TableCell>
                         <TableCell>
-                          {format(new Date(doc.created_at), "MMM d, yyyy")}
+                          {doc.category || "-"}
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            {doc.status === "failed" && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleReprocess(doc.id)}
-                                title="Reprocess"
-                              >
-                                <RefreshCw className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  title="Delete"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>
-                                    Delete Document
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete "{doc.title}
-                                    "? This will also delete all associated
-                                    chunks and embeddings.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() =>
-                                      handleDelete(doc.id, doc.title)
-                                    }
-                                  >
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
+                        <TableCell className="max-w-md">
+                          <p className="truncate text-sm text-muted-foreground">
+                            {doc.summary || "-"}
+                          </p>
                         </TableCell>
                       </TableRow>
                     ))

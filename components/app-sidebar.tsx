@@ -33,11 +33,7 @@ const data = {
       url: "#",
       items: [
         {
-          title: "FM-Global 8-34 Guru",
-          url: "/asrs1",
-        },
-        {
-          title: "FM Global Chat",
+          title: "FM Global Expert",
           url: "/chat-asrs2",
         },
         {
@@ -99,20 +95,6 @@ const data = {
         {
           title: "Subcontractors",
           url: "/subcontractors",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      items: [
-        {
-          title: "Profile",
-          url: "/profile",
-        },
-        {
-          title: "Settings",
-          url: "/settings",
         },
       ],
     },
