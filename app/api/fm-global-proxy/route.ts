@@ -4,17 +4,25 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Forward the request to the FM Global Render endpoint
-    // Using AbortController with 60 second timeout to handle Render free tier cold starts
+    // Transform the request body to match Railway endpoint expectations
+    // The Railway endpoint expects 'query' field instead of 'message'
+    const railwayBody = {
+      query: body.message || body.query || '',
+      sessionId: body.sessionId || `session_${Date.now()}`,
+      ...body
+    };
+    
+    // Forward the request to the FM Global Railway endpoint (migrated from Render)
+    // Using AbortController with 60 second timeout for reliability
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
     
-    const response = await fetch('https://rag-agent-asrs.onrender.com/api/fm-global/chat', {
+    const response = await fetch('https://fm-global-asrs-expert-production-afb0.up.railway.app/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(railwayBody),
       signal: controller.signal,
     });
     
@@ -22,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Render service error:', {
+      console.error('Railway service error:', {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
@@ -35,9 +43,9 @@ export async function POST(request: NextRequest) {
       if (isHtml) {
         return NextResponse.json(
           { 
-            error: `Render service is currently unavailable (HTTP ${response.status})`,
-            details: 'The service may be starting up from a cold state or experiencing issues. Please wait a moment and try again.',
-            renderStatus: response.status,
+            error: `Railway service is currently unavailable (HTTP ${response.status})`,
+            details: 'The service may be starting up or experiencing issues. Please wait a moment and try again.',
+            railwayStatus: response.status,
             isHtmlError: true
           },
           { status: 503 } // Service Unavailable
@@ -47,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: `Remote server error: ${response.status} - ${errorText.substring(0, 200)}`,
-          renderStatus: response.status 
+          railwayStatus: response.status 
         },
         { status: response.status }
       );
@@ -63,8 +71,8 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.name === 'AbortError') {
       return NextResponse.json(
         { 
-          error: 'Request timed out. The FM Global service might be starting up from a cold state. Please try again in a moment.',
-          details: 'Render free tier instances spin down after inactivity and may take 50+ seconds to restart.'
+          error: 'Request timed out. The FM Global service might be starting up. Please try again in a moment.',
+          details: 'Railway services may take a moment to respond on initial requests.'
         },
         { status: 504 } // Gateway Timeout
       );

@@ -20,12 +20,12 @@ interface ChatResponse {
   details?: string;
 }
 
-export default function FMGlobalRenderChatPage(): ReactElement {
+export default function FMGlobalRailwayChatPage(): ReactElement {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! I\'m your FM Global 8-34 ASRS Sprinkler Design expert powered by the Render cloud service. I can help you with requirements, regulations, design specifications, and compliance questions. What would you like to know?',
+      content: 'Hello! I\'m your FM Global 8-34 ASRS Sprinkler Design expert powered by the Railway cloud service. I can help you with requirements, regulations, design specifications, and compliance questions. What would you like to know?',
       timestamp: new Date(),
     },
   ]);
@@ -33,7 +33,7 @@ export default function FMGlobalRenderChatPage(): ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [connectionStatus, setConnectionStatus] = useState<'testing' | 'connected' | 'error'>('testing');
 
-  const testRenderConnection = async (): Promise<void> => {
+  const testRailwayConnection = async (): Promise<void> => {
     try {
       const response = await fetch('/api/fm-global-proxy', {
         method: 'POST',
@@ -59,7 +59,7 @@ export default function FMGlobalRenderChatPage(): ReactElement {
 
   // Test connection on mount
   useEffect(() => {
-    testRenderConnection();
+    testRailwayConnection();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
@@ -109,7 +109,7 @@ export default function FMGlobalRenderChatPage(): ReactElement {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.response || data.error || 'No response received from Render service',
+        content: data.response || data.error || 'No response received from Railway service',
         timestamp: new Date(),
       };
 
@@ -120,10 +120,10 @@ export default function FMGlobalRenderChatPage(): ReactElement {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `Sorry, I encountered an error while connecting to the Render service: ${error instanceof Error ? error.message : 'Unknown error'}. 
+        content: `Sorry, I encountered an error while connecting to the Railway service: ${error instanceof Error ? error.message : 'Unknown error'}. 
 
 This could be due to:
-- Render service cold start (can take 50+ seconds)
+- Railway service cold start (can take 30+ seconds)
 - Service temporarily down
 - Network connectivity issues
 
@@ -151,18 +151,18 @@ Please try again in a moment, or use the Local RAG version instead.`,
       case 'testing':
         return <Badge variant="outline" className="text-xs">Testing Connection...</Badge>;
       case 'connected':
-        return <Badge variant="default" className="text-xs bg-green-600">Connected to Render</Badge>;
+        return <Badge variant="default" className="text-xs bg-green-600">Connected to Railway</Badge>;
       case 'error':
-        return <Badge variant="destructive" className="text-xs">Render Service Error</Badge>;
+        return <Badge variant="destructive" className="text-xs">Railway Service Error</Badge>;
     }
   };
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">FM Global 8-34 ASRS Expert (Render)</h1>
+        <h1 className="text-3xl font-bold mb-2">FM Global 8-34 ASRS Expert (Railway)</h1>
         <p className="text-muted-foreground mb-4">
-          Testing the external Render cloud service for FM Global 8-34 ASRS sprinkler requirements
+          Testing the external Railway cloud service for FM Global 8-34 ASRS sprinkler requirements
         </p>
         
         <Card className="mb-4">
@@ -173,12 +173,12 @@ Please try again in a moment, or use the Local RAG version instead.`,
               ) : (
                 <AlertCircle className="h-5 w-5 text-red-600" />
               )}
-              FM Global 8-34 ASRS Sprinkler Expert (Render Cloud)
+              FM Global 8-34 ASRS Sprinkler Expert (Railway Cloud)
             </CardTitle>
             <CardDescription className="flex items-center gap-2">
               {getStatusBadge()}
               <a 
-                href="https://rag-agent-asrs.onrender.com/api/fm-global/chat"
+                href="https://fm-global-asrs-expert-production-afb0.up.railway.app/chat"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
@@ -196,12 +196,12 @@ Please try again in a moment, or use the Local RAG version instead.`,
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-red-900">Render Service Issues</h4>
+                  <h4 className="font-medium text-red-900">Railway Service Issues</h4>
                   <p className="text-sm text-red-700 mt-1">
-                    The external Render service appears to be unavailable. This could be due to:
+                    The external Railway service appears to be unavailable. This could be due to:
                   </p>
                   <ul className="text-sm text-red-700 mt-2 list-disc ml-5 space-y-1">
-                    <li>Cold start delay (Render free tier spins down after inactivity)</li>
+                    <li>Cold start delay (Railway services may spin down after inactivity)</li>
                     <li>Service deployment issues</li>
                     <li>502/503 gateway errors</li>
                     <li>Rate limiting or timeouts</li>
@@ -210,7 +210,7 @@ Please try again in a moment, or use the Local RAG version instead.`,
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={testRenderConnection}
+                      onClick={testRailwayConnection}
                     >
                       Retry Connection
                     </Button>
@@ -281,7 +281,7 @@ Please try again in a moment, or use the Local RAG version instead.`,
                     <div className="bg-gray-100 rounded-lg p-3">
                       <div className="flex items-center gap-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                        <span className="text-sm text-gray-600">Connecting to Render service...</span>
+                        <span className="text-sm text-gray-600">Connecting to Railway service...</span>
                       </div>
                     </div>
                   </div>
@@ -294,7 +294,7 @@ Please try again in a moment, or use the Local RAG version instead.`,
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask about FM Global 8-34 ASRS requirements via Render service..."
+                placeholder="Ask about FM Global 8-34 ASRS requirements via Railway service..."
                 disabled={isLoading}
                 className="flex-1"
               />

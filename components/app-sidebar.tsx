@@ -1,13 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { ChevronRight } from "lucide-react";
 import { NavUser } from "@/components/nav/nav-user";
-import { SearchForm } from "@/components/search-form";
-import Image from "next/image";
-import { useTheme } from "next-themes";
-import { createClient } from "@/lib/supabase/client";
-import { User } from "@supabase/supabase-js";
 import {
   Collapsible,
   CollapsibleContent,
@@ -26,6 +19,12 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { createClient } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { ChevronRight } from "lucide-react";
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import * as React from "react";
 
 const data = {
   navMain: [
@@ -35,15 +34,11 @@ const data = {
       items: [
         {
           title: "FM-Global 8-34 Guru",
-          url: "/fm-global2",
+          url: "/asrs1",
         },
         {
           title: "FM Global Chat",
-          url: "/fm-global-chat",
-        },
-        {
-          title: "FM Global Render Chat",
-          url: "/fm-global-render-chat",
+          url: "/chat-asrs2",
         },
         {
           title: "Tables & Figures",
@@ -53,14 +48,6 @@ const data = {
           title: "FM-Global Form",
           url: "/fm-global-form",
         },
-        {
-          title: "AI Agent Training",
-          url: "/fm-global-optimize",
-        },
-        {
-          title: "Documentation",
-          url: "/fm-global-docs",
-        },
       ],
     },
     {
@@ -68,12 +55,16 @@ const data = {
       url: "#",
       items: [
         {
+          title: "Project Insights",
+          url: "/pm-rag",
+        },
+        {
           title: "Projects Dashboard",
           url: "/projects-dashboard",
         },
         {
-          title: "Meeting Insights",
-          url: "/pm-rag",
+          title: "Meetings",
+          url: "/meetings",
         },
         {
           title: "Alleato Intel",
@@ -85,10 +76,6 @@ const data = {
       title: "Tables",
       url: "#",
       items: [
-        {
-          title: "Meetings",
-          url: "/meetings",
-        },
         {
           title: "Clients",
           url: "/clients",
@@ -122,10 +109,6 @@ const data = {
         {
           title: "Profile",
           url: "/profile",
-        },
-        {
-          title: "Team Chat",
-          url: "/collaborative-search",
         },
         {
           title: "Settings",
