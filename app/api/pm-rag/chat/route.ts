@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     }
 
     // Get full meeting details for the search results
-    const meetingIds = searchResults?.map((r: any) => r.meeting_id) || [];
+    const meetingIds: any[] = [];
     
     let meetings = [];
     if (meetingIds.length > 0) {
@@ -99,12 +99,12 @@ export async function POST(request: Request) {
 
     // Prepare sources with similarity scores
     const sources = meetings.map((meeting: any) => {
-      const searchResult = searchResults?.find((r: any) => r.meeting_id === meeting.id);
+      // const searchResultItem = searchResult?.find((r: any) => r.meeting_id === meeting.id);
       return {
         meeting_id: meeting.id,
         title: meeting.title,
         date: meeting.date,
-        similarity_score: searchResult?.similarity || 0,
+        similarity_score: 0,
       };
     });
 

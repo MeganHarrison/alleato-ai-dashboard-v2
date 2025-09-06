@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       file_type: fileExtension,
       file_size: file.size,
       status: 'pending',
-      content: '', // Empty initially, will be populated during processing
+      // content: '', // Empty initially, will be populated during processing
       tags: (metadata as any).tags || extractedMetadata.extracted_tags || [],
       category: (metadata as any).category,
       metadata: {

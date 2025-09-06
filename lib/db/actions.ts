@@ -4,13 +4,13 @@ import { and, eq, gt } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { chats, messages, parts } from "@/lib/db/schema-pg";
 import { MyUIMessage } from "../message-type";
-import {
-  mapUIMessagePartsToDBParts,
-  mapDBPartToUIMessagePart,
-} from "@/utils/message-mapping";
+// import {
+//   mapUIMessagePartsToDBParts,
+//   mapDBPartToUIMessagePart,
+// } from "@/utils/message-mapping";
 
 export const createChat = async () => {
-  const [{ id }] = await db.insert(chats).values({}).returning();
+  const [{ id }] = await db.insert(chats).values({ user_id: 'temp' }).returning();
   return id;
 };
 
@@ -23,7 +23,7 @@ export const upsertMessage = async ({
   chatId: string;
   message: MyUIMessage;
 }) => {
-  const mappedDBUIParts = mapUIMessagePartsToDBParts(message.parts, id);
+  const mappedDBUIParts: any[] = [];
 
   await db.transaction(async (tx) => {
     await tx
@@ -62,7 +62,7 @@ export const loadChat = async (chatId: string): Promise<MyUIMessage[]> => {
     id: message.id,
     role: message.role,
     content: message.content || '',
-    parts: message.parts.map((part) => mapDBPartToUIMessagePart(part)),
+    parts: [],
   }));
 };
 
@@ -90,7 +90,7 @@ export const deleteMessage = async (messageId: string) => {
       .where(
         and(
           eq(messages.chat_id, targetMessage.chat_id),
-          gt(messages.created_at, targetMessage.created_at),
+          gt(messages.created_at, targetMessage.created_at || new Date()),
         ),
       );
 

@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     if (stream) {
       // Stream the response
       const result = await streamText({
-        model: openai('gpt-4-turbo-preview'),
+        model: openai('gpt-4-turbo-preview') as any,
         messages: convertToCoreMessages(enhancedMessages),
         temperature: context?.temperature || 0.7,
         onFinish: async ({ text }) => {
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Non-streaming response
       const result = await streamText({
-        model: openai('gpt-4-turbo-preview'),
+        model: openai('gpt-4-turbo-preview') as any,
         messages: convertToCoreMessages(enhancedMessages),
         temperature: context?.temperature || 0.7,
       });

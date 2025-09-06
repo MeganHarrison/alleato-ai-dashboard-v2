@@ -88,7 +88,7 @@ Recent action items and decisions have been tracked across these meetings.
 
     // Generate AI response
     const { text } = await generateText({
-      model: openai('gpt-4-turbo'),
+      model: openai('gpt-4-turbo') as any,
       system: `You are a helpful PM Assistant. Use the provided context to answer questions about meetings, projects, and insights. Be concise and specific.
       
 Context:

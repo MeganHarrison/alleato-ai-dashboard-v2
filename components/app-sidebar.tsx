@@ -38,6 +38,10 @@ const data = {
           url: "/fm-global2",
         },
         {
+          title: "FM Global Chat",
+          url: "/fm-global-chat",
+        },
+        {
           title: "Tables & Figures",
           url: "/fm-global-tables",
         },
