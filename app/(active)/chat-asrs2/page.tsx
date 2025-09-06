@@ -37,13 +37,12 @@ export default function FMGlobalChat() {
   ];
 
   return (
-    <div className="flex h-screen bg-white">
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+    <>
+      <div className="flex flex-col h-full bg-white">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0 pb-4">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full px-8">
+            <div className="flex flex-col items-center justify-center min-h-full px-8 py-12">
               <h1 className="text-7xl font-bold text-black mb-4 tracking-tight">HELLO</h1>
               <p className="text-2xl text-orange-500 mb-12">How can I help you today?</p>
               
@@ -127,8 +126,8 @@ export default function FMGlobalChat() {
           )}
         </div>
 
-        {/* Input Area */}
-        <div className="border-t border-gray-200">
+        {/* Input Area - Fixed at bottom */}
+        <div className="border-t border-gray-200 bg-white flex-shrink-0">
           <form onSubmit={handleSubmit} className="flex items-center gap-2 px-8 py-4">
             <button
               type="button"
@@ -176,6 +175,6 @@ export default function FMGlobalChat() {
           </form>
         </div>
       </div>
-    </div>
+    </>
   );
 }
