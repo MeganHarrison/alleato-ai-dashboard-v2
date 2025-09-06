@@ -31,7 +31,7 @@ export default function FM834Layout({ children }: { children: ReactNode }) {
             <DynamicBreadcrumbs />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 ml-6 mr-6">
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 mx-[2.5%] sm:ml-6 sm:mr-6">
           <ErrorBoundary>{children}</ErrorBoundary>
         </div>
       </SidebarInset>

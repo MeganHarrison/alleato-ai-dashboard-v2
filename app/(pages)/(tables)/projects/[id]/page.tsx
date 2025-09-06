@@ -89,11 +89,17 @@ async function getProjectDetails(id: string) {
     .eq("project_id", parseInt(id))
     .order("date", { ascending: false })
 
+  // Get documents for this project (from documents table)
+  const { data: documents } = await supabase
+    .from("documents")
+    .select("*")
+    .order("id", { ascending: false })
+
   // Get meeting insights for this project
   const insightsResult = await getProjectMeetingInsights()
   const insights = insightsResult.success ? insightsResult.insights : []
 
-  return { project, meetings: meetings || [], insights }
+  return { project, meetings: meetings || [], documents: documents || [], insights }
 }
 
 // Placeholder data for demonstration
@@ -132,7 +138,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     notFound()
   }
 
-  const { project, meetings, insights } = data
+  const { project, meetings, documents, insights } = data
 
   // Calculate insight summary
   const safeInsights = insights || [];
@@ -291,10 +297,10 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       )}
 
       {/* Detailed Information Tabs */}
-      <Tabs defaultValue="insights" className="w-full">
+      <Tabs defaultValue="meetings" className="w-full">
         <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="insights">Insights</TabsTrigger>
           <TabsTrigger value="meetings">Meetings</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>

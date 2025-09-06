@@ -216,7 +216,7 @@ export function ClientsDataTable({ clients: initialClients }: ClientsDataTablePr
 
   return (
     <>
-      <div className="space-y-4 p-4 md:p-6">
+      <div className="space-y-4 p-2 sm:p-4 md:p-6 w-[95%] sm:w-full mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

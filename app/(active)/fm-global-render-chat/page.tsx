@@ -158,7 +158,7 @@ Please try again in a moment, or use the Local RAG version instead.`,
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto p-2 sm:p-6 max-w-4xl w-[95%] sm:w-full">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">FM Global 8-34 ASRS Expert (Railway)</h1>
         <p className="text-muted-foreground mb-4">

@@ -185,7 +185,7 @@ export function ProjectTasksDataTable({ tasks }: ProjectTasksDataTableProps) {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-2 sm:p-6 w-[95%] sm:w-full mx-auto">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>

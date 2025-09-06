@@ -249,7 +249,7 @@ export default function FMGlobalChat() {
               value={input}
               onChange={handleInputChange}
               placeholder="Type message"
-              className="flex-1 px-4 py-2 bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none"
+              className="flex-1 px-4 py-2 bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none text-left"
               disabled={isLoading}
             />
 
