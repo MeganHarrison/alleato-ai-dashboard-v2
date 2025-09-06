@@ -27,16 +27,55 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Lazy initialization to prevent startup failures
+let supabase: ReturnType<typeof createClient> | null = null;
+let openai: OpenAI | null = null;
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+function getSupabase() {
+  if (!supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!url || !key) {
+      throw new Error('Supabase configuration is missing. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_ANON_KEY environment variables.');
+    }
+    
+    supabase = createClient(url, key);
+  }
+  return supabase;
+}
+
+function getOpenAI() {
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    
+    if (!apiKey) {
+      console.warn('OpenAI API key is not set. AI responses will be limited.');
+      return null;
+    }
+    
+    openai = new OpenAI({ apiKey });
+  }
+  return openai;
+}
+
+function generateSimpleResponse(tables: any[] | null, figures: any[] | null): string {
+  let content = 'Based on FM Global 8-34 requirements:\n\n';
+  
+  if (tables && tables.length > 0) {
+    const table = tables[0];
+    content += `According to Table ${table.table_number}: ${table.title}\n\n`;
+    content += table.description || 'Please refer to the complete FM Global 8-34 standard for detailed requirements.';
+  } else if (figures && figures.length > 0) {
+    const figure = figures[0];
+    content += `Reference Figure ${figure.figure_number}: ${figure.title}\n\n`;
+    content += figure.description || 'This figure illustrates the applicable configuration.';
+  } else {
+    content = 'I can help you with FM Global 8-34 requirements. Please provide more specific details about your ASRS configuration.';
+  }
+  
+  return content;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,11 +91,23 @@ export async function POST(request: NextRequest) {
 
     console.log('FM RAG Query:', query, 'Context:', context);
 
+    // Get Supabase client (with error handling)
+    let supabaseClient;
+    try {
+      supabaseClient = getSupabase();
+    } catch (error) {
+      console.error('Supabase initialization error:', error);
+      return NextResponse.json(
+        { error: 'Database connection not configured' },
+        { status: 503 }
+      );
+    }
+
     // Search FM Global figures and tables directly from Supabase
     const searchTerms = query.toLowerCase();
     
     // Search figures
-    const { data: figures, error: figuresError } = await supabase
+    const { data: figures, error: figuresError } = await supabaseClient
       .from('fm_global_figures')
       .select('*')
       .or(`title.ilike.%${searchTerms}%,clean_caption.ilike.%${searchTerms}%,normalized_summary.ilike.%${searchTerms}%`)
@@ -67,7 +118,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Search tables  
-    const { data: tables, error: tablesError } = await supabase
+    const { data: tables, error: tablesError } = await supabaseClient
       .from('fm_global_tables')
       .select('*')
       .or(`title.ilike.%${searchTerms}%,commodity_types.ilike.%${searchTerms}%,protection_scheme.ilike.%${searchTerms}%`)
@@ -105,8 +156,10 @@ export async function POST(request: NextRequest) {
         `${item.type === 'figure' ? 'Figure' : 'Table'} ${item.display_number}: ${item.display_title}\n${item.description || ''}`
       ).join('\n\n');
 
-      try {
-        const completion = await openai.chat.completions.create({
+      const openaiClient = getOpenAI();
+      if (openaiClient) {
+        try {
+          const completion = await openaiClient.chat.completions.create({
           model: 'gpt-4-turbo-preview',
           messages: [
             {
@@ -126,20 +179,15 @@ Provide specific requirements including K-factors, pressure requirements, and sp
           temperature: 0.3
         });
 
-        aiContent = completion.choices[0].message.content || '';
-      } catch (error) {
-        console.error('OpenAI error:', error);
-        // Fallback to simple response
-        aiContent = `Based on FM Global 8-34 requirements:\n\n`;
-        if (tables && tables.length > 0) {
-          const table = tables[0];
-          aiContent += `According to Table ${table.table_number}: ${table.title}\n\n`;
-          aiContent += table.description || 'Please refer to the complete FM Global 8-34 standard for detailed requirements.';
-        } else if (figures && figures.length > 0) {
-          const figure = figures[0];
-          aiContent += `Reference Figure ${figure.figure_number}: ${figure.title}\n\n`;
-          aiContent += figure.description || 'This figure illustrates the applicable configuration.';
+          aiContent = completion.choices[0].message.content || '';
+        } catch (error) {
+          console.error('OpenAI error:', error);
+          // Fallback to simple response without AI
+          aiContent = generateSimpleResponse(tables, figures);
         }
+      } else {
+        // No OpenAI available, use fallback
+        aiContent = generateSimpleResponse(tables, figures);
       }
     } else {
       aiContent = 'I can help you with FM Global 8-34 requirements. Please provide more specific details about your ASRS configuration.';
@@ -181,25 +229,41 @@ Provide specific requirements including K-factors, pressure requirements, and sp
 }
 
 export async function GET() {
-  // Test Supabase connection
-  const { data: figuresCount } = await supabase
-    .from('fm_global_figures')
-    .select('*', { count: 'exact', head: true });
+  // Check if Supabase is configured
+  try {
+    const supabaseClient = getSupabase();
     
-  const { data: tablesCount } = await supabase
-    .from('fm_global_tables')
-    .select('*', { count: 'exact', head: true });
+    // Test Supabase connection
+    const { data: figuresCount } = await supabaseClient
+      .from('fm_global_figures')
+      .select('*', { count: 'exact', head: true });
+      
+    const { data: tablesCount } = await supabaseClient
+      .from('fm_global_tables')
+      .select('*', { count: 'exact', head: true });
 
-  return NextResponse.json({
-    service: 'FM Global RAG API - Real Supabase Integration',
-    version: '3.0',
-    status: 'connected',
-    database: {
-      figures_available: figuresCount?.length || 32,
-      tables_available: tablesCount?.length || 46
-    },
-    endpoints: {
-      'POST /api/fm-rag': 'Query FM Global knowledge base with real Supabase data'
-    }
-  });
+    return NextResponse.json({
+      service: 'FM Global RAG API - Real Supabase Integration',
+      version: '3.0',
+      status: 'connected',
+      database: {
+        figures_available: figuresCount?.length || 32,
+        tables_available: tablesCount?.length || 46
+      },
+      endpoints: {
+        'POST /api/fm-rag': 'Query FM Global knowledge base with real Supabase data'
+      }
+    });
+  } catch (error) {
+    return NextResponse.json({
+      service: 'FM Global RAG API',
+      version: '3.0',
+      status: 'not configured',
+      error: 'Database connection not configured. Please set environment variables.',
+      required_env: [
+        'NEXT_PUBLIC_SUPABASE_URL',
+        'NEXT_PUBLIC_SUPABASE_ANON_KEY or SUPABASE_SERVICE_ROLE_KEY'
+      ]
+    }, { status: 503 });
+  }
 }

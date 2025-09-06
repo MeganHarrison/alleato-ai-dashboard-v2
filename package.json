@@ -36,6 +36,8 @@
     "check:meetings-table": "node scripts/check-meetings-table.js",
     "vectorize:batch": "node scripts/vectorize-batch.js",
     "vectorize:all": "node scripts/vectorize-all-documents.js",
+    "generate:fm-embeddings": "tsx scripts/generate-fm-embeddings.ts",
+    "fm:seed": "tsx scripts/seed-fm-data.ts",
     "prepare": "husky",
     "clean": "rm -rf test-results screenshots coverage .next dist",
     "clean:all": "npm run clean && rm -rf node_modules .pnpm-store",
