@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "pnpm build",
+  "buildCommand": "(test -f scripts/fix-zod-imports.js && node scripts/fix-zod-imports.js || echo 'Skipping fix script') && pnpm next build",
   "outputDirectory": ".next",
   "installCommand": "pnpm install --production=false",
   "functions": {
