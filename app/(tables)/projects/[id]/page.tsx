@@ -368,42 +368,44 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           </Card>
         </TabsContent>
 
-        {/* Meetings Tab */}
+        {/* Meetings Tab - Now displaying Documents */}
         <TabsContent value="meetings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Project Meetings ({meetings.length})</CardTitle>
+              <CardTitle>Project Documents ({documents.length})</CardTitle>
             </CardHeader>
             <CardContent>
-              {meetings.length > 0 ? (
+              {documents.length > 0 ? (
                 <div className="space-y-3">
-                  {meetings.map((meeting) => (
-                    <div key={meeting.id} className="flex items-start justify-between p-3 rounded-lg border">
+                  {documents.map((document) => (
+                    <div key={document.id} className="flex items-start justify-between p-3 rounded-lg border">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-medium">{meeting.title || "Untitled Meeting"}</h4>
-                          {meeting.category && (
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <h4 className="font-medium">
+                            {/* Try to extract title from metadata or use first part of content */}
+                            {document.metadata && typeof document.metadata === 'object' && 'title' in document.metadata 
+                              ? (document.metadata as any).title
+                              : document.content 
+                                ? document.content.slice(0, 60).split('\n')[0] + (document.content.length > 60 ? '...' : '')
+                                : `Document #${document.id}`
+                            }
+                          </h4>
+                          {document.document_type && (
                             <Badge variant="secondary" className="text-xs">
-                              {meeting.category}
+                              {document.document_type}
                             </Badge>
                           )}
                         </div>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {format(new Date(meeting.date), "MMM d, yyyy")}
-                          </span>
-                          {meeting.duration_minutes && (
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {meeting.duration_minutes} min
-                            </span>
-                          )}
-                        </div>
-                        {meeting.summary && (
-                          <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                            {meeting.summary}
+                        {document.content && (
+                          <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
+                            {document.content.slice(0, 200)}{document.content.length > 200 ? '...' : ''}
                           </p>
+                        )}
+                        {document.metadata && (
+                          <div className="mt-2 text-xs text-muted-foreground">
+                            <span>Metadata available</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -411,7 +413,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  No meetings recorded for this project yet.
+                  No documents found in the system yet.
                 </p>
               )}
             </CardContent>

@@ -28,6 +28,7 @@
     "dev:with-mcp": "concurrently \"npm run mcp:start\" \"npm run dev\"",
     "validate": "npm run lint && npm run test && npx playwright test",
     "setup:rag": "node scripts/setup-rag-system.js",
+    "generate-insights": "tsx scripts/generate-insights.ts",
     "sync:fireflies": "node scripts/fireflies-sync-to-documents.js",
     "sync:fireflies-meetings": "node scripts/fireflies-sync-to-meetings-table.js",
     "sync:fireflies-complete": "node scripts/fireflies-sync-to-documents-complete.js",
