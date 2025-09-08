@@ -1,24 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { format } from "date-fns";
-import Link from "next/link";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -27,25 +11,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
-  Search,
-  Filter,
-  Columns3,
-  LayoutGrid,
-  List,
-  ChevronDown,
-  ExternalLink,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import {
+  Briefcase,
   Building,
   Calendar,
-  DollarSign,
-  Briefcase,
-  MapPin,
+  ChevronDown,
   ChevronUp,
   ChevronsUpDown,
-  Plus,
+  Columns3,
+  DollarSign,
+  ExternalLink,
   FileText,
+  Filter,
+  LayoutGrid,
+  List,
+  MapPin,
+  Plus,
+  Search,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 interface Project {
   id: string;
@@ -65,7 +65,7 @@ interface Project {
   updated_at?: string;
   due_date?: string;
   team?: string;
-  meetings?: any[];
+  documents?: any[];
 }
 
 const COLUMNS = [
@@ -127,7 +127,7 @@ export default function DashboardHome() {
               id,
               name
             ),
-            meetings (
+            documents (
               id
             )
           `);
@@ -397,10 +397,10 @@ export default function DashboardHome() {
                     </span>
                   </div>
                 )}
-                {project.meetings && project.meetings.length > 0 && (
+                {project.documents && project.documents.length > 0 && (
                   <div className="flex items-center gap-1">
                     <FileText className="h-3 w-3" />
-                    <span>{project.meetings.length} meetings</span>
+                    <span>{project.documents.length} document{project.documents.length !== 1 ? 's' : ''}</span>
                   </div>
                 )}
               </div>
@@ -552,7 +552,70 @@ export default function DashboardHome() {
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto w-[95%] sm:w-full px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Service Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* FM Global Guru Card */}
+          <div>
+            <Link
+              href="/chat-asrs"
+              className="block transition-transform hover:-translate-y-1"
+            >
+              <Card className="h-full bg-gray-50 border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-gray-200">
+                <CardContent className="p-8">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      FM Global Guru
+                    </h3>
+                    <span className="text-2xl font-bold text-gray-900">
+                      $3,500
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-base leading-relaxed">
+                    AI Agent trained on all of your business documents.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+
+          {/* Project Maestro Card */}
+          <div>
+            <Link
+              href="/projects"
+              className="block transition-transform hover:-translate-y-1"
+            >
+              <Card className="h-full bg-gray-50 border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-gray-200">
+                <CardContent className="p-8">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                    Project Maestro
+                  </h3>
+                  <p className="text-gray-600 text-base leading-relaxed">
+                    AI Agent trained on all the systems you use within your business.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+
+          {/* Company Knowledge Base Card */}
+          <div>
+            <Link
+              href="/insights"
+              className="block transition-transform hover:-translate-y-1"
+            >
+              <Card className="h-full bg-gray-50 border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-gray-200">
+                <CardContent className="p-8">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                    Company Knowledge Base
+                  </h3>
+                  <p className="text-gray-600 text-base leading-relaxed">
+                    Create and update content with your AI agent workflows.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>

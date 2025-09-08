@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     let result;
     if (documentIds && Array.isArray(documentIds)) {
       // Batch processing
-      result = await insightGenerator.batchGenerateInsights(documentIds);
+      result = await insightGenerator.generateInsightsBatch(documentIds);
     } else {
       // Single document processing
       result = await insightGenerator.generateDocumentInsights(documentId);

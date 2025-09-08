@@ -1,90 +1,597 @@
-import { getCurrentProjects } from "@/app/actions/dashboard-actions";
-import { ProjectsViewWrapper } from "@/components/projects/projects-view-wrapper";
-import { SectionCards } from "@/components/section-cards";
+"use client";
+
+import { AppSidebar } from "@/components/app-sidebar";
+import { DynamicBreadcrumbs } from "@/components/dynamic-breadcrumbs";
+import ErrorBoundary from "@/components/error-boundary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Activity,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Switch } from "@/components/ui/switch";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Toaster } from "@/components/ui/toaster";
+import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import {
   Briefcase,
+  Building,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  Columns3,
   DollarSign,
-  TrendingDownIcon,
-  TrendingUpIcon,
-  Users,
+  ExternalLink,
+  FileText,
+  Filter,
+  LayoutGrid,
+  List,
+  MapPin,
+  Plus,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
-import { AppSidebar } from "@/components/app-sidebar";
-import { 
-  SidebarProvider, 
-  SidebarInset, 
-  SidebarTrigger 
-} from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
-import { DynamicBreadcrumbs } from "@/components/dynamic-breadcrumbs";
-import ErrorBoundary from "@/components/error-boundary";
-import { Toaster } from "@/components/ui/toaster";
+import { useEffect, useMemo, useState } from "react";
 
-export default async function DashboardHome() {
-  const currentProjects = await getCurrentProjects();
+interface Project {
+  id: string;
+  name: string;
+  phase: string;
+  category?: string;
+  description?: string;
+  "est revenue"?: number;
+  address?: string;
+  state?: string;
+  location?: string;
+  clients?: {
+    id: number;
+    name: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+  due_date?: string;
+  team?: string;
+  documents?: any[];
+}
+
+const COLUMNS = [
+  { id: "name", label: "Project Name", defaultVisible: true },
+  { id: "phase", label: "Status", defaultVisible: true },
+  { id: "company", label: "Company", defaultVisible: true },
+  { id: "revenue", label: "Est. Revenue", defaultVisible: true },
+  { id: "category", label: "Category", defaultVisible: true },
+  { id: "location", label: "Location", defaultVisible: false },
+  { id: "created", label: "Created", defaultVisible: false },
+];
+
+function getStatusColor(phase: string) {
+  const statusMap: Record<string, string> = {
+    Planning: "bg-brand-100 text-brand-800 border-brand-200",
+    Current: "bg-green-100 text-green-800 border-green-200",
+    "On Hold": "bg-yellow-100 text-yellow-800 border-yellow-200",
+    Complete: "bg-gray-100 text-gray-800 border-gray-200",
+    Lost: "bg-red-100 text-red-800 border-red-200",
+  };
+  return statusMap[phase] || "bg-gray-100 text-gray-800 border-gray-200";
+}
+
+function formatCurrency(amount: number | null | undefined) {
+  if (!amount) return "—";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export default function DashboardHome() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPhase, setSelectedPhase] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showOnlyActive, setShowOnlyActive] = useState(true);
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+    new Set(COLUMNS.filter((col) => col.defaultVisible).map((col) => col.id))
+  );
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
   const services = [
     {
-      title: "ASRS GURU",
-      description: "Navigating FM Global 8-34 with clarity and confidence.",
-      href: "/asrs-design",
-      isExternal: false,
-      icon: "🏗️",
-      color: "bg-blue-50 border-blue-200",
+      title: "FM Global Guru",
+      description: "AI Agent trained on all of your business documents.",
+      href: "/fm-global-expert",
     },
     {
       title: "Project Maestro",
       description:
-        "Your right-hand strategist, research assistant, & business brain extension, all in one.",
+        "AI Agent trained on all the systems you use within your business.",
       href: "/projects-dashboard",
-      isExternal: false,
-      icon: "🎯",
-      color: "bg-green-50 border-green-200",
+      price: null,
     },
     {
       title: "Company Knowledge Base",
-      description: "Central hub for all SOP's and documentation",
-      href: "http://localhost:4321/",
-      isExternal: true,
-      icon: "📚",
-      color: "bg-purple-50 border-purple-200",
+      description: "Create and update content with your AI agent workflows.",
+      href: "/insights",
+      price: null,
     },
   ];
 
-  // Quick stats for mobile-first dashboard
-  const quickStats = [
-    {
-      title: "Total Revenue",
-      value: "$1,250.00",
-      trend: "+12.5%",
-      icon: DollarSign,
-      positive: true,
-    },
-    {
-      title: "Active Projects",
-      value: currentProjects.length.toString(),
-      trend: "+3",
-      icon: Briefcase,
-      positive: true,
-    },
-    {
-      title: "New Customers",
-      value: "1,234",
-      trend: "-20%",
-      icon: Users,
-      positive: false,
-    },
-    {
-      title: "Growth Rate",
-      value: "4.5%",
-      trend: "+4.5%",
-      icon: Activity,
-      positive: true,
-    },
-  ];
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const supabase = createClient();
+
+        let query = supabase.from("projects").select(`
+            *,
+            clients (
+              id,
+              name
+            ),
+            documents (
+              id
+            )
+          `);
+
+        // Only filter by phase if showOnlyActive is true
+        if (showOnlyActive) {
+          query = query.in("phase", ["Current", "Planning", "On Hold"]);
+        }
+
+        const { data, error } = await query.order("created_at", {
+          ascending: false,
+        });
+
+        if (error) {
+          throw new Error(`Supabase error: ${error.message}`);
+        }
+
+        if (data) {
+          setProjects(data);
+        }
+      } catch (err: unknown) {
+        console.error("Failed to fetch projects:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to load projects"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [showOnlyActive]);
+
+  // Get unique phases and types for filters
+  const phases = useMemo(() => {
+    const phaseSet = new Set(projects.map((p) => p.phase).filter(Boolean));
+    return ["all", ...Array.from(phaseSet).sort()];
+  }, [projects]);
+
+  const categories = useMemo(() => {
+    const categorySet = new Set(
+      projects.map((p) => p.category).filter(Boolean)
+    );
+    return ["all", ...Array.from(categorySet).sort()];
+  }, [projects]);
+
+  // Filter and sort projects
+  const filteredProjects = useMemo(() => {
+    let filtered = projects.filter((project) => {
+      // Phase filter
+      if (selectedPhase !== "all" && project.phase !== selectedPhase) {
+        return false;
+      }
+
+      // Category filter
+      if (selectedCategory !== "all" && project.category !== selectedCategory) {
+        return false;
+      }
+
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return (
+          project.name?.toLowerCase().includes(query) ||
+          project.description?.toLowerCase().includes(query) ||
+          project.clients?.name?.toLowerCase().includes(query) ||
+          project.address?.toLowerCase().includes(query) ||
+          project.state?.toLowerCase().includes(query)
+        );
+      }
+
+      return true;
+    });
+
+    // Apply sorting
+    if (sortColumn) {
+      filtered.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (sortColumn) {
+          case "name":
+            aValue = a.name?.toLowerCase() || "";
+            bValue = b.name?.toLowerCase() || "";
+            break;
+          case "phase":
+            aValue = a.phase?.toLowerCase() || "";
+            bValue = b.phase?.toLowerCase() || "";
+            break;
+          case "company":
+            aValue = a.clients?.name?.toLowerCase() || "";
+            bValue = b.clients?.name?.toLowerCase() || "";
+            break;
+          case "revenue":
+            aValue = a["est revenue"] || 0;
+            bValue = b["est revenue"] || 0;
+            break;
+          case "category":
+            aValue = a.category?.toLowerCase() || "";
+            bValue = b.category?.toLowerCase() || "";
+            break;
+          case "created":
+            aValue = a.created_at ? new Date(a.created_at).getTime() : 0;
+            bValue = b.created_at ? new Date(b.created_at).getTime() : 0;
+            break;
+          default:
+            return 0;
+        }
+
+        if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+        if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+        return 0;
+      });
+    } else {
+      // Default sort by created date descending
+      filtered.sort((a, b) => {
+        const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return bDate - aDate;
+      });
+    }
+
+    return filtered;
+  }, [
+    projects,
+    selectedPhase,
+    selectedCategory,
+    searchQuery,
+    sortColumn,
+    sortDirection,
+  ]);
+
+  const toggleColumn = (columnId: string) => {
+    const newVisible = new Set(visibleColumns);
+    if (newVisible.has(columnId)) {
+      newVisible.delete(columnId);
+    } else {
+      newVisible.add(columnId);
+    }
+    setVisibleColumns(newVisible);
+  };
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const getSortIcon = (column: string) => {
+    if (sortColumn !== column) {
+      return <ChevronsUpDown className="ml-2 h-4 w-4" />;
+    }
+    return sortDirection === "asc" ? (
+      <ChevronUp className="ml-2 h-4 w-4" />
+    ) : (
+      <ChevronDown className="ml-2 h-4 w-4" />
+    );
+  };
+
+  const CardView = () => (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {filteredProjects.map((project) => (
+        <Card
+          key={project.id}
+          className="group bg-white border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-200"
+        >
+          <CardContent className="p-5">
+            {/* Header */}
+            <div className="flex items-start justify-between text-brand-500 text-sm mb-3">
+              <div className="flex-1">
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="font-medium text-base line-clamp-1 hover:text-brand-500 hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  {project.name}
+                  <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+                {project.clients?.name && (
+                  <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
+                    <Building className="h-3.5 w-3.5" />
+                    <span>{project.clients.name}</span>
+                  </div>
+                )}
+              </div>
+              <Badge className={cn("text-xs", getStatusColor(project.phase))}>
+                {project.phase}
+              </Badge>
+            </div>
+
+            {/* Metadata */}
+            <div className="space-y-2 mb-3">
+              {project.category && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Briefcase className="h-3.5 w-3.5" />
+                  <span>{project.category}</span>
+                </div>
+              )}
+              {project["est revenue"] && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <DollarSign className="h-3.5 w-3.5" />
+                  <span className="font-medium">
+                    {formatCurrency(project["est revenue"])}
+                  </span>
+                </div>
+              )}
+              {(project.address || project.state) && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <MapPin className="h-3.5 w-3.5" />
+                  <span>
+                    {project.state
+                      ? `${project.address || ""} ${project.state}`.trim()
+                      : project.address}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Description */}
+            {project.description && (
+              <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                {project.description}
+              </p>
+            )}
+
+            {/* Footer */}
+            <div className="flex items-center justify-between pt-3 border-t">
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                {project.created_at && (
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    <span>
+                      {format(new Date(project.created_at), "MMM d, yyyy")}
+                    </span>
+                  </div>
+                )}
+                {project.documents && project.documents.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    <FileText className="h-3 w-3" />
+                    <span>
+                      {project.documents.length} document
+                      {project.documents.length !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <Link href={`/projects/${project.id}`}>
+                <Button size="sm" variant="ghost" className="h-7 px-2">
+                  View Details
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+
+  const TableView = () => (
+    <div className="border rounded-lg overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-gray-50">
+            {visibleColumns.has("name") && (
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("name")}
+              >
+                <div className="flex items-center">
+                  Project Name
+                  {getSortIcon("name")}
+                </div>
+              </TableHead>
+            )}
+            {visibleColumns.has("phase") && (
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("phase")}
+              >
+                <div className="flex items-center">
+                  Status
+                  {getSortIcon("phase")}
+                </div>
+              </TableHead>
+            )}
+            {visibleColumns.has("company") && (
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("company")}
+              >
+                <div className="flex items-center">
+                  Company
+                  {getSortIcon("company")}
+                </div>
+              </TableHead>
+            )}
+            {visibleColumns.has("revenue") && (
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("revenue")}
+              >
+                <div className="flex items-center">
+                  Est. Revenue
+                  {getSortIcon("revenue")}
+                </div>
+              </TableHead>
+            )}
+            {visibleColumns.has("category") && (
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("category")}
+              >
+                <div className="flex items-center">
+                  Category
+                  {getSortIcon("category")}
+                </div>
+              </TableHead>
+            )}
+            {visibleColumns.has("location") && <TableHead>Location</TableHead>}
+            {visibleColumns.has("created") && (
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("created")}
+              >
+                <div className="flex items-center">
+                  Created
+                  {getSortIcon("created")}
+                </div>
+              </TableHead>
+            )}
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredProjects.map((project) => (
+            <TableRow key={project.id} className="hover:bg-gray-50">
+              {visibleColumns.has("name") && (
+                <TableCell className="font-medium">
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="hover:text-brand-600 hover:underline flex items-center gap-1"
+                  >
+                    {project.name}
+                    <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100" />
+                  </Link>
+                </TableCell>
+              )}
+              {visibleColumns.has("phase") && (
+                <TableCell>
+                  <Badge
+                    className={cn("text-xs", getStatusColor(project.phase))}
+                  >
+                    {project.phase}
+                  </Badge>
+                </TableCell>
+              )}
+              {visibleColumns.has("company") && (
+                <TableCell>{project.clients?.name || "—"}</TableCell>
+              )}
+              {visibleColumns.has("revenue") && (
+                <TableCell className="font-medium">
+                  {formatCurrency(project["est revenue"])}
+                </TableCell>
+              )}
+              {visibleColumns.has("category") && (
+                <TableCell>{project.category || "—"}</TableCell>
+              )}
+              {visibleColumns.has("location") && (
+                <TableCell>{project.location || "—"}</TableCell>
+              )}
+              {visibleColumns.has("created") && (
+                <TableCell>
+                  {project.created_at
+                    ? format(new Date(project.created_at), "MMM d, yyyy")
+                    : "—"}
+                </TableCell>
+              )}
+              <TableCell className="text-right">
+                <Link href={`/projects/${project.id}`}>
+                  <Button size="sm" variant="ghost">
+                    View
+                  </Button>
+                </Link>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading projects...</p>
+            </div>
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    );
+  }
+
+  if (error) {
+    return (
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-red-500 text-6xl mb-4">⚠️</div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Failed to Load Projects
+              </h1>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-brand-600 text-white rounded hover:bg-brand-700"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -100,178 +607,202 @@ export default async function DashboardHome() {
             <DynamicBreadcrumbs />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 mx-[2.5%] sm:ml-6 sm:mr-6">
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 mx-[5%] sm:ml-6 sm:mr-6">
           <ErrorBoundary>
             <div className="min-h-screen">
-              {/* Compact Mobile Header */}
-              <div className="pb-3 pt-2">
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <h1 className="text-xl sm:text-[60px] lg:text-[80px] font-didot text-[#DB802D] leading-tight">
-                      hello.
-                    </h1>
-                  </div>
-                  <Button
-                    size="sm"
-                    className="bg-[#DB802D] hover:bg-[#c1731f] text-white rounded-full px-3 py-1.5 text-xs font-medium"
+              {/* Service Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {services.map((service, index) => (
+                  <Link
+                    href={service.href}
+                    key={index}
+                    className="block transition-transform hover:-translate-y-1"
                   >
-                    Quick Start
-                  </Button>
-                </div>
+                    <Card className="h-full bg-gray-50 border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-gray-200">
+                      <CardContent className="p-8">
+                        {service.price ? (
+                          <div className="flex items-start justify-between mb-4">
+                            <h3 className="text-base font-semibold text-gray-900">
+                              {service.title}
+                            </h3>
+                            <span className="text-2xl font-bold text-gray-900">
+                              {service.price}
+                            </span>
+                          </div>
+                        ) : (
+                          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                            {service.title}
+                          </h3>
+                        )}
+                        <p className="text-gray-600 text-base leading-relaxed">
+                          {service.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
               </div>
 
-              {/* Dense Mobile Stats Cards */}
+              {/* Projects Dashboard Header */}
               <div className="mb-4">
-                <h2 className="text-base font-semibold text-gray-900 mb-2 px-1">
-                  Quick Overview
-                </h2>
-                <div className="grid grid-cols-2 gap-2">
-                  {quickStats.map((stat, index) => {
-                    const Icon = stat.icon;
-                    return (
-                      <Card key={index} className="bg-white border-0 shadow-sm">
-                        <CardContent className="p-3">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <Icon className="h-4 w-4 text-gray-600" />
-                            <Badge
-                              variant="outline"
-                              className={`text-[10px] px-1.5 py-0.5 ${
-                                stat.positive
-                                  ? "text-green-700 border-green-200"
-                                  : "text-red-700 border-red-200"
-                              }`}
-                            >
-                              {stat.positive ? (
-                                <TrendingUpIcon className="h-2.5 w-2.5 mr-1" />
-                              ) : (
-                                <TrendingDownIcon className="h-2.5 w-2.5 mr-1" />
-                              )}
-                              {stat.trend}
-                            </Badge>
-                          </div>
-                          <div className="text-lg font-bold text-gray-900 mb-0.5">
-                            {stat.value}
-                          </div>
-                          <div className="text-[10px] text-gray-600 leading-tight">
-                            {stat.title}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Compact Mobile Service Cards */}
-              <div className="px-2 mb-4">
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-semibold text-gray-900">AI Services</h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-[#DB802D] text-xs px-2 py-1"
-                  >
-                    View All
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-l font-semibold">PROJECTS</h1>
+                  </div>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Project
                   </Button>
                 </div>
-                <div className="space-y-2">
-                  {services.map((service, index) =>
-                    service.isExternal ? (
-                      <a
-                        href={service.href}
-                        key={index}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block"
+              </div>
+
+              {/* Filters and Controls */}
+              <div className="rounded-lg mb-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    {/* Search */}
+                    <div className="relative w-full sm:w-64">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type="text"
+                        placeholder="Search projects..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+
+                    {/* Active Projects Toggle */}
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="active-only"
+                        checked={showOnlyActive}
+                        onCheckedChange={setShowOnlyActive}
+                      />
+                      <Label
+                        htmlFor="active-only"
+                        className="text-sm font-medium cursor-pointer"
                       >
-                        <Card
-                          className={`${service.color} border-0 shadow-sm transition-all duration-200 active:scale-[0.98] touch-manipulation`}
-                        >
-                          <CardContent className="p-3">
-                            <div className="flex items-center space-x-2.5">
-                              <div className="text-xl flex-shrink-0">
-                                {service.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-gray-900 text-sm mb-0.5 leading-tight">
-                                  {service.title}
-                                </h3>
-                                <p className="text-gray-600 text-xs line-clamp-1 leading-tight">
-                                  {service.description}
-                                </p>
-                              </div>
-                              <div className="text-gray-400 flex-shrink-0">
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 5l7 7-7 7"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </a>
-                    ) : (
-                      <Link href={service.href} key={index} className="block">
-                        <Card
-                          className={`${service.color} border-0 shadow-sm transition-all duration-200 active:scale-[0.98] touch-manipulation`}
-                        >
-                          <CardContent className="p-3">
-                            <div className="flex items-center space-x-2.5">
-                              <div className="text-xl flex-shrink-0">
-                                {service.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-gray-900 text-sm mb-0.5 leading-tight">
-                                  {service.title}
-                                </h3>
-                                <p className="text-gray-600 text-xs line-clamp-1 leading-tight">
-                                  {service.description}
-                                </p>
-                              </div>
-                              <div className="text-gray-400 flex-shrink-0">
-                                <svg
-                                  className="w-4 h-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 5l7 7-7 7"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    )
+                        Current projects only
+                      </Label>
+                    </div>
+
+                    {/* Filters */}
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-gray-400" />
+                      <select
+                        value={selectedPhase}
+                        onChange={(e) => setSelectedPhase(e.target.value)}
+                        className="text-sm border rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      >
+                        <option value="all">All Status</option>
+                        {phases
+                          .filter((p) => p !== "all")
+                          .map((phase) => (
+                            <option key={phase} value={phase}>
+                              {phase}
+                            </option>
+                          ))}
+                      </select>
+
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="text-sm border rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      >
+                        <option value="all">All Categories</option>
+                        {categories
+                          .filter((c) => c !== "all")
+                          .map((category) => (
+                            <option key={category} value={category}>
+                              {category}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Column selector for table view */}
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Columns3 className="h-4 w-4 mr-2" />
+                          Columns
+                          <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {COLUMNS.map((column) => (
+                          <DropdownMenuCheckboxItem
+                            key={column.id}
+                            checked={visibleColumns.has(column.id)}
+                            onCheckedChange={() => toggleColumn(column.id)}
+                          >
+                            {column.label}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <span className="text-sm text-gray-600">
+                      {filteredProjects.length} of {projects.length} projects
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content with View Toggle */}
+              <Tabs defaultValue="cards" className="space-y-4">
+                <TabsList className="bg-gray-50 border">
+                  <TabsTrigger
+                    value="cards"
+                    className="flex items-center gap-2"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    Cards
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="table"
+                    className="flex items-center gap-2"
+                  >
+                    <List className="h-4 w-4" />
+                    Table
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="cards">
+                  {filteredProjects.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 text-6xl mb-4">📁</div>
+                      <h3 className="text-lg font-medium mb-2">
+                        No projects found
+                      </h3>
+                      <p>Try adjusting your filters or search query</p>
+                    </div>
+                  ) : (
+                    <CardView />
                   )}
-                </div>
-              </div>
+                </TabsContent>
 
-              {/* Compact Mobile Projects Section */}
-              <div>
-                <div className="pt-4">
-                  <ProjectsViewWrapper projects={currentProjects} defaultView="card" />
-                </div>
-              </div>
-
-              {/* Desktop Only - Detailed Metrics */}
-              <div className="hidden lg:block px-4 lg:px-6 mt-8">
-                <SectionCards />
-              </div>
+                <TabsContent value="table">
+                  {filteredProjects.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="text-gray-500 text-6xl mb-4">📁</div>
+                      <h3 className="text-lg font-medium mb-2">
+                        No projects found
+                      </h3>
+                      <p className="text-gray-600">
+                        Try adjusting your filters or search query
+                      </p>
+                    </div>
+                  ) : (
+                    <TableView />
+                  )}
+                </TabsContent>
+              </Tabs>
             </div>
           </ErrorBoundary>
         </div>

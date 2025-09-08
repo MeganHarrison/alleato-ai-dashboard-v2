@@ -17,6 +17,9 @@ import {
   ListTodo,
   Lightbulb,
   Code,
+  FolderOpen,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -27,6 +30,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface AIInsight {
   id: number;
@@ -66,6 +74,8 @@ export default function AIInsightsDisplay() {
   const [selectedProject, setSelectedProject] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [projects, setProjects] = useState<string[]>([]);
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<"grouped" | "flat">("grouped");
 
   useEffect(() => {
     fetchInsights();
@@ -109,6 +119,34 @@ export default function AIInsightsDisplay() {
     return acc;
   }, {} as Record<string, AIInsight[]>);
 
+  // Group insights by project
+  const insightsByProject = filteredInsights.reduce((acc, insight) => {
+    const projectName = insight.project_name || "No Project";
+    if (!acc[projectName]) {
+      acc[projectName] = [];
+    }
+    acc[projectName].push(insight);
+    return acc;
+  }, {} as Record<string, AIInsight[]>);
+
+  const toggleProject = (projectName: string) => {
+    const newExpanded = new Set(expandedProjects);
+    if (newExpanded.has(projectName)) {
+      newExpanded.delete(projectName);
+    } else {
+      newExpanded.add(projectName);
+    }
+    setExpandedProjects(newExpanded);
+  };
+
+  const expandAllProjects = () => {
+    setExpandedProjects(new Set(Object.keys(insightsByProject)));
+  };
+
+  const collapseAllProjects = () => {
+    setExpandedProjects(new Set());
+  };
+
   const resolveInsight = async (insightId: number) => {
     try {
       const response = await fetch(
@@ -143,7 +181,17 @@ export default function AIInsightsDisplay() {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4 mb-4">
+      <div className="flex gap-4 mb-4 flex-wrap">
+        <Select value={viewMode} onValueChange={(value: "grouped" | "flat") => setViewMode(value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="View mode" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="grouped">Group by Project</SelectItem>
+            <SelectItem value="flat">Flat View</SelectItem>
+          </SelectContent>
+        </Select>
+
         <Select value={selectedProject} onValueChange={setSelectedProject}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Filter by project" />
@@ -173,6 +221,17 @@ export default function AIInsightsDisplay() {
           </SelectContent>
         </Select>
 
+        {viewMode === "grouped" && (
+          <>
+            <Button onClick={expandAllProjects} variant="outline" size="sm">
+              Expand All
+            </Button>
+            <Button onClick={collapseAllProjects} variant="outline" size="sm">
+              Collapse All
+            </Button>
+          </>
+        )}
+
         <Button onClick={fetchInsights} variant="outline">
           Refresh
         </Button>
@@ -201,30 +260,111 @@ export default function AIInsightsDisplay() {
         </div>
       </div>
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid grid-cols-7 w-full">
-          <TabsTrigger value="all">All</TabsTrigger>
-          {Object.keys(insightIcons).map((type) => (
-            <TabsTrigger key={type} value={type}>
-              {type.replace("_", " ").charAt(0).toUpperCase() +
-                type.replace("_", " ").slice(1)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      {viewMode === "grouped" ? (
+        // Grouped by Project View
+        <div className="space-y-4">
+          {Object.entries(insightsByProject).map(([projectName, projectInsights]) => (
+            <Card key={projectName} className="overflow-hidden">
+              <Collapsible
+                open={expandedProjects.has(projectName)}
+                onOpenChange={() => toggleProject(projectName)}
+              >
+                <CollapsibleTrigger className="w-full">
+                  <CardHeader className="hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {expandedProjects.has(projectName) ? (
+                          <ChevronDown className="h-5 w-5" />
+                        ) : (
+                          <ChevronRight className="h-5 w-5" />
+                        )}
+                        <FolderOpen className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg">{projectName}</CardTitle>
+                      </div>
+                      <div className="flex gap-2">
+                        <Badge variant="outline">
+                          {projectInsights.length} insights
+                        </Badge>
+                        <Badge 
+                          variant="secondary"
+                          className="bg-orange-100 text-orange-800"
+                        >
+                          {projectInsights.filter(i => i.resolved === 0).length} open
+                        </Badge>
+                        {projectInsights.some(i => i.severity === "high" || i.severity === "critical") && (
+                          <Badge className="bg-red-100 text-red-800">
+                            {projectInsights.filter(i => i.severity === "high" || i.severity === "critical").length} high priority
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="pt-0">
+                    <Tabs defaultValue="all" className="w-full">
+                      <TabsList className="grid grid-cols-7 w-full mb-4">
+                        <TabsTrigger value="all">All</TabsTrigger>
+                        {Object.keys(insightIcons).map((type) => (
+                          <TabsTrigger key={type} value={type}>
+                            {type.replace("_", " ").charAt(0).toUpperCase() +
+                              type.replace("_", " ").slice(1)}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
 
-        <TabsContent value="all" className="space-y-4">
-          {filteredInsights.map((insight) => (
-            <InsightCard
-              key={insight.id}
-              insight={insight}
-              onResolve={resolveInsight}
-            />
-          ))}
-        </TabsContent>
+                      <TabsContent value="all" className="space-y-4">
+                        {projectInsights.map((insight) => (
+                          <InsightCard
+                            key={insight.id}
+                            insight={insight}
+                            onResolve={resolveInsight}
+                          />
+                        ))}
+                      </TabsContent>
 
-        {Object.entries(groupedInsights).map(([type, typeInsights]) => (
-          <TabsContent key={type} value={type} className="space-y-4">
-            {typeInsights.map((insight) => (
+                      {Object.keys(insightIcons).map((type) => {
+                        const typeInsights = projectInsights.filter(i => i.insight_type === type);
+                        return (
+                          <TabsContent key={type} value={type} className="space-y-4">
+                            {typeInsights.length > 0 ? (
+                              typeInsights.map((insight) => (
+                                <InsightCard
+                                  key={insight.id}
+                                  insight={insight}
+                                  onResolve={resolveInsight}
+                                />
+                              ))
+                            ) : (
+                              <div className="text-center py-8 text-muted-foreground">
+                                No {type.replace("_", " ")} insights for this project
+                              </div>
+                            )}
+                          </TabsContent>
+                        );
+                      })}
+                    </Tabs>
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        // Flat View (Original)
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="grid grid-cols-7 w-full">
+            <TabsTrigger value="all">All</TabsTrigger>
+            {Object.keys(insightIcons).map((type) => (
+              <TabsTrigger key={type} value={type}>
+                {type.replace("_", " ").charAt(0).toUpperCase() +
+                  type.replace("_", " ").slice(1)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          <TabsContent value="all" className="space-y-4">
+            {filteredInsights.map((insight) => (
               <InsightCard
                 key={insight.id}
                 insight={insight}
@@ -232,8 +372,20 @@ export default function AIInsightsDisplay() {
               />
             ))}
           </TabsContent>
-        ))}
-      </Tabs>
+
+          {Object.entries(groupedInsights).map(([type, typeInsights]) => (
+            <TabsContent key={type} value={type} className="space-y-4">
+              {typeInsights.map((insight) => (
+                <InsightCard
+                  key={insight.id}
+                  insight={insight}
+                  onResolve={resolveInsight}
+                />
+              ))}
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { getProjectMeetingInsights } from "@/app/actions/meeting-insights-actions";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   getProjectDocuments,
   getProjectInsights,
@@ -10,6 +9,7 @@ import type { Database } from "@/types/database.types";
 import { createServerClient } from "@supabase/ssr";
 import { format } from "date-fns";
 import {
+  Activity,
   AlertCircle,
   Brain,
   Calendar,
@@ -22,9 +22,6 @@ import {
   MessageSquare,
   Users,
   XCircle,
-  TrendingUp,
-  Activity,
-  BarChart3,
 } from "lucide-react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -36,28 +33,36 @@ function ModernDocumentCard({ document }: { document: any }) {
   const getDocumentIcon = (type: string | null) => {
     if (!type) return <FileText className="h-4 w-4 text-gray-400" />;
     const lowerType = type.toLowerCase();
-    if (lowerType.includes('meeting')) return <MessageSquare className="h-4 w-4 text-blue-500" />;
-    if (lowerType.includes('report')) return <FileText className="h-4 w-4 text-green-500" />;
-    if (lowerType.includes('contract')) return <FileText className="h-4 w-4 text-purple-500" />;
-    if (lowerType.includes('proposal')) return <FileText className="h-4 w-4 text-orange-500" />;
+    if (lowerType.includes("meeting"))
+      return <MessageSquare className="h-4 w-4 text-blue-500" />;
+    if (lowerType.includes("report"))
+      return <FileText className="h-4 w-4 text-green-500" />;
+    if (lowerType.includes("contract"))
+      return <FileText className="h-4 w-4 text-purple-500" />;
+    if (lowerType.includes("proposal"))
+      return <FileText className="h-4 w-4 text-orange-500" />;
     return <FileText className="h-4 w-4 text-gray-400" />;
   };
 
   const extractTitle = (document: any) => {
     if (document.metadata && typeof document.metadata === "object") {
       if ("title" in document.metadata) return (document.metadata as any).title;
-      if ("filename" in document.metadata) return (document.metadata as any).filename;
+      if ("filename" in document.metadata)
+        return (document.metadata as any).filename;
       if ("name" in document.metadata) return (document.metadata as any).name;
     }
-    
+
     if (document.content) {
       const firstLine = document.content.split("\n")[0];
       if (firstLine && firstLine.length <= 100) {
         return firstLine;
       }
-      return document.content.slice(0, 50) + (document.content.length > 50 ? "..." : "");
+      return (
+        document.content.slice(0, 50) +
+        (document.content.length > 50 ? "..." : "")
+      );
     }
-    
+
     return `Document #${document.id}`;
   };
 
@@ -72,22 +77,22 @@ function ModernDocumentCard({ document }: { document: any }) {
   };
 
   return (
-    <div className="group relative bg-gray-50 hover:bg-white rounded-xl p-5 transition-all hover:shadow-lg cursor-pointer border border-gray-100 hover:border-gray-200">
+    <div className="group relative rounded-xl p-5 transition-all hover:shadow-lg cursor-pointer">
       <div className="flex items-start gap-3">
-        <div className="p-2 bg-white rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
+        <div className="p-2 rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
           {getDocumentIcon(document.document_type)}
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-sm text-gray-900 truncate group-hover:text-blue-600 transition-colors">
             {extractTitle(document)}
           </h4>
-          
+
           {extractDate(document) && (
             <p className="text-xs text-gray-500 mt-1">
               {format(new Date(extractDate(document)), "MMM d, yyyy")}
             </p>
           )}
-          
+
           {document.content && (
             <p className="mt-2 text-xs text-gray-600 line-clamp-2">
               {document.content.slice(0, 100)}
@@ -96,7 +101,7 @@ function ModernDocumentCard({ document }: { document: any }) {
           )}
         </div>
       </div>
-      
+
       {document.metadata && typeof document.metadata === "object" && (
         <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
           {"file_size" in document.metadata && (
@@ -187,11 +192,15 @@ async function getProjectDetails(id: string) {
 
   // Get additional documents using the action (may include different filtering)
   const documentsResult = await getProjectDocuments(parseInt(id));
-  const additionalDocuments = documentsResult.success ? documentsResult.documents : [];
+  const additionalDocuments = documentsResult.success
+    ? documentsResult.documents
+    : [];
 
   // Merge and deduplicate documents
   const allDocuments = [...(documents || []), ...additionalDocuments];
-  const uniqueDocuments = Array.from(new Map(allDocuments.map(doc => [doc.id, doc])).values());
+  const uniqueDocuments = Array.from(
+    new Map(allDocuments.map((doc) => [doc.id, doc])).values()
+  );
 
   // Get insights for this project (both project_insights and ai_insights)
   const insightsResult = await getProjectInsights(parseInt(id));
@@ -227,13 +236,8 @@ export default async function ProjectDetailPage({
     notFound();
   }
 
-  const {
-    project,
-    documents,
-    projectInsights,
-    aiInsights,
-    meetingInsights,
-  } = data;
+  const { project, documents, projectInsights, aiInsights, meetingInsights } =
+    data;
 
   // Calculate insight summary from meeting insights
   const safeInsights = meetingInsights || [];
@@ -293,22 +297,22 @@ export default async function ProjectDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen">
       {/* Modern Header Section */}
-      <div className="bg-white border-b">
+      <div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-light text-gray-900">
+              <h1 className="text-3xl font-medium text-gray-900">
                 {project.name || `Project ${project.id}`}
               </h1>
               {project["job number"] && (
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-base text-gray-700">
                   Job #{project["job number"]}
                 </p>
               )}
             </div>
-            <Badge 
+            <Badge
               className={cn(
                 "px-4 py-1.5 text-sm font-medium rounded-full",
                 getPhaseColor(project.phase)
@@ -317,7 +321,7 @@ export default async function ProjectDetailPage({
               {project.phase || "Not Started"}
             </Badge>
           </div>
-          
+
           {project.description && (
             <p className="mt-4 text-gray-600 max-w-3xl leading-relaxed">
               {project.description}
@@ -335,14 +339,19 @@ export default async function ProjectDetailPage({
               <div className="p-2 bg-green-50 rounded-lg">
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</span>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Revenue
+              </span>
             </div>
             <div className="text-2xl font-semibold text-gray-900">
               {formatCurrency(project["est revenue"])}
             </div>
             {project["est profit"] && (
               <p className="text-sm text-gray-500 mt-2">
-                <span className="text-green-600 font-medium">{formatCurrency(project["est profit"])}</span> profit
+                <span className="text-green-600 font-medium">
+                  {formatCurrency(project["est profit"])}
+                </span>{" "}
+                profit
               </p>
             )}
           </div>
@@ -353,7 +362,9 @@ export default async function ProjectDetailPage({
               <div className="p-2 bg-blue-50 rounded-lg">
                 <Calendar className="h-5 w-5 text-blue-600" />
               </div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Timeline</span>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Timeline
+              </span>
             </div>
             <div className="space-y-1">
               {project["start date"] && (
@@ -381,15 +392,15 @@ export default async function ProjectDetailPage({
               <div className="p-2 bg-purple-50 rounded-lg">
                 <MapPin className="h-5 w-5 text-purple-600" />
               </div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Location</span>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Location
+              </span>
             </div>
             <p className="text-sm font-medium text-gray-900">
               {project.address || "Not specified"}
             </p>
             {project.state && (
-              <p className="text-sm text-gray-500 mt-1">
-                {project.state}
-              </p>
+              <p className="text-sm text-gray-500 mt-1">{project.state}</p>
             )}
           </div>
 
@@ -399,7 +410,9 @@ export default async function ProjectDetailPage({
               <div className="p-2 bg-orange-50 rounded-lg">
                 <Users className="h-5 w-5 text-orange-600" />
               </div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Client</span>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Client
+              </span>
             </div>
             <p className="text-sm font-medium text-gray-900">
               {project.clients?.name || "Direct Client"}
@@ -420,7 +433,9 @@ export default async function ProjectDetailPage({
                 <div className="p-2 bg-white rounded-lg shadow-sm">
                   <Brain className="h-5 w-5 text-indigo-600" />
                 </div>
-                <h2 className="text-lg font-medium text-gray-900">Project Intelligence</h2>
+                <h2 className="text-lg font-medium text-gray-900">
+                  Project Intelligence
+                </h2>
               </div>
             </div>
             <div className="p-6">
@@ -432,9 +447,7 @@ export default async function ProjectDetailPage({
                   <div className="text-2xl font-semibold text-gray-900">
                     {insightStats.actions}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    Action Items
-                  </div>
+                  <div className="text-sm text-gray-500">Action Items</div>
                   {insightStats.pendingActions > 0 && (
                     <div className="text-xs text-orange-600 mt-1 font-medium">
                       {insightStats.pendingActions} pending
@@ -448,9 +461,7 @@ export default async function ProjectDetailPage({
                   <div className="text-2xl font-semibold text-gray-900">
                     {insightStats.risks}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    Risks
-                  </div>
+                  <div className="text-sm text-gray-500">Risks</div>
                 </div>
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-3">
@@ -459,9 +470,7 @@ export default async function ProjectDetailPage({
                   <div className="text-2xl font-semibold text-gray-900">
                     {insightStats.decisions}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    Decisions
-                  </div>
+                  <div className="text-sm text-gray-500">Decisions</div>
                 </div>
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 mb-3">
@@ -470,9 +479,7 @@ export default async function ProjectDetailPage({
                   <div className="text-2xl font-semibold text-gray-900">
                     {documents.length}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    Documents
-                  </div>
+                  <div className="text-sm text-gray-500">Documents</div>
                 </div>
               </div>
             </div>
@@ -484,12 +491,7 @@ export default async function ProjectDetailPage({
           <div className="px-6 py-4 border-b bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-white rounded-lg shadow-sm">
-                  <FileText className="h-5 w-5 text-gray-600" />
-                </div>
-                <h2 className="text-lg font-medium text-gray-900">
-                  Project Documents
-                </h2>
+                <h2 className="text-lg font-medium text-gray-900">Meetings</h2>
                 <Badge variant="secondary" className="rounded-full">
                   {documents.length}
                 </Badge>
@@ -501,15 +503,23 @@ export default async function ProjectDetailPage({
               <div className="space-y-6">
                 {/* Group documents by type */}
                 {(() => {
-                  const meetingDocs = documents.filter(doc => 
-                    doc.document_type === 'meeting' || 
-                    (doc.metadata && typeof doc.metadata === 'object' && 
-                     'type' in doc.metadata && (doc.metadata as any).type === 'meeting')
+                  const meetingDocs = documents.filter(
+                    (doc) =>
+                      doc.document_type === "meeting" ||
+                      (doc.metadata &&
+                        typeof doc.metadata === "object" &&
+                        "type" in doc.metadata &&
+                        (doc.metadata as any).type === "meeting")
                   );
-                  const otherDocs = documents.filter(doc => 
-                    doc.document_type !== 'meeting' && 
-                    !(doc.metadata && typeof doc.metadata === 'object' && 
-                      'type' in doc.metadata && (doc.metadata as any).type === 'meeting')
+                  const otherDocs = documents.filter(
+                    (doc) =>
+                      doc.document_type !== "meeting" &&
+                      !(
+                        doc.metadata &&
+                        typeof doc.metadata === "object" &&
+                        "type" in doc.metadata &&
+                        (doc.metadata as any).type === "meeting"
+                      )
                   );
 
                   return (
@@ -521,18 +531,24 @@ export default async function ProjectDetailPage({
                             <h3 className="text-sm font-medium text-gray-700">
                               Meeting Documents
                             </h3>
-                            <Badge variant="outline" className="text-xs rounded-full">
+                            <Badge
+                              variant="outline"
+                              className="text-xs rounded-full"
+                            >
                               {meetingDocs.length}
                             </Badge>
                           </div>
                           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {meetingDocs.map((document) => (
-                              <ModernDocumentCard key={document.id} document={document} />
+                              <ModernDocumentCard
+                                key={document.id}
+                                document={document}
+                              />
                             ))}
                           </div>
                         </div>
                       )}
-                      
+
                       {otherDocs.length > 0 && (
                         <div>
                           <div className="flex items-center gap-2 mb-4">
@@ -540,13 +556,19 @@ export default async function ProjectDetailPage({
                             <h3 className="text-sm font-medium text-gray-700">
                               Other Documents
                             </h3>
-                            <Badge variant="outline" className="text-xs rounded-full">
+                            <Badge
+                              variant="outline"
+                              className="text-xs rounded-full"
+                            >
                               {otherDocs.length}
                             </Badge>
                           </div>
                           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {otherDocs.map((document) => (
-                              <ModernDocumentCard key={document.id} document={document} />
+                              <ModernDocumentCard
+                                key={document.id}
+                                document={document}
+                              />
                             ))}
                           </div>
                         </div>
@@ -569,17 +591,23 @@ export default async function ProjectDetailPage({
         </div>
 
         {/* Modern Insights Section */}
-        {(safeInsights.length > 0 || projectInsights.length > 0 || aiInsights.length > 0) && (
+        {(safeInsights.length > 0 ||
+          projectInsights.length > 0 ||
+          aiInsights.length > 0) && (
           <div className="space-y-6">
-            <h2 className="text-xl font-light text-gray-900">Project Insights</h2>
-            
+            <h2 className="text-xl font-light text-gray-900">
+              Project Insights
+            </h2>
+
             {/* AI-Generated Insights */}
             {aiInsights.length > 0 && (
               <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
                 <div className="px-6 py-4 border-b bg-gradient-to-r from-purple-50 to-pink-50">
                   <div className="flex items-center gap-2">
                     <Brain className="h-5 w-5 text-purple-600" />
-                    <h3 className="text-md font-medium text-gray-900">AI-Generated Insights</h3>
+                    <h3 className="text-md font-medium text-gray-900">
+                      AI-Generated Insights
+                    </h3>
                     <Badge variant="secondary" className="rounded-full text-xs">
                       {aiInsights.length}
                     </Badge>
@@ -595,7 +623,10 @@ export default async function ProjectDetailPage({
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             {insight.insight_type && (
-                              <Badge variant="outline" className="capitalize text-xs">
+                              <Badge
+                                variant="outline"
+                                className="capitalize text-xs"
+                              >
                                 {insight.insight_type}
                               </Badge>
                             )}
@@ -603,9 +634,12 @@ export default async function ProjectDetailPage({
                               <Badge
                                 className={cn(
                                   "text-xs",
-                                  insight.severity === "high" && "bg-red-100 text-red-700",
-                                  insight.severity === "medium" && "bg-yellow-100 text-yellow-700",
-                                  insight.severity === "low" && "bg-green-100 text-green-700"
+                                  insight.severity === "high" &&
+                                    "bg-red-100 text-red-700",
+                                  insight.severity === "medium" &&
+                                    "bg-yellow-100 text-yellow-700",
+                                  insight.severity === "low" &&
+                                    "bg-green-100 text-green-700"
                                 )}
                               >
                                 {insight.severity}
@@ -621,12 +655,15 @@ export default async function ProjectDetailPage({
                           {insight.confidence_score && (
                             <div className="mt-2 flex items-center gap-2">
                               <div className="text-xs text-gray-500">
-                                Confidence: {Math.round(insight.confidence_score * 100)}%
+                                Confidence:{" "}
+                                {Math.round(insight.confidence_score * 100)}%
                               </div>
                               <div className="flex-1 max-w-[100px] h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div 
+                                <div
                                   className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
-                                  style={{ width: `${insight.confidence_score * 100}%` }}
+                                  style={{
+                                    width: `${insight.confidence_score * 100}%`,
+                                  }}
                                 />
                               </div>
                             </div>
@@ -646,7 +683,9 @@ export default async function ProjectDetailPage({
           <div className="px-6 py-4 border-b bg-gray-50">
             <div className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-gray-600" />
-              <h2 className="text-lg font-medium text-gray-900">Project Timeline</h2>
+              <h2 className="text-lg font-medium text-gray-900">
+                Project Timeline
+              </h2>
             </div>
           </div>
           <div className="p-6">
@@ -654,11 +693,31 @@ export default async function ProjectDetailPage({
               <div className="absolute left-8 top-8 bottom-0 w-0.5 bg-gray-200"></div>
               <div className="space-y-6">
                 {[
-                  { date: "2024-01-15", event: "Project kickoff", status: "completed" },
-                  { date: "2024-02-01", event: "Requirements finalized", status: "completed" },
-                  { date: "2024-03-15", event: "Phase 1 complete", status: "completed" },
-                  { date: "2024-04-30", event: "Phase 2 delivery", status: "in-progress" },
-                  { date: "2024-06-01", event: "Final delivery", status: "upcoming" },
+                  {
+                    date: "2024-01-15",
+                    event: "Project kickoff",
+                    status: "completed",
+                  },
+                  {
+                    date: "2024-02-01",
+                    event: "Requirements finalized",
+                    status: "completed",
+                  },
+                  {
+                    date: "2024-03-15",
+                    event: "Phase 1 complete",
+                    status: "completed",
+                  },
+                  {
+                    date: "2024-04-30",
+                    event: "Phase 2 delivery",
+                    status: "in-progress",
+                  },
+                  {
+                    date: "2024-06-01",
+                    event: "Final delivery",
+                    status: "upcoming",
+                  },
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-4">
                     <div className="relative z-10 flex items-center justify-center w-16 h-16 bg-white rounded-full border-2 border-gray-200">
@@ -670,13 +729,16 @@ export default async function ProjectDetailPage({
                         {format(new Date(item.date), "MMMM d, yyyy")}
                       </p>
                     </div>
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={cn(
                         "capitalize text-xs",
-                        item.status === "completed" && "bg-green-50 text-green-700 border-green-200",
-                        item.status === "in-progress" && "bg-blue-50 text-blue-700 border-blue-200",
-                        item.status === "upcoming" && "bg-gray-50 text-gray-700 border-gray-200"
+                        item.status === "completed" &&
+                          "bg-green-50 text-green-700 border-green-200",
+                        item.status === "in-progress" &&
+                          "bg-blue-50 text-blue-700 border-blue-200",
+                        item.status === "upcoming" &&
+                          "bg-gray-50 text-gray-700 border-gray-200"
                       )}
                     >
                       {item.status.replace("-", " ")}

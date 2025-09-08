@@ -44,6 +44,9 @@ When you notice:
 - Ensure setup instructions work on fresh installations
 - Validate that documented commands produce expected results
 
+### 6. Annotate all files
+- At the top of every file annotate with the functionality, related files, and anything else you feel is needed.
+
 ## Working Process
 
 1. **Analyze Changes**: When code modifications occur, analyze what was changed

@@ -62,10 +62,37 @@ __pycache__/
 # Documentation build artifacts
 documentation/.cache/
 documentation/build/
-documentation/
 
 # Archive directory (for cleaned up files)
 .archive/
+.cleanup-backup/
+
+# Temporary test files (should not be committed)
+test-*.js
+*-test*.js
+final-verification-test.js
+take-*-screenshot*.js
+*-screenshot.png
+
+# Prevent test file accumulation (only allow organized e2e tests)
+tests/test-*
+tests/manual/
+tests/screenshots/
+tests/test-browser/
+tests-new/
+tests-backup/
+scripts-new/
+
+# One-off test scripts (use /tmp instead)
+test-*.py
+test-*.ts
+*-test.py
+*-test.ts
+manual-*.js
+manual-*.ts
+
+# MCP playwright screenshots
+.playwright-mcp/
 
 # Submodules and embedded repos (these should be managed separately)
 astro-docs/

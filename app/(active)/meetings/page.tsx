@@ -38,7 +38,8 @@ import {
   Calendar,
   FileText,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -47,7 +48,6 @@ import { toast } from "sonner";
 interface Document {
   id: string;
   title: string;
-  meeting_date: string | null;
   summary: string | null;
   project_id: number | null;
   processing_status: string | null;
@@ -55,11 +55,18 @@ interface Document {
   action_items: string[] | null;
   created_at: string;
   updated_at: string;
+  file_type?: string | null;
+  file_size?: number | null;
+  author?: string | null;
+  content?: string | null;
+  document_type?: string | null;
+  embedding?: string | null;
+  metadata?: any;
 }
 
 interface Project {
   id: number;
-  name: string;
+  name: string | null;
 }
 
 export default function MeetingsPage() {
@@ -72,7 +79,13 @@ export default function MeetingsPage() {
   const [editedDocument, setEditedDocument] = useState<Partial<Document>>({});
   const [summaryDialogOpen, setSummaryDialogOpen] = useState(false);
   const [selectedSummary, setSelectedSummary] = useState<string>("");
-  const supabase = createClient();
+  const [supabase] = useState(() => {
+    const client = createClient();
+    if (!client) {
+      console.error("Failed to create Supabase client. Check environment variables.");
+    }
+    return client;
+  });
 
   useEffect(() => {
     loadData();
@@ -83,13 +96,40 @@ export default function MeetingsPage() {
       setLoading(true);
       setError(null);
       
+      // Check if Supabase client is available
+      if (!supabase) {
+        throw new Error("Database connection not available. Please check your configuration.");
+      }
+      
+      // Check authentication status (optional in development)
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) {
+        console.warn("Authentication warning:", authError);
+        // In development, continue without authentication
+        // In production, you might want to throw an error or redirect to login
+        console.log("Continuing without authentication (development mode)");
+      } else {
+        console.log("Authenticated user:", user?.email);
+      }
+      
       // Load documents
       const { data: docsData, error: docsError } = await supabase
         .from('documents')
         .select('*')
-        .order('meeting_date', { ascending: false, nullsFirst: false });
+        .order('created_at', { ascending: false });
       
-      if (docsError) throw docsError;
+      if (docsError) {
+        console.error("Error loading documents:", {
+          message: docsError.message,
+          details: docsError.details,
+          hint: docsError.hint,
+          code: docsError.code
+        });
+        throw new Error(docsError.message || "Failed to load documents");
+      }
+      
+      console.log("Documents loaded:", docsData?.length || 0);
       
       // Load projects for the dropdown
       const { data: projectsData, error: projectsError } = await supabase
@@ -97,13 +137,51 @@ export default function MeetingsPage() {
         .select('id, name')
         .order('name');
       
-      if (projectsError) throw projectsError;
+      if (projectsError) {
+        console.error("Error loading projects:", {
+          message: projectsError.message,
+          details: projectsError.details,
+          hint: projectsError.hint,
+          code: projectsError.code
+        });
+        throw new Error(projectsError.message || "Failed to load projects");
+      }
       
-      setDocuments(docsData || []);
-      setProjects(projectsData || []);
+      console.log("Projects loaded:", projectsData?.length || 0);
+      
+      setDocuments((docsData || []).map(doc => ({
+        id: String(doc.id || ''),
+        title: doc.title || '',
+        summary: doc.summary,
+        project_id: doc.project_id,
+        processing_status: doc.processing_status,
+        participants: doc.participants,
+        action_items: doc.action_items,
+        created_at: doc.created_at || new Date().toISOString(),
+        updated_at: doc.updated_at || new Date().toISOString(),
+        file_type: doc.file_type,
+        file_size: doc.file_size,
+        author: doc.author,
+        content: doc.content,
+        document_type: doc.document_type,
+        embedding: doc.embedding,
+        metadata: doc.metadata
+      })));
+      setProjects((projectsData || []).map(proj => ({
+        id: proj.id,
+        name: proj.name || 'Unnamed Project'
+      })));
     } catch (error) {
-      console.error("Error loading data:", error);
-      setError("Failed to load data. Please try refreshing the page.");
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("Error in loadData:", {
+        error,
+        message: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      setError(errorMessage || "Failed to load data. Please try refreshing the page.");
+      toast.error("Failed to load data", {
+        description: errorMessage
+      });
     } finally {
       setLoading(false);
     }
@@ -123,16 +201,19 @@ export default function MeetingsPage() {
     if (!editingId || !editedDocument) return;
     
     try {
+      if (!supabase) {
+        throw new Error('Database connection not available');
+      }
+      
       const { error } = await supabase
         .from('documents')
         .update({
           title: editedDocument.title,
-          meeting_date: editedDocument.meeting_date,
           summary: editedDocument.summary,
           project_id: editedDocument.project_id,
           updated_at: new Date().toISOString()
         })
-        .eq('id', editingId);
+        .eq('id', Number(editingId));
       
       if (error) throw error;
       
@@ -272,22 +353,13 @@ export default function MeetingsPage() {
                     </TableCell>
                     
                     <TableCell>
-                      {isEditing ? (
-                        <Input
-                          type="date"
-                          value={currentDoc.meeting_date || ""}
-                          onChange={(e) => handleFieldChange("meeting_date", e.target.value)}
-                          className="min-w-[120px]"
-                        />
-                      ) : (
-                        <div className="flex items-center gap-1 text-sm">
-                          <Calendar className="h-3 w-3" />
-                          {document.meeting_date 
-                            ? format(new Date(document.meeting_date), "MMM d, yyyy")
-                            : "No date"
-                          }
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1 text-sm">
+                        <Calendar className="h-3 w-3" />
+                        {document.created_at 
+                          ? format(new Date(document.created_at), "MMM d, yyyy")
+                          : "No date"
+                        }
+                      </div>
                     </TableCell>
                     
                     <TableCell>
@@ -311,14 +383,14 @@ export default function MeetingsPage() {
                     <TableCell>
                       {isEditing ? (
                         <Select
-                          value={String(currentDoc.project_id || "")}
-                          onValueChange={(value) => handleFieldChange("project_id", value ? Number(value) : null)}
+                          value={currentDoc.project_id ? String(currentDoc.project_id) : "none"}
+                          onValueChange={(value) => handleFieldChange("project_id", value === "none" ? null : Number(value))}
                         >
                           <SelectTrigger className="min-w-[150px]">
                             <SelectValue placeholder="Select project" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">No project</SelectItem>
+                            <SelectItem value="none">No project</SelectItem>
                             {projects.map((project) => (
                               <SelectItem key={project.id} value={String(project.id)}>
                                 {project.name}
