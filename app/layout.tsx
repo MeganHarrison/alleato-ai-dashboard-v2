@@ -1,7 +1,7 @@
-import React, { type ReactElement } from "react";
-import type { Metadata } from "next";
-import "./globals.css";
 import "@/components/docs/documentation-styles.css";
+import type { Metadata } from "next";
+import React, { type ReactElement } from "react";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Alleato - AI Intelligence",
@@ -15,9 +15,7 @@ export default function RootLayout({
 }>): ReactElement {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased bg-white">
-        {children}
-      </body>
+      <body className="font-sans antialiased bg-white pb-6">{children}</body>
     </html>
   );
 }

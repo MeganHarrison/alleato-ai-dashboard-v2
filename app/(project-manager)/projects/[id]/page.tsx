@@ -14,113 +14,18 @@ import {
   Brain,
   Calendar,
   CheckCircle2,
-  Clock,
   DollarSign,
   FileText,
   Lightbulb,
   MapPin,
-  MessageSquare,
   Users,
   XCircle,
 } from "lucide-react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { DocumentsTable } from "./DocumentsTable";
 
 export const dynamic = "force-dynamic";
-
-// Modern Document Card Component
-function ModernDocumentCard({ document }: { document: any }) {
-  const getDocumentIcon = (type: string | null) => {
-    if (!type) return <FileText className="h-4 w-4 text-gray-400" />;
-    const lowerType = type.toLowerCase();
-    if (lowerType.includes("meeting"))
-      return <MessageSquare className="h-4 w-4 text-blue-500" />;
-    if (lowerType.includes("report"))
-      return <FileText className="h-4 w-4 text-green-500" />;
-    if (lowerType.includes("contract"))
-      return <FileText className="h-4 w-4 text-purple-500" />;
-    if (lowerType.includes("proposal"))
-      return <FileText className="h-4 w-4 text-orange-500" />;
-    return <FileText className="h-4 w-4 text-gray-400" />;
-  };
-
-  const extractTitle = (document: any) => {
-    if (document.metadata && typeof document.metadata === "object") {
-      if ("title" in document.metadata) return (document.metadata as any).title;
-      if ("filename" in document.metadata)
-        return (document.metadata as any).filename;
-      if ("name" in document.metadata) return (document.metadata as any).name;
-    }
-
-    if (document.content) {
-      const firstLine = document.content.split("\n")[0];
-      if (firstLine && firstLine.length <= 100) {
-        return firstLine;
-      }
-      return (
-        document.content.slice(0, 50) +
-        (document.content.length > 50 ? "..." : "")
-      );
-    }
-
-    return `Document #${document.id}`;
-  };
-
-  const extractDate = (document: any) => {
-    if (document.metadata && typeof document.metadata === "object") {
-      const metadata = document.metadata as any;
-      if (metadata.date) return metadata.date;
-      if (metadata.created_at) return metadata.created_at;
-      if (metadata.meeting_date) return metadata.meeting_date;
-    }
-    return null;
-  };
-
-  return (
-    <div className="group relative rounded-xl p-5 transition-all hover:shadow-lg cursor-pointer">
-      <div className="flex items-start gap-3">
-        <div className="p-2 rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
-          {getDocumentIcon(document.document_type)}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-sm text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-            {extractTitle(document)}
-          </h4>
-
-          {extractDate(document) && (
-            <p className="text-xs text-gray-500 mt-1">
-              {format(new Date(extractDate(document)), "MMM d, yyyy")}
-            </p>
-          )}
-
-          {document.content && (
-            <p className="mt-2 text-xs text-gray-600 line-clamp-2">
-              {document.content.slice(0, 100)}
-              {document.content.length > 100 ? "..." : ""}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {document.metadata && typeof document.metadata === "object" && (
-        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
-          {"file_size" in document.metadata && (
-            <span className="flex items-center gap-1">
-              <div className="w-1 h-1 bg-gray-400 rounded-full" />
-              {Math.round((document.metadata as any).file_size / 1024)} KB
-            </span>
-          )}
-          {"duration_minutes" in document.metadata && (
-            <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {(document.metadata as any).duration_minutes} min
-            </span>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 interface Insight {
   type: "risk" | "action_item" | "decision" | "question" | "highlight";
@@ -486,12 +391,12 @@ export default async function ProjectDetailPage({
           </div>
         )}
 
-        {/* Documents Section - Modern Design */}
+        {/* Documents Section - Table View */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
           <div className="px-6 py-4 border-b bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-medium text-gray-900">Meetings</h2>
+                <h2 className="text-lg font-medium text-gray-900">Documents</h2>
                 <Badge variant="secondary" className="rounded-full">
                   {documents.length}
                 </Badge>
@@ -499,94 +404,10 @@ export default async function ProjectDetailPage({
             </div>
           </div>
           <div className="p-6">
-            {documents.length > 0 ? (
-              <div className="space-y-6">
-                {/* Group documents by type */}
-                {(() => {
-                  const meetingDocs = documents.filter(
-                    (doc) =>
-                      doc.document_type === "meeting" ||
-                      (doc.metadata &&
-                        typeof doc.metadata === "object" &&
-                        "type" in doc.metadata &&
-                        (doc.metadata as any).type === "meeting")
-                  );
-                  const otherDocs = documents.filter(
-                    (doc) =>
-                      doc.document_type !== "meeting" &&
-                      !(
-                        doc.metadata &&
-                        typeof doc.metadata === "object" &&
-                        "type" in doc.metadata &&
-                        (doc.metadata as any).type === "meeting"
-                      )
-                  );
-
-                  return (
-                    <>
-                      {meetingDocs.length > 0 && (
-                        <div>
-                          <div className="flex items-center gap-2 mb-4">
-                            <MessageSquare className="h-4 w-4 text-blue-500" />
-                            <h3 className="text-sm font-medium text-gray-700">
-                              Meeting Documents
-                            </h3>
-                            <Badge
-                              variant="outline"
-                              className="text-xs rounded-full"
-                            >
-                              {meetingDocs.length}
-                            </Badge>
-                          </div>
-                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {meetingDocs.map((document) => (
-                              <ModernDocumentCard
-                                key={document.id}
-                                document={document}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {otherDocs.length > 0 && (
-                        <div>
-                          <div className="flex items-center gap-2 mb-4">
-                            <FileText className="h-4 w-4 text-gray-500" />
-                            <h3 className="text-sm font-medium text-gray-700">
-                              Other Documents
-                            </h3>
-                            <Badge
-                              variant="outline"
-                              className="text-xs rounded-full"
-                            >
-                              {otherDocs.length}
-                            </Badge>
-                          </div>
-                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {otherDocs.map((document) => (
-                              <ModernDocumentCard
-                                key={document.id}
-                                document={document}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  );
-                })()}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                  <FileText className="h-8 w-8 text-gray-400" />
-                </div>
-                <p className="text-sm text-gray-500">
-                  No documents associated with this project yet
-                </p>
-              </div>
-            )}
+            <DocumentsTable 
+              documents={documents} 
+              projectId={parseInt(id)}
+            />
           </div>
         </div>
 

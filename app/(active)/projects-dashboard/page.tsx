@@ -1,24 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { format } from "date-fns";
-import Link from "next/link";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -27,28 +11,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
-  Search,
-  Filter,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import {
+  Briefcase,
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronUp,
   Columns3,
+  DollarSign,
+  ExternalLink,
+  Filter,
   LayoutGrid,
   List,
-  ChevronDown,
-  ExternalLink,
-  TrendingUp,
-  Building,
-  Calendar,
-  DollarSign,
-  Briefcase,
   MapPin,
-  Users,
-  ChevronUp,
-  ChevronsUpDown,
+  Phone,
   Plus,
-  FileText,
-  BarChart3,
+  Search,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 interface Project {
   id: string;
@@ -336,7 +331,7 @@ export default function ProjectsPage() {
   }
 
   const CardView = () => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {filteredProjects.map((project) => (
         <Card
           key={project.id}
@@ -344,7 +339,7 @@ export default function ProjectsPage() {
         >
           <CardContent className="p-5">
             {/* Header */}
-            <div className="flex items-start justify-between text-brand-500 text-sm mb-3">
+            <div className="flex items-start justify-between text-sm mb-3">
               <div className="flex-1">
                 <Link
                   href={`/projects/${project.id}`}
@@ -353,16 +348,18 @@ export default function ProjectsPage() {
                   {project.name}
                   <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Link>
-                {project.clients?.name && (
-                  <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
-                    <Building className="h-3.5 w-3.5" />
-                    <span>{project.clients.name}</span>
+                {project.meetings && project.meetings.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Phone className="h-3 w-3" />
+                    <span>{project.meetings.length} meetings</span>
                   </div>
                 )}
               </div>
-              <Badge className={cn("text-xs", getStatusColor(project.phase))}>
-                {project.phase}
-              </Badge>
+              {project.clients?.name && (
+                <div className="flex items-center gap-1 text-sm text-brand font-medium mt-1">
+                  <span>{project.clients.name}</span>
+                </div>
+              )}
             </div>
 
             {/* Metadata */}
@@ -401,28 +398,12 @@ export default function ProjectsPage() {
             )}
 
             {/* Footer */}
-            <div className="flex items-center justify-between pt-3 border-t">
+            <div className="flex items-center justify-between pt-3">
               <div className="flex items-center gap-4 text-xs text-gray-500">
-                {project.created_at && (
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>
-                      {format(new Date(project.created_at), "MMM d, yyyy")}
-                    </span>
-                  </div>
-                )}
-                {project.meetings && project.meetings.length > 0 && (
-                  <div className="flex items-center gap-1">
-                    <FileText className="h-3 w-3" />
-                    <span>{project.meetings.length} meetings</span>
-                  </div>
-                )}
+                <Badge className={cn("text-xs", getStatusColor(project.phase))}>
+                  {project.phase}
+                </Badge>
               </div>
-              <Link href={`/projects/${project.id}`}>
-                <Button size="sm" variant="ghost" className="h-7 px-2">
-                  View Details
-                </Button>
-              </Link>
             </div>
           </CardContent>
         </Card>

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { PageHeader } from "@/components/page-header";
 import { 
   Table,
   TableBody,
@@ -23,8 +22,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Loader2,
-  Search,
   Edit,
   Save,
   X,
@@ -32,10 +29,8 @@ import {
   FileText,
   Download,
   Trash2,
-  AlertCircle
 } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -50,14 +45,12 @@ import {
 
 interface Document {
   id: number;
-  title: string | null;
-  summary: string | null;
-  project_id: number | null;
-  storage_path: string | null;
   content: string | null;
+  document_type: string | null;
   metadata: any;
-  created_at: string | null;
-  updated_at: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  project_id?: number | null;
 }
 
 interface Project {
@@ -65,78 +58,58 @@ interface Project {
   name: string | null;
 }
 
-export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+interface DocumentsTableProps {
+  documents: Document[];
+  projects?: Project[];
+  projectId?: number;
+  onDocumentsUpdate?: () => void;
+}
+
+export function DocumentsTable({ 
+  documents: initialDocuments, 
+  projects = [], 
+  projectId,
+  onDocumentsUpdate 
+}: DocumentsTableProps) {
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editedDocument, setEditedDocument] = useState<Partial<Document>>({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
-  const [supabase] = useState(() => {
-    const client = createClient();
-    if (!client) {
-      console.error("Failed to create Supabase client. Check environment variables.");
-    }
-    return client;
-  });
+  const [supabase] = useState(() => createClient());
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      if (!supabase) {
-        throw new Error("Database connection not available. Please check your configuration.");
-      }
-      
-      // Load documents
-      const { data: documentsData, error: documentsError } = await supabase
-        .from('documents')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (documentsError) {
-        console.error("Error loading documents:", documentsError);
-        throw new Error(documentsError.message || "Failed to load documents");
-      }
-      
-      console.log("Documents loaded:", documentsData?.length || 0);
-      
-      // Load projects for the dropdown
-      const { data: projectsData, error: projectsError } = await supabase
-        .from('projects')
-        .select('id, name')
-        .order('name');
-      
-      if (projectsError) {
-        console.error("Error loading projects:", projectsError);
-        throw new Error(projectsError.message || "Failed to load projects");
-      }
-      
-      console.log("Projects loaded:", projectsData?.length || 0);
-      
-      setDocuments(documentsData || []);
-      setProjects((projectsData || []).map(proj => ({
-        id: proj.id,
-        name: proj.name || 'Unnamed Project'
-      })));
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error("Error in loadData:", error);
-      setError(errorMessage || "Failed to load data. Please try refreshing the page.");
-      toast.error("Failed to load data", {
-        description: errorMessage
-      });
-    } finally {
-      setLoading(false);
+  // Extract title from document
+  const extractTitle = (doc: Document): string => {
+    if (doc.metadata?.title) return doc.metadata.title;
+    if (doc.metadata?.file_path) {
+      const parts = doc.metadata.file_path.split('/');
+      return parts[parts.length - 1].replace(/\.[^/.]+$/, '');
     }
+    if (doc.content) {
+      const firstLine = doc.content.split('\n')[0];
+      return firstLine.substring(0, 100);
+    }
+    return `Document ${doc.id}`;
+  };
+
+  // Extract date from document
+  const extractDate = (doc: Document): string | null => {
+    if (doc.metadata?.date) return doc.metadata.date;
+    if (doc.metadata?.created_at) return doc.metadata.created_at;
+    if (doc.metadata?.updated_at) return doc.metadata.updated_at;
+    if (doc.created_at) return doc.created_at;
+    return null;
+  };
+
+  // Extract summary from document
+  const extractSummary = (doc: Document): string => {
+    if (doc.metadata?.summary) return doc.metadata.summary;
+    if (doc.metadata?.description) return doc.metadata.description;
+    if (doc.metadata?.ai_summary) return doc.metadata.ai_summary;
+    if (doc.content) {
+      return doc.content.substring(0, 200) + (doc.content.length > 200 ? '...' : '');
+    }
+    return '';
   };
 
   const handleEdit = (document: Document) => {
@@ -157,15 +130,20 @@ export default function DocumentsPage() {
         throw new Error('Database connection not available');
       }
       
+      const updateData: any = {
+        content: editedDocument.content,
+        document_type: editedDocument.document_type,
+        metadata: editedDocument.metadata,
+      };
+      
+      // Only include project_id if it's not already set by the parent
+      if (!projectId && editedDocument.project_id !== undefined) {
+        updateData.project_id = editedDocument.project_id;
+      }
+      
       const { error } = await supabase
         .from('documents')
-        .update({
-          title: editedDocument.title,
-          summary: editedDocument.summary,
-          project_id: editedDocument.project_id,
-          metadata: editedDocument.metadata,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', editingId);
       
       if (error) throw error;
@@ -174,7 +152,7 @@ export default function DocumentsPage() {
       setDocuments(documents => 
         documents.map(doc => 
           doc.id === editingId 
-            ? { ...doc, ...editedDocument, updated_at: new Date().toISOString() }
+            ? { ...doc, ...editedDocument }
             : doc
         )
       );
@@ -182,6 +160,10 @@ export default function DocumentsPage() {
       setEditingId(null);
       setEditedDocument({});
       toast.success("Document updated successfully");
+      
+      if (onDocumentsUpdate) {
+        onDocumentsUpdate();
+      }
     } catch (error) {
       console.error("Error updating document:", error);
       toast.error("Failed to update document");
@@ -190,12 +172,12 @@ export default function DocumentsPage() {
 
   const handleFieldChange = (field: keyof Document, value: any) => {
     if (field === 'metadata') {
-      // For date field in metadata
+      // For metadata updates, merge with existing metadata
       setEditedDocument(prev => ({ 
         ...prev, 
         metadata: { 
           ...(prev.metadata || {}), 
-          date: value 
+          ...value 
         } 
       }));
     } else {
@@ -229,6 +211,10 @@ export default function DocumentsPage() {
       );
       
       toast.success("Document deleted successfully");
+      
+      if (onDocumentsUpdate) {
+        onDocumentsUpdate();
+      }
     } catch (error) {
       console.error("Error deleting document:", error);
       toast.error("Failed to delete document");
@@ -240,150 +226,71 @@ export default function DocumentsPage() {
 
   const handleDownload = async (document: Document) => {
     try {
-      if (!document.storage_path) {
-        // If no storage path, try to download content as text file
-        if (document.content) {
-          const blob = new Blob([document.content], { type: 'text/plain' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${document.title || 'document'}.txt`;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        } else {
-          toast.error("No content available to download");
-        }
-        return;
+      if (document.content) {
+        const blob = new Blob([document.content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = window.document.createElement('a');
+        a.href = url;
+        a.download = `${extractTitle(document)}.txt`;
+        window.document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        window.document.body.removeChild(a);
+        toast.success("Document downloaded successfully");
+      } else {
+        toast.error("No content available to download");
       }
-
-      if (!supabase) {
-        throw new Error('Database connection not available');
-      }
-
-      // Download from Supabase storage
-      const { data, error } = await supabase.storage
-        .from('documents')
-        .download(document.storage_path);
-      
-      if (error) throw error;
-      
-      const url = window.URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = document.title || 'document';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success("Document downloaded successfully");
     } catch (error) {
       console.error("Error downloading document:", error);
       toast.error("Failed to download document");
     }
   };
 
-  const getDocumentDate = (document: Document) => {
-    // Try to get date from metadata first
-    if (document.metadata && typeof document.metadata === 'object') {
-      const metadata = document.metadata as any;
-      if (metadata.date) return metadata.date;
-    }
-    // Fallback to created_at
-    return document.created_at;
-  };
-
-  const filteredDocuments = documents.filter(doc =>
-    searchTerm === "" ||
-    doc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.summary?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <span>Loading documents...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-6">
-      {/* Header Section */}
-      <div className="flex items-start justify-between">
-        <PageHeader 
-          title="Documents" 
-          description="View and manage all documents in the system" 
-        />
-      </div>
-
-      {/* Search Bar */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Search documents..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      {/* Table */}
+    <>
       <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
         <Table>
           <TableHeader className="bg-gray-50/50">
             <TableRow className="border-b border-gray-200 hover:bg-transparent">
               <TableHead className="w-[25%] font-semibold text-gray-900 px-6 py-4">Title</TableHead>
               <TableHead className="w-[12%] font-semibold text-gray-900 px-4 py-4">Date</TableHead>
-              <TableHead className="w-[18%] font-semibold text-gray-900 px-4 py-4">Project</TableHead>
-              <TableHead className="w-[30%] font-semibold text-gray-900 px-4 py-4">Summary</TableHead>
+              {!projectId && (
+                <TableHead className="w-[18%] font-semibold text-gray-900 px-4 py-4">Project</TableHead>
+              )}
+              <TableHead className={`${projectId ? "w-[45%]" : "w-[30%]"} font-semibold text-gray-900 px-4 py-4`}>Summary</TableHead>
               <TableHead className="w-[15%] text-center font-semibold text-gray-900 px-6 py-4">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredDocuments.length === 0 ? (
+            {documents.length === 0 ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="text-center py-12 text-gray-500">
+                <TableCell colSpan={projectId ? 4 : 5} className="text-center py-12 text-gray-500">
                   <div className="flex flex-col items-center gap-2">
                     <FileText className="h-8 w-8 text-gray-300" />
                     <span className="text-sm font-medium">No documents found</span>
-                    <span className="text-xs text-gray-400">Try adjusting your search criteria</span>
+                    <span className="text-xs text-gray-400">Documents will appear here when added</span>
                   </div>
                 </TableCell>
               </TableRow>
             ) : (
-              filteredDocuments.map((document) => {
+              documents.map((document) => {
                 const isEditing = editingId === document.id;
                 const currentDocument = isEditing ? editedDocument : document;
-                const documentDate = getDocumentDate(currentDocument as Document);
+                const documentDate = extractDate(currentDocument as Document);
                 
                 return (
                   <TableRow key={document.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                     <TableCell className="px-6 py-4">
                       {isEditing ? (
                         <Input
-                          value={currentDocument.title || ""}
-                          onChange={(e) => handleFieldChange("title", e.target.value)}
+                          value={currentDocument.metadata?.title || extractTitle(currentDocument as Document)}
+                          onChange={(e) => handleFieldChange("metadata", { title: e.target.value })}
                           className="w-full"
                           placeholder="Enter title..."
                         />
                       ) : (
                         <div className="font-semibold text-gray-900 text-sm">
-                          {document.title || <span className="text-gray-400 italic">Untitled</span>}
+                          {extractTitle(document)}
                         </div>
                       )}
                     </TableCell>
@@ -396,7 +303,7 @@ export default function DocumentsPage() {
                             new Date(currentDocument.metadata.date).toISOString().split('T')[0] : 
                             ''
                           }
-                          onChange={(e) => handleFieldChange("metadata", e.target.value)}
+                          onChange={(e) => handleFieldChange("metadata", { date: e.target.value })}
                           className="w-full text-xs"
                         />
                       ) : (
@@ -412,47 +319,49 @@ export default function DocumentsPage() {
                       )}
                     </TableCell>
                     
-                    <TableCell className="px-4 py-4">
-                      {isEditing ? (
-                        <Select
-                          value={currentDocument.project_id ? String(currentDocument.project_id) : "none"}
-                          onValueChange={(value) => handleFieldChange("project_id", value === "none" ? null : Number(value))}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select project" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">No project</SelectItem>
-                            {projects.map((project) => (
-                              <SelectItem key={project.id} value={String(project.id)}>
-                                {project.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <div className="text-sm">
-                          {document.project_id 
-                            ? <span className="font-medium text-gray-900">
-                                {projects.find(p => p.id === document.project_id)?.name || "Unknown"}
-                              </span>
-                            : <span className="text-gray-400 italic text-xs">No project</span>
-                          }
-                        </div>
-                      )}
-                    </TableCell>
+                    {!projectId && (
+                      <TableCell className="px-4 py-4">
+                        {isEditing ? (
+                          <Select
+                            value={currentDocument.project_id ? String(currentDocument.project_id) : "none"}
+                            onValueChange={(value) => handleFieldChange("project_id", value === "none" ? null : Number(value))}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select project" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">No project</SelectItem>
+                              {projects.map((project) => (
+                                <SelectItem key={project.id} value={String(project.id)}>
+                                  {project.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className="text-sm">
+                            {document.project_id 
+                              ? <span className="font-medium text-gray-900">
+                                  {projects.find(p => p.id === document.project_id)?.name || "Unknown"}
+                                </span>
+                              : <span className="text-gray-400 italic text-xs">No project</span>
+                            }
+                          </div>
+                        )}
+                      </TableCell>
+                    )}
                     
                     <TableCell className="px-4 py-4">
                       {isEditing ? (
                         <Textarea
-                          value={currentDocument.summary || ""}
-                          onChange={(e) => handleFieldChange("summary", e.target.value)}
+                          value={currentDocument.metadata?.summary || extractSummary(currentDocument as Document)}
+                          onChange={(e) => handleFieldChange("metadata", { summary: e.target.value })}
                           className="w-full min-h-[60px] text-xs"
                           placeholder="Enter summary..."
                         />
                       ) : (
                         <div className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                          {document.summary || <span className="text-gray-400 italic">No summary</span>}
+                          {extractSummary(document) || <span className="text-gray-400 italic">No summary</span>}
                         </div>
                       )}
                     </TableCell>
@@ -525,7 +434,7 @@ export default function DocumentsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete "{documentToDelete?.title || 'this document'}". 
+              This will permanently delete "{extractTitle(documentToDelete || {} as Document)}". 
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -542,6 +451,6 @@ export default function DocumentsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }
