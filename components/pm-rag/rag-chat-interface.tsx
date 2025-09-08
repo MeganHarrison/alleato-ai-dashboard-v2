@@ -57,7 +57,7 @@ export default function RAGChatInterface() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || loading) return;
+    if (!input?.trim() || loading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -236,7 +236,7 @@ export default function RAGChatInterface() {
               disabled={loading}
               className="flex-1"
             />
-            <Button type="submit" disabled={loading || !input.trim()}>
+            <Button type="submit" disabled={loading || !input?.trim()}>
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (

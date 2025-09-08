@@ -7,7 +7,7 @@ import { Send, Loader2, Sparkles, ArrowRight, MessageSquare } from 'lucide-react
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { useChat } from "ai/react";
+import { useChat } from '@ai-sdk/react';
 import { cn } from '@/lib/utils';
 
 export default function FMGlobalChatInterface() {
@@ -201,10 +201,10 @@ export default function FMGlobalChatInterface() {
             
             <Button 
               type="submit" 
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || !input?.trim()}
               className={cn(
                 "mr-2 h-9 w-9 rounded-xl p-0 transition-all",
-                input.trim() 
+                input?.trim() 
                   ? "bg-gradient-to-r from-[#DB802D] to-[#DB802D]/80 text-white hover:shadow-md hover:shadow-[#DB802D]/20" 
                   : "bg-muted text-muted-foreground"
               )}
@@ -212,7 +212,7 @@ export default function FMGlobalChatInterface() {
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Send className={cn("h-4 w-4 transition-transform", input.trim() && "translate-x-0.5")} />
+                <Send className={cn("h-4 w-4 transition-transform", input?.trim() && "translate-x-0.5")} />
               )}
             </Button>
           </div>

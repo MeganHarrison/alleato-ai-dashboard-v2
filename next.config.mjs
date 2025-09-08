@@ -57,6 +57,12 @@ const nextConfig = {
   ],
   
   webpack: (config, { isServer, dev }) => {
+    // Add alias for Zod v4 compatibility
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'zod/v4': 'zod',
+    };
+    
     // Suppress the critical dependency warning for Supabase realtime
     config.module = {
       ...config.module,

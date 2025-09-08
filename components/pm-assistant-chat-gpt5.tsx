@@ -158,7 +158,7 @@ export default function PMAssistantChatGPT5({
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input?.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -668,7 +668,7 @@ export default function PMAssistantChatGPT5({
                 
                 <Button
                   onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
+                  disabled={!input?.trim() || isLoading}
                   className="h-auto"
                 >
                   <Send className="w-4 h-4" />

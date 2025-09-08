@@ -46,7 +46,7 @@ export default function RagChatPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!input.trim() || isLoading) return;
+    if (!input?.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: `msg_${Date.now()}`,
@@ -255,7 +255,7 @@ export default function RagChatPage() {
               />
               <Button
                 type="submit"
-                disabled={!input.trim() || isLoading}
+                disabled={!input?.trim() || isLoading}
                 className="self-end"
               >
                 {isLoading ? (

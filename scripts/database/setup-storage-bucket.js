@@ -22,10 +22,10 @@ async function setupStorageBucket() {
       auth: { persistSession: false }
     });
 
-    // Create the documents bucket
-    console.log('1️⃣ Creating documents bucket...');
+    // Create the rag_documents bucket
+    console.log('1️⃣ Creating rag_documents bucket...');
     const { data: bucketData, error: bucketError } = await supabase.storage
-      .createBucket('documents', {
+      .createBucket('rag_documents', {
         public: false, // Private bucket - only authenticated users can access
         allowedMimeTypes: [
           'text/plain',
@@ -43,9 +43,9 @@ async function setupStorageBucket() {
     }
 
     if (bucketError && bucketError.message.includes('already exists')) {
-      console.log('✅ Documents bucket already exists');
+      console.log('✅ RAG documents bucket already exists');
     } else {
-      console.log('✅ Documents bucket created successfully');
+      console.log('✅ RAG documents bucket created successfully');
     }
 
     // Create RLS policies for the bucket
@@ -55,21 +55,21 @@ async function setupStorageBucket() {
     const uploadPolicySQL = `
       CREATE POLICY "Allow authenticated uploads" ON storage.objects
       FOR INSERT TO authenticated
-      WITH CHECK (bucket_id = 'documents');
+      WITH CHECK (bucket_id = 'rag_documents');
     `;
 
     // Allow authenticated users to read their own files
     const readPolicySQL = `
       CREATE POLICY "Allow authenticated reads" ON storage.objects
       FOR SELECT TO authenticated
-      USING (bucket_id = 'documents');
+      USING (bucket_id = 'rag_documents');
     `;
 
     // Allow authenticated users to delete their own files
     const deletePolicySQL = `
       CREATE POLICY "Allow authenticated deletes" ON storage.objects
       FOR DELETE TO authenticated
-      USING (bucket_id = 'documents');
+      USING (bucket_id = 'rag_documents');
     `;
 
     // Execute policies (they may already exist, so we'll catch errors)
@@ -94,9 +94,9 @@ async function setupStorageBucket() {
       throw new Error(`Failed to list buckets: ${listError.message}`);
     }
 
-    const documentsBucket = bucketsData.find(b => b.name === 'documents');
+    const documentsBucket = bucketsData.find(b => b.name === 'rag_documents');
     if (documentsBucket) {
-      console.log('✅ Documents bucket is accessible');
+      console.log('✅ RAG documents bucket is accessible');
       console.log(`   Bucket ID: ${documentsBucket.id}`);
       console.log(`   Public: ${documentsBucket.public}`);
     } else {
@@ -105,7 +105,7 @@ async function setupStorageBucket() {
 
     console.log('\n🎉 Storage setup completed successfully!');
     console.log('\n📋 Summary:');
-    console.log('- Documents bucket created with 10MB file size limit');
+    console.log('- RAG documents bucket created with 10MB file size limit');
     console.log('- Allowed file types: text, PDF, Word docs, CSV');
     console.log('- RLS policies configured for authenticated access');
     console.log('- Ready for file uploads via Dropzone component');

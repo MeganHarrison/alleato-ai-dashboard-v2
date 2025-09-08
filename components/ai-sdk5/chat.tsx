@@ -119,7 +119,7 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
             <Button
               type="submit"
               size="icon"
-              disabled={!input.trim() || isLoading}
+              disabled={!input?.trim() || isLoading}
               className="h-[60px] w-[60px]"
             >
               {isLoading ? (

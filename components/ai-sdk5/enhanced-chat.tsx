@@ -319,7 +319,7 @@ export function EnhancedChat({
                 )}
               </div>
               <PromptInputSubmit 
-                disabled={!input.trim() || isLoading}
+                disabled={!input?.trim() || isLoading}
                 status={isLoading ? "streaming" : "ready"}
               />
             </PromptInputToolbar>

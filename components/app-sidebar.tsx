@@ -35,7 +35,7 @@ const data = {
       items: [
         {
           title: "FM Global Expert",
-          url: "/chat-asrs2",
+          url: "/fm-global-expert",
         },
         {
           title: "Tables & Figures",

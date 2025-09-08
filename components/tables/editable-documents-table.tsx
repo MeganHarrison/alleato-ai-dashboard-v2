@@ -5,10 +5,7 @@ import { updateDocument, deleteDocument } from "@/app/actions/documents-full-act
 import { DocumentDetailsSheet } from "@/components/documents/document-details-sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -37,19 +34,15 @@ import {
   Trash2,
   Check,
   X,
-  FileText,
-  Filter,
   Columns3,
-  LayoutGrid,
-  List,
-  ChevronDown,
   Search,
+  Sparkles,
   Eye,
-  Download,
-  File,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface Document {
   id: number;
@@ -57,11 +50,6 @@ interface Document {
   document_type: string | null;
   embedding: string | null;
   metadata: any | null;
-  title?: string | null;
-  project?: string | null;
-  date?: string | null;
-  category?: string | null;
-  summary?: string | null;
 }
 
 interface EditableDocumentsTableProps {
@@ -81,12 +69,13 @@ const extractTitle = (doc: Document): string => {
     const firstLine = doc.content.split('\n')[0];
     return firstLine.substring(0, 100);
   }
-  return '';
+  return `Document ${doc.id}`;
 };
 
 const extractProject = (doc: Document): string => {
   if (doc.metadata?.project) return doc.metadata.project;
   if (doc.metadata?.project_name) return doc.metadata.project_name;
+  if (doc.metadata?.project_id) return `Project ${doc.metadata.project_id}`;
   return '';
 };
 
@@ -94,30 +83,37 @@ const extractDate = (doc: Document): string => {
   if (doc.metadata?.date) return doc.metadata.date;
   if (doc.metadata?.created_at) return doc.metadata.created_at;
   if (doc.metadata?.updated_at) return doc.metadata.updated_at;
+  if (doc.metadata?.timestamp) return doc.metadata.timestamp;
   return '';
 };
 
-const extractCategory = (doc: Document): string => {
-  if (doc.metadata?.category) return doc.metadata.category;
-  if (doc.document_type) return doc.document_type;
-  return 'General';
-};
-
 const extractSummary = (doc: Document): string => {
+  // Check for AI-generated insights or summaries
+  if (doc.metadata?.ai_insights?.summary) return doc.metadata.ai_insights.summary;
+  if (doc.metadata?.ai_summary) return doc.metadata.ai_summary;
   if (doc.metadata?.summary) return doc.metadata.summary;
   if (doc.metadata?.description) return doc.metadata.description;
+  
+  // If no summary and has content, return first 200 characters
   if (doc.content) {
-    // Return first 200 characters of content as summary
-    return doc.content.substring(0, 200);
+    return doc.content.substring(0, 200) + (doc.content.length > 200 ? '...' : '');
   }
   return '';
 };
 
+const hasAIInsights = (doc: Document): boolean => {
+  return !!(
+    doc.metadata?.ai_insights || 
+    doc.metadata?.ai_summary || 
+    doc.metadata?.ai_generated
+  );
+};
+
 const formatDate = (dateStr: string): string => {
-  if (!dateStr) return '';
+  if (!dateStr) return '—';
   try {
     const date = new Date(dateStr);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return format(date, 'MMM d, yyyy');
   } catch {
     return dateStr;
   }
@@ -128,22 +124,31 @@ export function EditableDocumentsTable({ documents }: EditableDocumentsTableProp
   const [editedDocument, setEditedDocument] = useState<Document | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"table" | "cards" | "list">("table");
+  const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
+  const [generatingDocIds, setGeneratingDocIds] = useState<Set<number>>(new Set());
   const [visibleColumns, setVisibleColumns] = useState({
-    title: true,
-    project: true,
+    name: true,
     date: true,
-    category: true,
     summary: true,
+    project: true,
+    insights: true,
     actions: true,
   });
+
+  // Check if any documents are missing AI insights
+  const documentsWithoutInsights = useMemo(() => {
+    return documents.filter(doc => !hasAIInsights(doc));
+  }, [documents]);
 
   // Filter documents based on search and type
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {
       const matchesSearch = 
-        (doc.content?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-        (doc.document_type?.toLowerCase() || '').includes(searchQuery.toLowerCase());
+        searchQuery === "" ||
+        extractTitle(doc).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        extractProject(doc).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        extractSummary(doc).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (doc.content?.toLowerCase() || '').includes(searchQuery.toLowerCase());
       
       const matchesType = typeFilter === "all" || doc.document_type === typeFilter;
       
@@ -207,21 +212,48 @@ export function EditableDocumentsTable({ documents }: EditableDocumentsTableProp
     }
   };
 
-  const getTypeColor = (type: string | null) => {
-    if (!type) return "bg-gray-100 text-gray-800";
-    switch (type.toLowerCase()) {
-      case "pdf":
-        return "bg-red-100 text-red-800";
-      case "text":
-        return "bg-blue-100 text-blue-800";
-      case "markdown":
-        return "bg-purple-100 text-purple-800";
-      case "html":
-        return "bg-orange-100 text-orange-800";
-      case "json":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const handleGenerateInsights = async (documentId?: number) => {
+    const docsToProcess = documentId 
+      ? [documents.find(d => d.id === documentId)].filter(Boolean)
+      : documentsWithoutInsights;
+
+    if (docsToProcess.length === 0) {
+      toast.info("No documents to process");
+      return;
+    }
+
+    setIsGeneratingInsights(true);
+    const processingIds = new Set(docsToProcess.map(d => d!.id));
+    setGeneratingDocIds(processingIds);
+
+    try {
+      // Call the API endpoint to generate insights
+      const response = await fetch('/api/insights/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          documentIds: docsToProcess.map(doc => doc!.id)
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to generate insights: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      toast.success(`Generated AI insights for ${result.processed || docsToProcess.length} document(s)`);
+      
+      // Refresh the page to show updated documents
+      window.location.reload();
+    } catch (error) {
+      console.error("Error generating insights:", error);
+      toast.error("Failed to generate AI insights. Please try again.");
+    } finally {
+      setIsGeneratingInsights(false);
+      setGeneratingDocIds(new Set());
     }
   };
 
@@ -230,138 +262,84 @@ export function EditableDocumentsTable({ documents }: EditableDocumentsTableProp
       <Table>
         <TableHeader>
           <TableRow>
-            {visibleColumns.title && <TableHead>Title</TableHead>}
-            {visibleColumns.project && <TableHead className="w-[150px]">Project</TableHead>}
-            {visibleColumns.date && <TableHead className="w-[180px]">Date/Time</TableHead>}
-            {visibleColumns.category && <TableHead className="w-[120px]">Category</TableHead>}
+            {visibleColumns.name && <TableHead>Name</TableHead>}
+            {visibleColumns.date && <TableHead className="w-[120px]">Date</TableHead>}
             {visibleColumns.summary && <TableHead>Summary</TableHead>}
-            {visibleColumns.actions && <TableHead className="w-[100px]">Actions</TableHead>}
+            {visibleColumns.project && <TableHead className="w-[150px]">Project</TableHead>}
+            {visibleColumns.insights && <TableHead className="w-[100px]">AI Insights</TableHead>}
+            {visibleColumns.actions && <TableHead className="w-[120px]">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredDocuments.map((document) => {
             const isEditing = editingId === document.id;
+            const isGenerating = generatingDocIds.has(document.id);
+            const hasInsights = hasAIInsights(document);
 
             return (
               <TableRow key={document.id} className={cn(isEditing && "bg-muted/50")}>
-                {visibleColumns.title && (
+                {visibleColumns.name && (
                   <TableCell>
-                    {isEditing ? (
-                      <Input
-                        value={editedDocument?.title || ""}
-                        onChange={(e) =>
-                          setEditedDocument((prev) =>
-                            prev ? { ...prev, title: e.target.value } : null
-                          )
-                        }
-                        placeholder="Enter title"
-                        className="h-8"
-                      />
-                    ) : (
-                      <DocumentDetailsSheet
-                        document={document}
-                        trigger={
-                          <Button 
-                            variant="link" 
-                            className="w-fit px-0 text-left text-foreground font-medium h-auto"
-                          >
-                            {extractTitle(document) || <span className="text-muted-foreground">Untitled</span>}
-                          </Button>
-                        }
-                      />
-                    )}
-                  </TableCell>
-                )}
-                
-                {visibleColumns.project && (
-                  <TableCell>
-                    {isEditing ? (
-                      <Input
-                        value={editedDocument?.project || ""}
-                        onChange={(e) =>
-                          setEditedDocument((prev) =>
-                            prev ? { ...prev, project: e.target.value } : null
-                          )
-                        }
-                        placeholder="Project name"
-                        className="h-8"
-                      />
-                    ) : (
-                      <div>
-                        {extractProject(document) || <span className="text-muted-foreground">—</span>}
-                      </div>
-                    )}
+                    <DocumentDetailsSheet
+                      document={document}
+                      trigger={
+                        <Button 
+                          variant="link" 
+                          className="w-fit px-0 text-left text-foreground font-medium h-auto justify-start"
+                        >
+                          {extractTitle(document)}
+                        </Button>
+                      }
+                    />
                   </TableCell>
                 )}
                 
                 {visibleColumns.date && (
                   <TableCell>
-                    {isEditing ? (
-                      <Input
-                        type="datetime-local"
-                        value={editedDocument?.date || ""}
-                        onChange={(e) =>
-                          setEditedDocument((prev) =>
-                            prev ? { ...prev, date: e.target.value } : null
-                          )
-                        }
-                        className="h-8"
-                      />
-                    ) : (
-                      <div className="text-sm">
-                        {formatDate(extractDate(document)) || <span className="text-muted-foreground">—</span>}
-                      </div>
-                    )}
-                  </TableCell>
-                )}
-                
-                {visibleColumns.category && (
-                  <TableCell>
-                    {isEditing ? (
-                      <Select
-                        value={editedDocument?.category || ""}
-                        onValueChange={(value) =>
-                          setEditedDocument((prev) =>
-                            prev ? { ...prev, category: value } : null
-                          )
-                        }
-                      >
-                        <SelectTrigger className="h-8">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="meeting">Meeting</SelectItem>
-                          <SelectItem value="report">Report</SelectItem>
-                          <SelectItem value="documentation">Documentation</SelectItem>
-                          <SelectItem value="proposal">Proposal</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <Badge variant="outline">
-                        {extractCategory(document) || "General"}
-                      </Badge>
-                    )}
+                    <div className="text-sm text-muted-foreground">
+                      {formatDate(extractDate(document))}
+                    </div>
                   </TableCell>
                 )}
                 
                 {visibleColumns.summary && (
                   <TableCell>
-                    {isEditing ? (
-                      <Textarea
-                        value={editedDocument?.summary || ""}
-                        onChange={(e) =>
-                          setEditedDocument((prev) =>
-                            prev ? { ...prev, summary: e.target.value } : null
-                          )
-                        }
-                        placeholder="Enter summary"
-                        className="min-h-[60px]"
-                      />
+                    <div className="max-w-[400px] line-clamp-2 text-sm">
+                      {extractSummary(document) || <span className="text-muted-foreground italic">No summary available</span>}
+                    </div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.project && (
+                  <TableCell>
+                    <div className="text-sm">
+                      {extractProject(document) || <span className="text-muted-foreground">—</span>}
+                    </div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.insights && (
+                  <TableCell>
+                    {isGenerating ? (
+                      <Badge variant="secondary" className="gap-1">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Generating
+                      </Badge>
+                    ) : hasInsights ? (
+                      <Badge variant="default" className="gap-1">
+                        <Check className="h-3 w-3" />
+                        Generated
+                      </Badge>
                     ) : (
-                      <div className="max-w-[400px] line-clamp-2 text-sm">
-                        {extractSummary(document) || <span className="text-muted-foreground">No summary</span>}
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleGenerateInsights(document.id)}
+                        className="h-7 text-xs gap-1"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        Generate
+                      </Button>
                     )}
                   </TableCell>
                 )}
@@ -390,6 +368,18 @@ export function EditableDocumentsTable({ documents }: EditableDocumentsTableProp
                         </>
                       ) : (
                         <>
+                          <DocumentDetailsSheet
+                            document={document}
+                            trigger={
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            }
+                          />
                           <Button
                             size="icon"
                             variant="ghost"
@@ -429,136 +419,40 @@ export function EditableDocumentsTable({ documents }: EditableDocumentsTableProp
     </div>
   );
 
-  const renderCardView = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {filteredDocuments.map((document) => {
-        const isEditing = editingId === document.id;
-
-        return (
-          <Card key={document.id} className={cn(isEditing && "ring-2 ring-primary")}>
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <File className="h-4 w-4 text-muted-foreground" />
-                  <Badge className={cn("font-normal", getTypeColor(document.document_type))}>
-                    {document.document_type || "Unknown"}
-                  </Badge>
-                </div>
-                <div className="flex gap-1">
-                  {isEditing ? (
-                    <>
-                      <Button size="icon" variant="ghost" onClick={handleSave} className="h-6 w-6">
-                        <Check className="h-3 w-3" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={handleCancel} className="h-6 w-6">
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button size="icon" variant="ghost" onClick={() => handleEdit(document)} className="h-6 w-6">
-                        <Pencil className="h-3 w-3" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleDelete(document.id)} className="h-6 w-6 text-destructive">
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">ID: {document.id}</div>
-                {isEditing ? (
-                  <Textarea
-                    value={editedDocument?.content || ""}
-                    onChange={(e) =>
-                      setEditedDocument((prev) =>
-                        prev ? { ...prev, content: e.target.value } : null
-                      )
-                    }
-                    className="min-h-[100px]"
-                  />
-                ) : (
-                  <p className="text-sm line-clamp-3">
-                    {document.content || <span className="text-muted-foreground">No content</span>}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
-  );
-
-  const renderListView = () => (
-    <div className="space-y-2">
-      {filteredDocuments.map((document) => {
-        const isEditing = editingId === document.id;
-
-        return (
-          <div
-            key={document.id}
-            className={cn(
-              "flex items-center justify-between p-3 rounded-lg border",
-              isEditing && "bg-muted/50"
-            )}
-          >
-            <div className="flex items-center gap-3 flex-1">
-              <File className="h-4 w-4 text-muted-foreground" />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">#{document.id}</span>
-                  <Badge className={cn("font-normal", getTypeColor(document.document_type))}>
-                    {document.document_type || "Unknown"}
-                  </Badge>
-                </div>
-                {isEditing ? (
-                  <Textarea
-                    value={editedDocument?.content || ""}
-                    onChange={(e) =>
-                      setEditedDocument((prev) =>
-                        prev ? { ...prev, content: e.target.value } : null
-                      )
-                    }
-                    className="mt-1"
-                  />
-                ) : (
-                  <p className="text-sm text-muted-foreground truncate max-w-[500px]">
-                    {document.content || "No content"}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="flex gap-1">
-              {isEditing ? (
-                <>
-                  <Button size="icon" variant="ghost" onClick={handleSave} className="h-8 w-8">
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="ghost" onClick={handleCancel} className="h-8 w-8">
-                    <X className="h-4 w-4" />
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button size="icon" variant="ghost" onClick={() => handleEdit(document)} className="h-8 w-8">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="ghost" onClick={() => handleDelete(document.id)} className="h-8 w-8 text-destructive">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-
   return (
     <div className="space-y-4">
+      {/* Alert for documents without insights */}
+      {documentsWithoutInsights.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Sparkles className="h-5 w-5 text-amber-600" />
+            <div>
+              <p className="font-medium text-amber-900">AI Insights Available</p>
+              <p className="text-sm text-amber-700">
+                {documentsWithoutInsights.length} document{documentsWithoutInsights.length !== 1 ? 's' : ''} can be enhanced with AI-generated insights
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={() => handleGenerateInsights()}
+            disabled={isGeneratingInsights}
+            className="gap-2"
+          >
+            {isGeneratingInsights ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Generating Insights...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Generate All Insights
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
       {/* Controls */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 flex-1">
@@ -587,45 +481,29 @@ export function EditableDocumentsTable({ documents }: EditableDocumentsTableProp
         </div>
 
         <div className="flex items-center gap-2">
-          {viewMode === "table" && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Columns3 className="h-4 w-4 mr-2" />
-                  Columns
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {Object.entries(visibleColumns).map(([key, value]) => (
-                  <DropdownMenuCheckboxItem
-                    key={key}
-                    checked={value}
-                    onCheckedChange={(checked) =>
-                      setVisibleColumns((prev) => ({ ...prev, [key]: checked }))
-                    }
-                  >
-                    {key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ")}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
-            <TabsList>
-              <TabsTrigger value="table">
-                <List className="h-4 w-4" />
-              </TabsTrigger>
-              <TabsTrigger value="cards">
-                <LayoutGrid className="h-4 w-4" />
-              </TabsTrigger>
-              <TabsTrigger value="list">
-                <List className="h-4 w-4" />
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Columns3 className="h-4 w-4 mr-2" />
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {Object.entries(visibleColumns).map(([key, value]) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={value}
+                  onCheckedChange={(checked) =>
+                    setVisibleColumns((prev) => ({ ...prev, [key]: checked }))
+                  }
+                >
+                  {key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ")}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -634,10 +512,8 @@ export function EditableDocumentsTable({ documents }: EditableDocumentsTableProp
         Showing {filteredDocuments.length} of {documents.length} documents
       </div>
 
-      {/* Content */}
-      {viewMode === "table" && renderTableView()}
-      {viewMode === "cards" && renderCardView()}
-      {viewMode === "list" && renderListView()}
+      {/* Table Content */}
+      {renderTableView()}
     </div>
   );
 }

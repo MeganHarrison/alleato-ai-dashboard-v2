@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Download, Upload, Zap, FileText, Brain, RefreshCw, CheckCircle, AlertCircle, Loader2, Database, Search, Clock, Users } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
+import { Download, Upload, Zap, FileText, Brain, RefreshCw, CheckCircle, AlertCircle, Loader2, Database, Search, Clock, Users, CheckCircle2, XCircle } from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 
 interface ProcessingStatus {
@@ -41,6 +42,7 @@ interface RecentTranscript {
 }
 
 export default function RAGVectorizationAdmin(): ReactElement {
+  const { toast } = useToast()
   const [firefliesStatus, setFirefliesStatus] = useState<ProcessingStatus>({ type: "idle" })
   const [vectorizeStatus, setVectorizeStatus] = useState<ProcessingStatus>({ type: "idle" })
   const [insightsStatus, setInsightsStatus] = useState<ProcessingStatus>({ type: "idle" })
@@ -52,6 +54,7 @@ export default function RAGVectorizationAdmin(): ReactElement {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
   const [recentTranscripts, setRecentTranscripts] = useState<RecentTranscript[]>([])
+  const [syncedMeetingTitles, setSyncedMeetingTitles] = useState<string[]>([])
 
   // Load initial data on mount
   useEffect(() => {
@@ -91,36 +94,92 @@ export default function RAGVectorizationAdmin(): ReactElement {
     setFirefliesStatus({ type: "loading", message: "Connecting to Fireflies API..." })
     
     try {
-      const response = await fetch("/api/fireflies/sync", {
+      // Call the Cloudflare Worker directly
+      const response = await fetch("https://worker-alleato-fireflies-rag.megan-d14.workers.dev/api/sync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          limit: 20,
-          startDate: selectedDateRange.start || undefined,
-          endDate: selectedDateRange.end || undefined
+          limit: selectedDateRange.start || selectedDateRange.end ? 50 : 10
         })
       })
 
       const data = await response.json()
       
-      if (!response.ok) {
+      if (!response.ok || !data.success) {
         throw new Error(data.error || "Failed to sync transcripts")
       }
 
-      setSyncedTranscripts(data.transcriptsProcessed || 0)
+      const syncedCount = data.processed || 0
+      const failedCount = data.failed || 0
+      
+      setSyncedTranscripts(syncedCount)
+      
+      // Build detailed message with meeting titles if available
+      let message = `Successfully synced ${syncedCount} transcript${syncedCount !== 1 ? 's' : ''}`
+      if (failedCount > 0) {
+        message += ` (${failedCount} failed)`
+      }
+      
+      // Show errors if any
+      let details = { ...data }
+      if (data.errors && data.errors.length > 0) {
+        details.failedTranscripts = data.errors.map((e: any) => ({
+          id: e.transcript_id,
+          error: e.error
+        }))
+      }
+      
       setFirefliesStatus({
-        type: "success",
-        message: `Successfully synced ${data.transcriptsProcessed} transcripts`,
-        details: data
+        type: syncedCount > 0 ? "success" : failedCount > 0 ? "error" : "success",
+        message: message,
+        details: details
       })
       
-      // Refresh sync status and recent transcripts
-      fetchSyncStatus()
-      fetchRecentTranscripts()
+      // Show toast notification with details
+      if (syncedCount > 0) {
+        toast({
+          title: "✅ Fireflies Sync Complete",
+          description: (
+            <div className="space-y-2">
+              <p>{message}</p>
+              <p className="text-sm text-muted-foreground">
+                The transcripts have been saved to the documents table with summaries, action items, and bullet points.
+              </p>
+            </div>
+          ),
+          duration: 5000,
+        })
+      } else if (failedCount > 0) {
+        toast({
+          title: "⚠️ Sync Completed with Errors",
+          description: `Failed to sync ${failedCount} transcript${failedCount !== 1 ? 's' : ''}. Check the details for more information.`,
+          variant: "destructive",
+          duration: 5000,
+        })
+      }
+      
+      // Store meeting titles if we can get them from recent transcripts
+      if (syncedCount > 0) {
+        setSyncedMeetingTitles(prev => [...prev])
+      }
+      
+      // Refresh sync status and recent transcripts after a short delay
+      setTimeout(() => {
+        fetchSyncStatus()
+        fetchRecentTranscripts()
+      }, 1000)
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to sync transcripts"
       setFirefliesStatus({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to sync transcripts"
+        message: errorMessage
+      })
+      
+      toast({
+        title: "❌ Fireflies Sync Failed",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000,
       })
     }
   }
@@ -359,12 +418,12 @@ export default function RAGVectorizationAdmin(): ReactElement {
                 {firefliesStatus.type === "loading" ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Syncing...
+                    Syncing Fireflies...
                   </>
                 ) : (
                   <>
                     <RefreshCw className="mr-2 h-4 w-4" />
-                    Sync Last 20 Transcripts
+                    Sync Fireflies Transcripts (Manual)
                   </>
                 )}
               </Button>

@@ -73,7 +73,7 @@ export function ChatInterface({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!input.trim() || isLoading || isStreaming) {
+    if (!input?.trim() || isLoading || isStreaming) {
       return;
     }
 
@@ -229,7 +229,7 @@ export function ChatInterface({
             />
             <Button
               type="submit"
-              disabled={!input.trim() || isLoading || isStreaming}
+              disabled={!input?.trim() || isLoading || isStreaming}
               size="icon"
             >
               <Send className="h-4 w-4" />

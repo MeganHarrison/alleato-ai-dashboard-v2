@@ -39,14 +39,12 @@ import { format } from "date-fns";
 import {
   Briefcase,
   Building,
-  Calendar,
   ChevronDown,
   ChevronUp,
   ChevronsUpDown,
   Columns3,
   DollarSign,
   ExternalLink,
-  FileText,
   Filter,
   LayoutGrid,
   List,
@@ -388,38 +386,10 @@ export default function DashboardHome() {
 
             {/* Description */}
             {project.description && (
-              <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+              <p className="text-sm text-gray-600 line-clamp-2">
                 {project.description}
               </p>
             )}
-
-            {/* Footer */}
-            <div className="flex items-center justify-between pt-3 border-t">
-              <div className="flex items-center gap-4 text-xs text-gray-500">
-                {project.created_at && (
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>
-                      {format(new Date(project.created_at), "MMM d, yyyy")}
-                    </span>
-                  </div>
-                )}
-                {project.documents && project.documents.length > 0 && (
-                  <div className="flex items-center gap-1">
-                    <FileText className="h-3 w-3" />
-                    <span>
-                      {project.documents.length} document
-                      {project.documents.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <Link href={`/projects/${project.id}`}>
-                <Button size="sm" variant="ghost" className="h-7 px-2">
-                  View Details
-                </Button>
-              </Link>
-            </div>
           </CardContent>
         </Card>
       ))}

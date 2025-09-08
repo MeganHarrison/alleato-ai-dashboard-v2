@@ -33,7 +33,7 @@ export function AIChat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || isLoading) return
+    if (!input?.trim() || isLoading) return
 
     const userMessage = input.trim()
     setInput("")
@@ -125,7 +125,7 @@ export function AIChat() {
             <Button
               type="submit"
               size="icon"
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || !input?.trim()}
               className="ml-2 bg-black text-white hover:bg-black/90"
             >
               <Send className="h-4 w-4" />

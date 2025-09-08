@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
             success: false, 
             error: { 
               code: 'STORAGE_ERROR', 
-              message: 'Storage bucket "documents" not found. Please create it in Supabase.' 
+              message: 'Storage bucket "rag_documents" not found. Please create it in Supabase.' 
             } 
           },
           { status: 500 }

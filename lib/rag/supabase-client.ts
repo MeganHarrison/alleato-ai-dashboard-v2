@@ -22,7 +22,7 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 export const documentOperations = {
   async create(document: Partial<RagDocument>): Promise<RagDocument> {
     const { data, error } = await supabase
-      .from('documents')
+      .from('rag_documents')
       .insert(document)
       .select()
       .single();
@@ -33,7 +33,7 @@ export const documentOperations = {
 
   async update(id: string, updates: Partial<RagDocument>): Promise<RagDocument> {
     const { data, error } = await supabase
-      .from('documents')
+      .from('rag_documents')
       .update(updates)
       .eq('id', id)
       .select()
@@ -45,7 +45,7 @@ export const documentOperations = {
 
   async delete(id: string): Promise<void> {
     const { error } = await supabase
-      .from('documents')
+      .from('rag_documents')
       .delete()
       .eq('id', id);
 
@@ -54,7 +54,7 @@ export const documentOperations = {
 
   async getById(id: string): Promise<RagDocument | null> {
     const { data, error } = await supabase
-      .from('documents')
+      .from('rag_documents')
       .select()
       .eq('id', id)
       .single();
@@ -76,7 +76,7 @@ export const documentOperations = {
     const { page = 1, limit = 20, status, search, user_id } = params;
     const offset = (page - 1) * limit;
 
-    let query = supabase.from('documents').select(`
+    let query = supabase.from('rag_documents').select(`
       *,
       project:projects(id, name)
     `, { count: 'exact' });
@@ -257,7 +257,7 @@ export const queueOperations = {
 export const storageOperations = {
   async uploadDocument(file: File, path: string): Promise<string> {
     const { data, error } = await supabase.storage
-      .from('documents')
+      .from('rag_documents')
       .upload(path, file, {
         cacheControl: '3600',
         upsert: false,
@@ -269,7 +269,7 @@ export const storageOperations = {
 
   async downloadDocument(path: string): Promise<Blob> {
     const { data, error } = await supabase.storage
-      .from('documents')
+      .from('rag_documents')
       .download(path);
 
     if (error) throw error;
@@ -278,7 +278,7 @@ export const storageOperations = {
 
   async deleteDocument(path: string): Promise<void> {
     const { error } = await supabase.storage
-      .from('documents')
+      .from('rag_documents')
       .remove([path]);
 
     if (error) throw error;
@@ -286,7 +286,7 @@ export const storageOperations = {
 
   async getPublicUrl(path: string): Promise<string> {
     const { data } = supabase.storage
-      .from('documents')
+      .from('rag_documents')
       .getPublicUrl(path);
 
     return data.publicUrl;
@@ -300,7 +300,7 @@ export const statsOperations = {
   async getSystemStats(): Promise<SystemStats> {
     // Get document stats
     const { data: docStats, error: docError } = await supabase
-      .from('documents')
+      .from('rag_documents')
       .select('status')
       .then(({ data }) => {
         const stats = {
@@ -319,7 +319,7 @@ export const statsOperations = {
 
     // Get last processed document
     const { data: lastProcessed } = await supabase
-      .from('documents')
+      .from('rag_documents')
       .select('processed_at')
       .eq('status', 'completed')
       .order('processed_at', { ascending: false })

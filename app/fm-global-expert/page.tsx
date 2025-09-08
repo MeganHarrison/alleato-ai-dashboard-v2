@@ -1,12 +1,20 @@
 "use client";
 
-import { useChat } from "ai/react";
+import { AppSidebar } from "@/components/app-sidebar";
+import { DynamicBreadcrumbs } from "@/components/dynamic-breadcrumbs";
+import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { useChat } from '@ai-sdk/react';
 import { Mic, Paperclip, Send } from "lucide-react";
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 
 export default function FMGlobalChat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error, append } =
     useChat({
       api: "/api/fm-global",
     });
@@ -21,15 +29,12 @@ export default function FMGlobalChat() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSuggestionClick = (query: string) => {
-    handleInputChange({ target: { value: query } } as any);
-    // Auto-submit after setting the value
-    setTimeout(() => {
-      const form = document.querySelector("form") as HTMLFormElement;
-      if (form) {
-        form.requestSubmit();
-      }
-    }, 100);
+  const handleSuggestionClick = async (query: string) => {
+    // Use append instead of handleInputChange + submit to avoid infinite loops
+    await append({
+      role: "user",
+      content: query,
+    });
   };
 
   const suggestions = [
@@ -39,8 +44,21 @@ export default function FMGlobalChat() {
   ];
 
   return (
-    <>
-      <div className="flex flex-col h-full bg-white">
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+            <DynamicBreadcrumbs />
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 mx-[5%] sm:ml-6 sm:mr-6">
+          <div className="flex flex-col h-full bg-white">
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto min-h-0 pb-4">
           {messages.length === 0 ? (
@@ -271,7 +289,9 @@ export default function FMGlobalChat() {
             </button>
           </form>
         </div>
-      </div>
-    </>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

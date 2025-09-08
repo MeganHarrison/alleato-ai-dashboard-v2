@@ -53,7 +53,7 @@ export default function RAGChatPage(): ReactElement {
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-    if (!input.trim() || loading) return;
+    if (!input?.trim() || loading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -194,7 +194,7 @@ export default function RAGChatPage(): ReactElement {
                 disabled={loading}
                 className="flex-1"
               />
-              <Button type="submit" disabled={loading || !input.trim()}>
+              <Button type="submit" disabled={loading || !input?.trim()}>
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
