@@ -381,7 +381,7 @@ export default function PMAssistantChatGPT5({
           <TabsContent value="chat" className="flex-1 flex flex-col p-0">
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.length === 0 && showQuickActions && (
+              {(messages?.length || 0) === 0 && showQuickActions && (
                 <div className="space-y-4">
                   <div className="text-center py-8">
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -677,7 +677,7 @@ export default function PMAssistantChatGPT5({
               
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Press Enter to send, Shift+Enter for new line</span>
-                <span>{input.length}/4000</span>
+                <span>{input?.length || 0}/4000</span>
               </div>
             </div>
           </TabsContent>

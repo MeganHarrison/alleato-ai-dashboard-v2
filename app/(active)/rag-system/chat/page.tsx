@@ -172,7 +172,7 @@ export default function RagChatPage() {
               variant="outline"
               size="sm"
               onClick={clearChat}
-              disabled={messages.length === 0}
+              disabled={(messages?.length || 0) === 0}
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Clear Chat
@@ -182,7 +182,7 @@ export default function RagChatPage() {
         <CardContent className="flex-1 flex flex-col overflow-hidden p-0">
           <ScrollArea className="flex-1 px-6" ref={scrollAreaRef}>
             <div className="space-y-4 py-4">
-              {messages.length === 0 ? (
+              {(messages?.length || 0) === 0 ? (
                 <div className="text-center py-8">
                   <Bot className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground">

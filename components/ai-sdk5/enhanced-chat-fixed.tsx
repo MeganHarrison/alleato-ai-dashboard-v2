@@ -150,7 +150,7 @@ export function EnhancedChatFixed({
       <div className="flex-1 overflow-hidden">
         <Conversation className="h-full">
           <ConversationContent>
-            {messages.length === 0 ? (
+            {(messages?.length || 0) === 0 ? (
               minimalWelcome ? (
                 <MinimalWelcome
                   onSuggestionClick={handleSuggestionClick}
@@ -244,7 +244,7 @@ export function EnhancedChatFixed({
             />
             <PromptInputToolbar>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                {messages.length > 0 && (
+                {(messages?.length || 0) > 0 && (
                   <span>Chat ID: {id.slice(-8)}</span>
                 )}
               </div>

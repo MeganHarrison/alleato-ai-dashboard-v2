@@ -74,7 +74,7 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
     <div className="flex flex-col h-full">
       <ScrollArea className="flex-1 px-4" ref={scrollAreaRef}>
         <div className="max-w-4xl mx-auto">
-          {messages.length === 0 ? (
+          {(messages?.length || 0) === 0 ? (
             <ProjectManagerWelcome onSuggestionClick={handleSuggestionClick} />
           ) : (
             <div className="py-4 space-y-4">

@@ -100,7 +100,7 @@ export function EnhancedChat({
 
   // Auto-submit initial prompt if provided
   useEffect(() => {
-    if (initialPrompt && !hasSubmittedInitial && messages.length === 0 && !isLoading) {
+    if (initialPrompt && !hasSubmittedInitial && (messages?.length || 0) === 0 && !isLoading) {
       setHasSubmittedInitial(true);
       // Send initial prompt directly using proper format
       // Docs: https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat#sendmessage
@@ -116,7 +116,7 @@ export function EnhancedChat({
     const saveInterval = setInterval(async () => {
       try {
         const messagesString = JSON.stringify(messages);
-        if (messagesString !== lastSavedMessagesRef.current && messages.length > 0) {
+        if (messagesString !== lastSavedMessagesRef.current && (messages?.length || 0) > 0) {
           await saveChat({ chatId: id, messages });
           lastSavedMessagesRef.current = messagesString;
           console.log(`Chat ${id} auto-saved during streaming`);
@@ -228,7 +228,7 @@ export function EnhancedChat({
       <div className="flex-1 overflow-hidden">
         <Conversation className="h-full">
           <ConversationContent>
-            {messages.length === 0 ? (
+            {(messages?.length || 0) === 0 ? (
               minimalWelcome ? (
                 <MinimalWelcome
                   onSuggestionClick={handleSuggestionClick}
@@ -314,7 +314,7 @@ export function EnhancedChat({
             />
             <PromptInputToolbar>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                {messages.length > 0 && (
+                {(messages?.length || 0) > 0 && (
                   <span>Chat ID: {id.slice(-8)}</span>
                 )}
               </div>

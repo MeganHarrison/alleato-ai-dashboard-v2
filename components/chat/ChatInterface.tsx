@@ -153,7 +153,7 @@ export function ChatInterface({
                 </select>
               </div>
               
-              {messages.length > 0 && (
+              {(messages?.length || 0) > 0 && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -192,7 +192,7 @@ export function ChatInterface({
         <CardContent className="flex-1 p-0">
           <ScrollArea className="h-full">
             <div className="p-4 space-y-4">
-              {messages.length === 0 ? (
+              {(messages?.length || 0) === 0 ? (
                 <div className="text-center text-muted-foreground py-8">
                   <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p className="text-lg font-medium mb-2">Welcome to PM RAG Assistant</p>

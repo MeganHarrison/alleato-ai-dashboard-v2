@@ -123,7 +123,7 @@ export function EnhancedChatV5({
       <div className="flex-1 overflow-hidden">
         <Conversation className="h-full">
           <ConversationContent>
-            {messages.length === 0 ? (
+            {(messages?.length || 0) === 0 ? (
               <MinimalWelcome
                 onSuggestionClick={handleSuggestionClick}
                 welcomeMessage={welcomeMessage}
@@ -195,7 +195,7 @@ export function EnhancedChatV5({
             />
             <PromptInputToolbar>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                {messages.length > 0 && (
+                {(messages?.length || 0) > 0 && (
                   <span>Chat ID: {id.slice(-8)}</span>
                 )}
               </div>

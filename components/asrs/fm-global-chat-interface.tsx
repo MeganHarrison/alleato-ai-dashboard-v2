@@ -55,7 +55,7 @@ export default function FMGlobalChatInterface() {
       
       <ScrollArea ref={scrollAreaRef} className="flex-1 px-6 py-8">
         <div className="space-y-6">
-          {messages.length === 0 ? (
+          {(messages?.length || 0) === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[400px]">
               <div className="relative mb-8">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#DB802D] to-[#DB802D]/60 flex items-center justify-center shadow-lg">
@@ -219,12 +219,12 @@ export default function FMGlobalChatInterface() {
           
           {/* Character count and status */}
           <div className="absolute -top-6 right-0 flex items-center gap-2 text-xs text-muted-foreground">
-            {input.length > 0 && (
+            {input && (input?.length || 0) > 0 && (
               <span className={cn(
                 "transition-colors",
-                input.length > 500 ? "text-destructive" : ""
+                (input?.length || 0) > 500 ? "text-destructive" : ""
               )}>
-                {input.length}/500
+                {input?.length || 0}/500
               </span>
             )}
             {isLoading && (
