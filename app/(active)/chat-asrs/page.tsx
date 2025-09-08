@@ -1,13 +1,12 @@
 "use client";
 
-import cx from "classnames";
+import type { Message } from "ai";
 import { useChat } from "ai/react";
-import { Weather } from "../../weather";
-import { useState, useEffect } from "react";
-import ReactMarkdown, { Components } from "react-markdown";
+import cx from "classnames";
+import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import type { Message } from "ai";
+import { Weather } from "../../weather";
 
 export default function Page() {
   const {
@@ -28,7 +27,7 @@ export default function Page() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="bg-gray-900 border-b border-gray-800 p-4 shadow-xl flex-shrink-0">
+      <header className=" border-b border-gray-100 p-4 flex-shrink-0">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
             Claude AI Assistant
@@ -91,15 +90,12 @@ export default function Page() {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div
-                    className={cx(
-                      "rounded-2xl shadow-lg transition-all duration-200",
-                      {
-                        "bg-gradient-to-br from-blue-600 to-blue-700 text-white":
-                          message.role === "user",
-                        "bg-gray-900 border border-gray-800":
-                          message.role !== "user",
-                      }
-                    )}
+                    className={cx("rounded-2xl transition-all duration-200", {
+                      "bg-gradient-to-br from-blue-600 to-blue-700 text-white":
+                        message.role === "user",
+                      "bg-gray-50 border border-gray-100":
+                        message.role !== "user",
+                    })}
                   >
                     {/* Message Header */}
                     <div
@@ -113,7 +109,7 @@ export default function Page() {
                     >
                       <div
                         className={cx(
-                          "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg",
+                          "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold",
                           {
                             "bg-white/20 backdrop-blur":
                               message.role === "user",
@@ -235,7 +231,7 @@ export default function Page() {
                                       style={oneDark as any}
                                       language={language}
                                       PreTag="div"
-                                      className="rounded-lg shadow-xl"
+                                      className="rounded-lg"
                                       customStyle={{
                                         margin: 0,
                                         padding: "1.5rem",
@@ -261,16 +257,16 @@ export default function Page() {
                             // Tables
                             table: ({ children }) => (
                               <div className="overflow-x-auto my-4">
-                                <table className="min-w-full divide-y divide-gray-700">
+                                <table className="min-w-full divide-y divide-gray-200">
                                   {children}
                                 </table>
                               </div>
                             ),
                             thead: ({ children }) => (
-                              <thead className="bg-gray-800">{children}</thead>
+                              <thead className="bg-gray-50">{children}</thead>
                             ),
                             tbody: ({ children }) => (
-                              <tbody className="bg-gray-900 divide-y divide-gray-800">
+                              <tbody className="bg-gray-50 divide-y divide-gray-200">
                                 {children}
                               </tbody>
                             ),
@@ -285,7 +281,7 @@ export default function Page() {
                               </td>
                             ),
                             // Horizontal Rule
-                            hr: () => <hr className="border-gray-800 my-6" />,
+                            hr: () => <hr className="border-gray-200 my-6" />,
                           }}
                         >
                           {message.content}
@@ -369,7 +365,7 @@ export default function Page() {
                                       {toolName === "getWeather" ? (
                                         <Weather weatherAtLocation={result} />
                                       ) : (
-                                        <pre className="text-xs overflow-x-auto p-3 bg-gray-950 rounded-lg font-mono text-gray-400">
+                                        <pre className="text-xs overflow-x-auto p-3 bg-gray-50 rounded-lg font-mono text-gray-400">
                                           {JSON.stringify(result, null, 2)}
                                         </pre>
                                       )}
@@ -393,7 +389,7 @@ export default function Page() {
               messages.length > 0 &&
               messages[messages.length - 1].role === "user" && (
                 <div className="mr-auto max-w-[90%]">
-                  <div className="bg-gray-900 border border-gray-800 rounded-2xl shadow-lg p-4">
+                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold">
                         AI
@@ -420,13 +416,13 @@ export default function Page() {
 
           {/* Input form */}
           <form onSubmit={handleFormSubmit} className="relative flex-shrink-0">
-            <div className="bg-gray-900 p-3 rounded-2xl border border-gray-800 shadow-xl">
+            <div className="bg-gray-50 p-3 rounded-2xl border border-gray-200">
               <div className="flex gap-3">
                 <input
                   name="prompt"
                   value={input}
                   onChange={handleInputChange}
-                  className="flex-1 px-4 py-3 bg-gray-950 text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 placeholder-gray-500 transition-all"
+                  className="flex-1 px-4 py-3 bg-gray-100 text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 placeholder-gray-500 transition-all"
                   placeholder="Ask Claude anything..."
                   disabled={chatLoading}
                   autoComplete="off"
@@ -437,9 +433,9 @@ export default function Page() {
                   className={cx(
                     "px-6 py-3 rounded-xl font-medium transition-all transform",
                     {
-                      "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-105 active:scale-95":
+                      "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-105 active:scale-95":
                         !chatLoading && input?.trim(),
-                      "bg-gray-800 text-gray-500 cursor-not-allowed":
+                      "bg-gray-50 text-gray-200 cursor-not-allowed":
                         chatLoading || !input?.trim(),
                     }
                   )}

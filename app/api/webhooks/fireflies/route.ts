@@ -74,6 +74,10 @@ async function fetchTranscriptFromFireflies(transcriptId: string) {
           action_items
           topics_discussed
           meeting_type
+          overview
+          bullet_gist
+          outline
+          shorthand_bullet
         }
         
         sentences {
@@ -301,11 +305,22 @@ export async function POST(request: NextRequest) {
         file_path: filePath,
         file_type: 'md',
         file_size: markdownContent.length,
-        content: '', // Will be populated during vectorization
+        content: markdownContent, // Store the full markdown content
+        summary: transcript.summary?.overview || null, // Store overview in summary column
+        action_items: transcript.summary?.action_items || [], // Store action items in dedicated column
+        bullet_points: transcript.summary?.bullet_gist || [], // Store bullet points in dedicated column
         status: 'pending',
         category: 'meeting',
+        document_type: 'meeting',
+        meeting_date: transcript.date,
+        participants: transcript.participants,
+        duration_minutes: Math.round(transcript.duration / 60),
         tags: metadata.keywords,
-        metadata: metadata,
+        metadata: {
+          ...metadata,
+          outline: transcript.summary?.outline || [],
+          shorthand_bullet: transcript.summary?.shorthand_bullet || [],
+        },
       })
       .select()
       .single();

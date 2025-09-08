@@ -1,0 +1,160 @@
+{
+  "table_metadata": {
+    "id": "Table_2",
+    "number": 2,
+    "title": "Hose Demand Design and Water Supply Duration",
+    "section": "2.2.1.6",
+    "pages": [19],
+    "last_updated": "2024-07",
+    "extraction_date": "2024-12-20"
+  },
+  "applicable_conditions": {
+    "asrs_type": ["horizontal_loading", "shuttle", "mini_load"],
+    "system_types": ["wet", "dry"],
+    "sprinkler_arrangements": ["ceiling_only", "ceiling_and_in_rack"],
+    "application": "Used for ceiling-only or ceiling/in-rack systems that must be hydraulically balanced"
+  },
+  "structure_type": "specification_table",
+  "data_points": [
+    {
+      "sprinkler_type": "standard_coverage",
+      "conditions": [
+        {
+          "sprinklers_in_design": "12 or less",
+          "hose_demand_gpm": 250,
+          "hose_demand_lpm": 950,
+          "water_supply_duration_min": 60
+        },
+        {
+          "sprinklers_in_design": "13 to 19",
+          "hose_demand_gpm": 500,
+          "hose_demand_lpm": 1900,
+          "water_supply_duration_min": 90
+        },
+        {
+          "sprinklers_in_design": "20 or more",
+          "hose_demand_gpm": 500,
+          "hose_demand_lpm": 1900,
+          "water_supply_duration_min": 120
+        }
+      ]
+    },
+    {
+      "sprinkler_type": "extended_coverage",
+      "conditions": [
+        {
+          "sprinklers_in_design": "6 or less",
+          "hose_demand_gpm": 250,
+          "hose_demand_lpm": 950,
+          "water_supply_duration_min": 60
+        },
+        {
+          "sprinklers_in_design": "7 to 9",
+          "hose_demand_gpm": 500,
+          "hose_demand_lpm": 1900,
+          "water_supply_duration_min": 90
+        },
+        {
+          "sprinklers_in_design": "10 or more",
+          "hose_demand_gpm": 500,
+          "hose_demand_lpm": 1900,
+          "water_supply_duration_min": 120
+        }
+      ]
+    }
+  ],
+  "special_requirements": {
+    "tl_asrs": {
+      "hose_demand": {
+        "minimum_gpm": 500,
+        "minimum_lpm": 1900
+      },
+      "water_supply_duration": {
+        "standard_min": 240,
+        "note": "Minimum 4-hour duration for ceiling sprinkler and hose demand"
+      },
+      "small_hose_stations": {
+        "flow_per_station_gpm": 50,
+        "flow_per_station_lpm": 190,
+        "number_of_stations": 2,
+        "total_flow_gpm": 100,
+        "total_flow_lpm": 380,
+        "remaining_allowance_gpm": 400,
+        "remaining_allowance_lpm": 1515
+      }
+    },
+    "tl_asrs_combustible_containers": {
+      "ceiling_height_le_25ft": {
+        "duration_hours": 2,
+        "duration_min": 120
+      },
+      "ceiling_height_gt_25ft": {
+        "duration_hours": 4,
+        "duration_min": 240
+      },
+      "monitor_nozzles": {
+        "flow_per_nozzle_gpm": 200,
+        "flow_per_nozzle_lpm": 760,
+        "number_of_nozzles": 2,
+        "total_flow_gpm": 400,
+        "total_flow_lpm": 1520
+      }
+    },
+    "vertically_enclosed_asrs": {
+      "hose_demand_gpm": 250,
+      "hose_demand_lpm": 950,
+      "water_supply_duration_min": 60,
+      "application": "For manual intervention"
+    }
+  },
+  "small_hose_connection_stations": {
+    "general_requirements": {
+      "flow_per_station_gpm": 50,
+      "flow_per_station_lpm": 190,
+      "number_of_stations": 2,
+      "total_minimum_flow_gpm": 100,
+      "total_minimum_flow_lpm": 380,
+      "location": "Near access points to ASRS storage aisles"
+    },
+    "consultation_requirements": [
+      "Local fire service coordination",
+      "Authority having jurisdiction recommendations",
+      "Wet-barrel vs dry-barrel stations",
+      "Hose connection sizes",
+      "Horizontal distance between stations"
+    ],
+    "water_supply_arrangements": [
+      "Piping system dedicated solely for small hose stations",
+      "Piping connected to different sprinkler system than ASRS protection"
+    ],
+    "exemption": "Can be avoided at documented discretion of local authority having jurisdiction"
+  },
+  "fire_detection_requirements": {
+    "installation": "FM Approved ceiling-level fire detection per Data Sheet 5-48",
+    "spacing": "Same maximum spacing as ceiling sprinklers when obstructed ceiling construction",
+    "activation_functions": [
+      "Send alarm to constantly attended location",
+      "Automatically shut-down ASRS robot operations"
+    ],
+    "exemption": "Not needed when closed-top, noncombustible, solid-walled containers used throughout"
+  },
+  "footnotes": [
+    "Use this table for horizontal-loading ASRS storage arrangements",
+    "Applies to ceiling-only or ceiling/in-rack systems requiring hydraulic balancing",
+    "Water supply duration includes both sprinkler and hose demands when from same supply",
+    "Duration requirements vary by ASRS type and ceiling height"
+  ],
+  "validation_rules": [
+    {
+      "rule": "sprinkler_count_classification",
+      "description": "Correctly classify number of sprinklers to determine hose demand and duration"
+    },
+    {
+      "rule": "system_type_matching",
+      "description": "Ensure hose demand matches sprinkler system type (standard vs extended coverage)"
+    }
+  ],
+  "related_tables": [
+    "Table_1", "Table_3"
+  ]
+}

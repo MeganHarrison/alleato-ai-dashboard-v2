@@ -19,7 +19,8 @@ import { format } from 'date-fns';
 
 interface Insight {
   id: string;
-  document_id: string;
+  document_id?: string;
+  meeting_id?: string;
   project_id?: number;
   insight_type: string;
   title: string;
@@ -27,6 +28,12 @@ interface Insight {
   severity?: string;
   metadata?: any;
   created_at: string;
+  document?: {
+    id: string;
+    title: string;
+    source: string;
+    created_at: string;
+  };
   documents?: {
     title: string;
     source: string;
@@ -46,6 +53,8 @@ interface InsightsViewProps {
     created_at: string;
   }>;
   stats: Record<string, number>;
+  severityStats?: Record<string, number>;
+  totalInsights?: number;
 }
 
 const insightTypeConfig = {
@@ -79,6 +88,24 @@ const insightTypeConfig = {
     bgColor: 'bg-purple-50',
     label: 'Key Topic'
   },
+  opportunity: {
+    icon: Sparkles,
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50',
+    label: 'Opportunity'
+  },
+  strategic: {
+    icon: TrendingUp,
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-50',
+    label: 'Strategic'
+  },
+  technical: {
+    icon: FileText,
+    color: 'text-cyan-500',
+    bgColor: 'bg-cyan-50',
+    label: 'Technical'
+  },
   default: {
     icon: FileText,
     color: 'text-gray-500',
@@ -87,7 +114,7 @@ const insightTypeConfig = {
   }
 };
 
-export function InsightsView({ insights, documentsWithoutInsights, stats }: InsightsViewProps) {
+export function InsightsView({ insights, documentsWithoutInsights, stats, severityStats, totalInsights }: InsightsViewProps) {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
 
@@ -111,21 +138,42 @@ export function InsightsView({ insights, documentsWithoutInsights, stats }: Insi
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {Object.entries(insightTypeConfig).filter(([key]) => key !== 'default').map(([key, config]) => (
-          <Card key={key} className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => setSelectedType(key)}>
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          {Object.entries(insightTypeConfig).filter(([key]) => key !== 'default').map(([key, config]) => (
+            <Card key={key} className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => setSelectedType(key)}>
+              <CardHeader className="pb-2">
+                <div className={`w-10 h-10 rounded-lg ${config.bgColor} flex items-center justify-center`}>
+                  <config.icon className={`w-5 h-5 ${config.color}`} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats[key] || 0}</div>
+                <p className="text-xs text-muted-foreground">{config.label}s</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        {/* Severity Distribution */}
+        {severityStats && Object.keys(severityStats).length > 0 && (
+          <Card>
             <CardHeader className="pb-2">
-              <div className={`w-10 h-10 rounded-lg ${config.bgColor} flex items-center justify-center`}>
-                <config.icon className={`w-5 h-5 ${config.color}`} />
-              </div>
+              <CardTitle className="text-sm">Severity Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats[key] || 0}</div>
-              <p className="text-xs text-muted-foreground">{config.label}s</p>
+              <div className="flex gap-4">
+                {Object.entries(severityStats).map(([severity, count]) => (
+                  <div key={severity} className="flex items-center gap-2">
+                    <Badge variant={getSeverityColor(severity)}>{severity}</Badge>
+                    <span className="text-sm font-medium">{count}</span>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
-        ))}
+        )}
       </div>
 
       {/* Documents Without Insights */}
@@ -240,10 +288,10 @@ export function InsightsView({ insights, documentsWithoutInsights, stats }: Insi
                         </div>
                         
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          {insight.documents && (
+                          {(insight.document || insight.documents) && (
                             <span className="flex items-center gap-1">
                               <FileText className="w-3 h-3" />
-                              {insight.documents.title}
+                              {insight.document?.title || insight.documents?.title}
                             </span>
                           )}
                           {insight.projects && (

@@ -94,15 +94,15 @@ export function ProjectsCardView({ projects }: ProjectsCardViewProps) {
   }
 
   return (
-    <div className="space-y-3 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 sm:space-y-0">
+    <div className="space-y-2 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-2 sm:space-y-0">
       {projects.length === 0 ? (
         <div className="col-span-full">
           <Card className="border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <BriefcaseIcon className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium text-muted-foreground">No projects found</p>
-              <p className="text-sm text-muted-foreground mt-1">Create your first project to get started</p>
-              <Button className="mt-4">
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              <BriefcaseIcon className="h-8 w-8 text-muted-foreground mb-3" />
+              <p className="text-base font-medium text-muted-foreground">No projects found</p>
+              <p className="text-xs text-muted-foreground mt-1">Create your first project to get started</p>
+              <Button size="sm" className="mt-3">
                 Create Project
               </Button>
             </CardContent>
@@ -112,17 +112,17 @@ export function ProjectsCardView({ projects }: ProjectsCardViewProps) {
         projects.map((project) => (
           <Card
             key={project.id}
-            className="group relative overflow-hidden transition-all duration-200 active:scale-[0.98] touch-manipulation sm:hover:shadow-lg"
+            className="group relative overflow-hidden transition-all duration-200 active:scale-[0.98] touch-manipulation sm:hover:shadow-lg border-0 shadow-sm"
           >
             {/* Progress Bar */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gray-200 dark:bg-gray-800">
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-800">
               <div
                 className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
                 style={{ width: `${calculateProgress(project)}%` }}
               />
             </div>
 
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 pt-3 px-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <ProjectDetailsWithMeetings
@@ -130,14 +130,14 @@ export function ProjectsCardView({ projects }: ProjectsCardViewProps) {
                     trigger={
                       <Button
                         variant="link"
-                        className="p-0 h-auto font-semibold text-sm sm:text-base hover:underline text-left justify-start line-clamp-1"
+                        className="p-0 h-auto font-semibold text-xs hover:underline text-left justify-start line-clamp-1"
                       >
                         {project.name || "Untitled Project"}
                       </Button>
                     }
                   />
                   {project["job number"] && (
-                    <p className="text-xs text-muted-foreground mt-1 font-mono">
+                    <p className="text-[10px] text-muted-foreground mt-0.5 font-mono">
                       Job #{project["job number"]}
                     </p>
                   )}
@@ -147,9 +147,9 @@ export function ProjectsCardView({ projects }: ProjectsCardViewProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity touch-manipulation"
+                      className="h-6 w-6 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity touch-manipulation"
                     >
-                      <MoreVerticalIcon className="h-4 w-4" />
+                      <MoreVerticalIcon className="h-3 w-3" />
                       <span className="sr-only">Open menu</span>
                     </Button>
                   </DropdownMenuTrigger>
@@ -167,54 +167,54 @@ export function ProjectsCardView({ projects }: ProjectsCardViewProps) {
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-3">
-              {/* Mobile-First Layout: Category and Phase */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="text-xs">
+            <CardContent className="space-y-2 px-3 pb-3">
+              {/* Dense Mobile Layout: Category and Phase */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0.5">
                   {project.category || "General"}
                 </Badge>
-                <Badge className={cn("text-xs gap-1", getPhaseColor(project.phase))}>
+                <Badge className={cn("text-[10px] gap-1 px-1.5 py-0.5", getPhaseColor(project.phase))}>
                   {getPhaseIcon(project.phase)}
                   <span className="hidden sm:inline">{project.phase || "Not Started"}</span>
                   <span className="sm:hidden">{project.phase?.charAt(0) || "N"}</span>
                 </Badge>
               </div>
 
-              {/* Mobile-Optimized Financial Info */}
+              {/* Compact Financial Info */}
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <DollarSignIcon className="h-3 w-3" />
+                  <div className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                    <DollarSignIcon className="h-2.5 w-2.5" />
                     Revenue
                   </div>
-                  <p className="text-lg font-bold text-green-600">
+                  <p className="text-sm font-bold text-green-600 leading-tight">
                     {formatCurrency(project["est revenue"])}
                   </p>
                 </div>
                 <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <TrendingUpIcon className="h-3 w-3" />
+                  <div className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                    <TrendingUpIcon className="h-2.5 w-2.5" />
                     Profit
                   </div>
-                  <p className="text-lg font-bold text-blue-600">
+                  <p className="text-sm font-bold text-blue-600 leading-tight">
                     {formatCurrency(project["est profit"])}
                   </p>
                 </div>
               </div>
 
-              {/* Simplified Date Info for Mobile */}
-              <div className="flex items-center justify-between pt-2 border-t text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="h-3 w-3" />
+              {/* Ultra-compact Date Info */}
+              <div className="flex items-center justify-between pt-1.5 border-t text-[10px] text-muted-foreground">
+                <div className="flex items-center gap-0.5">
+                  <CalendarIcon className="h-2.5 w-2.5" />
                   <span className="hidden sm:inline">Start:</span>
                 </div>
                 <span className="font-medium">{formatDate(project["start date"])}</span>
               </div>
 
-              {/* Mobile-Optimized Description - Only show if space allows */}
+              {/* Hide description on mobile to save space */}
               {project.description && (
-                <div className="pt-1 sm:pt-2">
-                  <p className="text-xs text-muted-foreground line-clamp-1 sm:line-clamp-2">
+                <div className="hidden sm:block pt-1">
+                  <p className="text-xs text-muted-foreground line-clamp-1">
                     {project.description}
                   </p>
                 </div>

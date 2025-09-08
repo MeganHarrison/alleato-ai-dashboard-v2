@@ -14,6 +14,9 @@ export function middleware(request: NextRequest) {
     '/auth/callback',
     '/api/auth',
     '/api/health',  // Health check endpoint for deployment validation
+    '/',  // Temporarily allow public access for testing
+    '/meetings',  // Temporarily allow public access for testing
+    '/rag-admin',  // Temporarily allow public access for testing
   ]
   
   const pathname = request.nextUrl.pathname

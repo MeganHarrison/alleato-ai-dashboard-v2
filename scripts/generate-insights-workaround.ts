@@ -125,17 +125,90 @@ async function generateInsightsWorkaround() {
           console.log(`  ✅ Generated ${insights.actionItems.length} actions, ${insights.decisions.length} decisions`);
         }
         
-        // 8. Also try to insert into ai_insights table
+        // 8. Insert into ai_insights table with duplicate prevention
+        let insertedCount = 0;
+        let duplicateCount = 0;
+        
+        // Insert action items
         for (const item of insights.actionItems) {
-          await supabase
+          const { error } = await supabase
             .from('ai_insights')
             .insert({
-              meeting_id: doc.id,
+              meeting_id: doc.id,  // Use meeting_id (the meetings table expects this)
               insight_type: 'action_item',
               title: item.title,
               description: item.description,
-              severity: item.priority || 'medium'
+              severity: item.priority || 'medium',
+              confidence_score: 0.8,
+              project_id: doc.metadata?.project_id || doc.project_id || null
             });
+          
+          if (error) {
+            if (error.message?.includes('duplicate') || error.message?.includes('unique')) {
+              duplicateCount++;
+            } else {
+              console.log(`    ⚠️  Failed to insert action item: ${error.message}`);
+            }
+          } else {
+            insertedCount++;
+          }
+        }
+        
+        // Insert decisions as insights
+        for (const decision of insights.decisions) {
+          const { error } = await supabase
+            .from('ai_insights')
+            .insert({
+              meeting_id: doc.id,
+              insight_type: 'decision',
+              title: decision.title,
+              description: decision.description,
+              severity: 'medium',
+              confidence_score: 0.85,
+              project_id: doc.metadata?.project_id || doc.project_id || null
+            });
+          
+          if (error) {
+            if (error.message?.includes('duplicate') || error.message?.includes('unique')) {
+              duplicateCount++;
+            } else {
+              console.log(`    ⚠️  Failed to insert decision: ${error.message}`);
+            }
+          } else {
+            insertedCount++;
+          }
+        }
+        
+        // Insert risks as insights
+        for (const risk of insights.risks) {
+          const { error } = await supabase
+            .from('ai_insights')
+            .insert({
+              meeting_id: doc.id,
+              insight_type: 'risk',
+              title: risk.title,
+              description: risk.description,
+              severity: 'high',
+              confidence_score: 0.75,
+              project_id: doc.metadata?.project_id || doc.project_id || null
+            });
+          
+          if (error) {
+            if (error.message?.includes('duplicate') || error.message?.includes('unique')) {
+              duplicateCount++;
+            } else {
+              console.log(`    ⚠️  Failed to insert risk: ${error.message}`);
+            }
+          } else {
+            insertedCount++;
+          }
+        }
+        
+        if (insertedCount > 0) {
+          console.log(`  📊 Inserted ${insertedCount} new insights`);
+        }
+        if (duplicateCount > 0) {
+          console.log(`  ⏭️  Skipped ${duplicateCount} duplicate insights`);
         }
         
         // Add delay to avoid rate limiting

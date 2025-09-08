@@ -201,7 +201,7 @@ Deno.serve(async (req: Request) => {
 })
 ```
 ---
-# Specify the following for Cursor rules
+# Specify the following for development rules
 description: Guidelines for writing Supabase database functions
 alwaysApply: false
 ---
