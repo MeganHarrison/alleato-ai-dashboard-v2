@@ -45,23 +45,22 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-interface Document {
+interface Meeting {
   id: string;
-  title: string;
+  title: string | null;
   summary: string | null;
   project_id: number | null;
   processing_status: string | null;
   participants: string[] | null;
-  action_items: string[] | null;
-  created_at: string;
-  updated_at: string;
-  file_type?: string | null;
-  file_size?: number | null;
-  author?: string | null;
-  content?: string | null;
-  document_type?: string | null;
-  embedding?: string | null;
-  metadata?: any;
+  created_at: string | null;
+  updated_at: string | null;
+  date: string;
+  duration_minutes: number | null;
+  fireflies_id: string | null;
+  fireflies_link: string | null;
+  transcript_url: string | null;
+  category: string | null;
+  tags: string[] | null;
 }
 
 interface Project {
@@ -70,13 +69,13 @@ interface Project {
 }
 
 export default function MeetingsPage() {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editedDocument, setEditedDocument] = useState<Partial<Document>>({});
+  const [editedMeeting, setEditedMeeting] = useState<Partial<Meeting>>({});
   const [summaryDialogOpen, setSummaryDialogOpen] = useState(false);
   const [selectedSummary, setSelectedSummary] = useState<string>("");
   const [supabase] = useState(() => {
@@ -113,23 +112,23 @@ export default function MeetingsPage() {
         console.log("Authenticated user:", user?.email);
       }
       
-      // Load documents
-      const { data: docsData, error: docsError } = await supabase
-        .from('documents')
+      // Load meetings
+      const { data: meetingsData, error: meetingsError } = await supabase
+        .from('meetings')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (docsError) {
-        console.error("Error loading documents:", {
-          message: docsError.message,
-          details: docsError.details,
-          hint: docsError.hint,
-          code: docsError.code
+      if (meetingsError) {
+        console.error("Error loading meetings:", {
+          message: meetingsError.message,
+          details: meetingsError.details,
+          hint: meetingsError.hint,
+          code: meetingsError.code
         });
-        throw new Error(docsError.message || "Failed to load documents");
+        throw new Error(meetingsError.message || "Failed to load meetings");
       }
       
-      console.log("Documents loaded:", docsData?.length || 0);
+      console.log("Meetings loaded:", meetingsData?.length || 0);
       
       // Load projects for the dropdown
       const { data: projectsData, error: projectsError } = await supabase
@@ -149,23 +148,22 @@ export default function MeetingsPage() {
       
       console.log("Projects loaded:", projectsData?.length || 0);
       
-      setDocuments((docsData || []).map(doc => ({
-        id: String(doc.id || ''),
-        title: doc.title || '',
-        summary: doc.summary,
-        project_id: doc.project_id,
-        processing_status: doc.processing_status,
-        participants: doc.participants,
-        action_items: doc.action_items,
-        created_at: doc.created_at || new Date().toISOString(),
-        updated_at: doc.updated_at || new Date().toISOString(),
-        file_type: doc.file_type,
-        file_size: doc.file_size,
-        author: doc.author,
-        content: doc.content,
-        document_type: doc.document_type,
-        embedding: doc.embedding,
-        metadata: doc.metadata
+      setMeetings((meetingsData || []).map(meeting => ({
+        id: meeting.id,
+        title: meeting.title,
+        summary: meeting.summary,
+        project_id: meeting.project_id,
+        processing_status: meeting.processing_status,
+        participants: meeting.participants,
+        created_at: meeting.created_at,
+        updated_at: meeting.updated_at,
+        date: meeting.date,
+        duration_minutes: meeting.duration_minutes,
+        fireflies_id: meeting.fireflies_id,
+        fireflies_link: meeting.fireflies_link,
+        transcript_url: meeting.transcript_url,
+        category: meeting.category,
+        tags: meeting.tags
       })));
       setProjects((projectsData || []).map(proj => ({
         id: proj.id,
@@ -187,18 +185,18 @@ export default function MeetingsPage() {
     }
   };
 
-  const handleEdit = (document: Document) => {
-    setEditingId(document.id);
-    setEditedDocument({ ...document });
+  const handleEdit = (meeting: Meeting) => {
+    setEditingId(meeting.id);
+    setEditedMeeting({ ...meeting });
   };
 
   const handleCancel = () => {
     setEditingId(null);
-    setEditedDocument({});
+    setEditedMeeting({});
   };
 
   const handleSave = async () => {
-    if (!editingId || !editedDocument) return;
+    if (!editingId || !editedMeeting) return;
     
     try {
       if (!supabase) {
@@ -206,37 +204,37 @@ export default function MeetingsPage() {
       }
       
       const { error } = await supabase
-        .from('documents')
+        .from('meetings')
         .update({
-          title: editedDocument.title,
-          summary: editedDocument.summary,
-          project_id: editedDocument.project_id,
+          title: editedMeeting.title,
+          summary: editedMeeting.summary,
+          project_id: editedMeeting.project_id,
           updated_at: new Date().toISOString()
         })
-        .eq('id', Number(editingId));
+        .eq('id', editingId);
       
       if (error) throw error;
       
       // Update local state
-      setDocuments(docs => 
-        docs.map(doc => 
-          doc.id === editingId 
-            ? { ...doc, ...editedDocument, updated_at: new Date().toISOString() }
-            : doc
+      setMeetings(meetings => 
+        meetings.map(meeting => 
+          meeting.id === editingId 
+            ? { ...meeting, ...editedMeeting, updated_at: new Date().toISOString() }
+            : meeting
         )
       );
       
       setEditingId(null);
-      setEditedDocument({});
-      toast.success("Document updated successfully");
+      setEditedMeeting({});
+      toast.success("Meeting updated successfully");
     } catch (error) {
       console.error("Error updating document:", error);
       toast.error("Failed to update document");
     }
   };
 
-  const handleFieldChange = (field: keyof Document, value: any) => {
-    setEditedDocument(prev => ({ ...prev, [field]: value }));
+  const handleFieldChange = (field: keyof Meeting, value: any) => {
+    setEditedMeeting(prev => ({ ...prev, [field]: value }));
   };
 
   const openSummaryDialog = (summary: string) => {
@@ -265,11 +263,11 @@ export default function MeetingsPage() {
     );
   };
 
-  const filteredDocuments = documents.filter(doc =>
+  const filteredMeetings = meetings.filter(meeting =>
     searchTerm === "" ||
-    doc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.participants?.some(p => p.toLowerCase().includes(searchTerm.toLowerCase()))
+    meeting.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    meeting.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    meeting.participants?.some(p => p.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   if (loading) {
@@ -277,7 +275,7 @@ export default function MeetingsPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
-          <span>Loading documents...</span>
+          <span>Loading meetings...</span>
         </div>
       </div>
     );
@@ -306,7 +304,7 @@ export default function MeetingsPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Search documents..."
+          placeholder="Search meetings..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10"
@@ -327,36 +325,38 @@ export default function MeetingsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredDocuments.length === 0 ? (
+            {filteredMeetings.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  No documents found
+                  No meetings found
                 </TableCell>
               </TableRow>
             ) : (
-              filteredDocuments.map((document) => {
-                const isEditing = editingId === document.id;
-                const currentDoc = isEditing ? editedDocument : document;
+              filteredMeetings.map((meeting) => {
+                const isEditing = editingId === meeting.id;
+                const currentMeeting = isEditing ? editedMeeting : meeting;
                 
                 return (
-                  <TableRow key={document.id}>
+                  <TableRow key={meeting.id}>
                     <TableCell>
                       {isEditing ? (
                         <Input
-                          value={currentDoc.title || ""}
+                          value={currentMeeting.title || ""}
                           onChange={(e) => handleFieldChange("title", e.target.value)}
                           className="min-w-[200px]"
                         />
                       ) : (
-                        <div className="font-medium">{document.title}</div>
+                        <div className="font-medium">{meeting.title}</div>
                       )}
                     </TableCell>
                     
                     <TableCell>
                       <div className="flex items-center gap-1 text-sm">
                         <Calendar className="h-3 w-3" />
-                        {document.created_at 
-                          ? format(new Date(document.created_at), "MMM d, yyyy")
+                        {meeting.date 
+                          ? format(new Date(meeting.date), "MMM d, yyyy")
+                          : meeting.created_at
+                          ? format(new Date(meeting.created_at), "MMM d, yyyy")
                           : "No date"
                         }
                       </div>
@@ -365,7 +365,7 @@ export default function MeetingsPage() {
                     <TableCell>
                       {isEditing ? (
                         <Textarea
-                          value={currentDoc.summary || ""}
+                          value={currentMeeting.summary || ""}
                           onChange={(e) => handleFieldChange("summary", e.target.value)}
                           className="min-w-[250px] min-h-[80px]"
                           placeholder="Enter summary..."
@@ -373,9 +373,9 @@ export default function MeetingsPage() {
                       ) : (
                         <div 
                           className="text-sm text-muted-foreground cursor-pointer hover:text-foreground line-clamp-2"
-                          onClick={() => document.summary && openSummaryDialog(document.summary)}
+                          onClick={() => meeting.summary && openSummaryDialog(meeting.summary)}
                         >
-                          {document.summary || "No summary"}
+                          {meeting.summary || "No summary"}
                         </div>
                       )}
                     </TableCell>
@@ -383,7 +383,7 @@ export default function MeetingsPage() {
                     <TableCell>
                       {isEditing ? (
                         <Select
-                          value={currentDoc.project_id ? String(currentDoc.project_id) : "none"}
+                          value={currentMeeting.project_id ? String(currentMeeting.project_id) : "none"}
                           onValueChange={(value) => handleFieldChange("project_id", value === "none" ? null : Number(value))}
                         >
                           <SelectTrigger className="min-w-[150px]">
@@ -400,8 +400,8 @@ export default function MeetingsPage() {
                         </Select>
                       ) : (
                         <div>
-                          {document.project_id 
-                            ? projects.find(p => p.id === document.project_id)?.name || "Unknown"
+                          {meeting.project_id 
+                            ? projects.find(p => p.id === meeting.project_id)?.name || "Unknown"
                             : <span className="text-muted-foreground">No project</span>
                           }
                         </div>
@@ -409,7 +409,7 @@ export default function MeetingsPage() {
                     </TableCell>
                     
                     <TableCell>
-                      {getStatusBadge(document.processing_status)}
+                      {getStatusBadge(meeting.processing_status)}
                     </TableCell>
                     
                     <TableCell className="text-right">
@@ -436,7 +436,7 @@ export default function MeetingsPage() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => handleEdit(document)}
+                          onClick={() => handleEdit(meeting)}
                           className="h-8 w-8 p-0"
                         >
                           <Edit className="h-4 w-4" />

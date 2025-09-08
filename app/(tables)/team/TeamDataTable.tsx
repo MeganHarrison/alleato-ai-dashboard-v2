@@ -176,8 +176,8 @@ export default function TeamDataTable({ employees }: TeamDataTableProps) {
           <SelectContent>
             <SelectItem value="all">All Departments</SelectItem>
             {departments.map((dept) => (
-              <SelectItem key={dept} value={dept}>
-                {dept}
+              <SelectItem key={dept || 'null'} value={dept || ''}>
+                {dept || 'Unknown'}
               </SelectItem>
             ))}
           </SelectContent>

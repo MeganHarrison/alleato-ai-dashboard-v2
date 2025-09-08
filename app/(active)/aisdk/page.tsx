@@ -1,11 +1,6 @@
 'use client';
 
 import { ReactElement, Fragment, useState } from 'react';
-import {
-  Conversation,
-  ConversationContent,
-  ConversationScrollButton,
-} from '@/components/ai-elements/conversation';
 import { Message, MessageContent } from '@/components/ai-elements/message';
 import {
   PromptInput,
@@ -51,11 +46,11 @@ const models = [
   },
 ];
 
-const ChatBotDemo = () => {
+const ChatBotDemo = (): ReactElement => {
   const [input, setInput] = useState('');
   const [model, setModel] = useState<string>(models[0].value);
   const [webSearch, setWebSearch] = useState(false);
-  const { messages, sendMessage, status } = useChat();
+  const { messages, sendMessage, status, regenerate } = useChat();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,25 +71,23 @@ const ChatBotDemo = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 relative size-full h-screen">
       <div className="flex flex-col h-full">
-        <Conversation className="h-full">
-          <ConversationContent>
+        <div className="h-full overflow-y-auto">
+          <div className="p-4">
             {messages.map((message) => (
               <div key={message.id}>
-                {message.role === 'assistant' && message.parts.filter((part) => part.type === 'source-url').length > 0 && (
+                {message.role === 'assistant' && message.parts.some((part) => 'url' in part) && (
                   <Sources>
                     <SourcesTrigger
                       count={
-                        message.parts.filter(
-                          (part) => part.type === 'source-url',
-                        ).length
+                        message.parts.filter((part) => 'url' in part).length
                       }
                     />
-                    {message.parts.filter((part) => part.type === 'source-url').map((part, i) => (
+                    {message.parts.filter((part) => 'url' in part).map((part, i) => (
                       <SourcesContent key={`${message.id}-${i}`}>
                         <Source
                           key={`${message.id}-${i}`}
-                          href={part.url}
-                          title={part.url}
+                          href={'url' in part ? part.url : '#'}
+                          title={'url' in part ? part.url : 'Source'}
                         />
                       </SourcesContent>
                     ))}
@@ -112,19 +105,23 @@ const ChatBotDemo = () => {
                               </Response>
                             </MessageContent>
                           </Message>
-                          {message.role === 'assistant' && i === messages.length - 1 && (
+                          {message.role === 'assistant' && (
                             <Actions className="mt-2">
                               <Action
-                                onClick={() => regenerate()}
+                                onClick={() => regenerate?.()}
                                 label="Retry"
+                                tooltip="Retry generation"
                               >
                                 <RefreshCcwIcon className="size-3" />
                               </Action>
                               <Action
-                                onClick={() =>
-                                  navigator.clipboard.writeText(part.text)
-                                }
+                                onClick={() => {
+                                  if ('text' in part) {
+                                    navigator.clipboard.writeText(part.text);
+                                  }
+                                }}
                                 label="Copy"
+                                tooltip="Copy message"
                               >
                                 <CopyIcon className="size-3" />
                               </Action>
@@ -150,9 +147,8 @@ const ChatBotDemo = () => {
               </div>
             ))}
             {status === 'submitted' && <Loader />}
-          </ConversationContent>
-          <ConversationScrollButton />
-        </Conversation>
+          </div>
+        </div>
 
         <PromptInput onSubmit={handleSubmit} className="mt-4">
           <PromptInputTextarea

@@ -1,6 +1,6 @@
 // Subcontractors Page - Subcontractor Directory with Data Table
 
-import { Suspense } from "react";
+import { Suspense, ReactElement } from "react";
 import { getSubcontractors } from "@/app/actions/subcontractors-actions";
 import SubcontractorsDataTable from "./SubcontractorsDataTable";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

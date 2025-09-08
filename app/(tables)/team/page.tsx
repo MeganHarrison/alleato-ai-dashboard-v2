@@ -1,6 +1,6 @@
 // Team Page - Employee Directory with Data Table
 
-import { Suspense } from "react";
+import { Suspense, ReactElement } from "react";
 import { getEmployees } from "@/app/actions/employees-actions";
 import TeamDataTable from "./TeamDataTable";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

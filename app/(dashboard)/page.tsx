@@ -78,6 +78,13 @@ interface Project {
   documents?: any[];
 }
 
+interface Service {
+  title: string;
+  description: string;
+  href: string;
+  price?: string | null;
+}
+
 const COLUMNS = [
   { id: "name", label: "Project Name", defaultVisible: true },
   { id: "phase", label: "Status", defaultVisible: true },
@@ -123,7 +130,7 @@ export default function DashboardHome() {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const services = [
+  const services: Service[] = [
     {
       title: "FM Global Guru",
       description: "AI Agent trained on all of your business documents.",

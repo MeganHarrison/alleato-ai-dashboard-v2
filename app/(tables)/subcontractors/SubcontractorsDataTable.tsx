@@ -260,7 +260,7 @@ export default function SubcontractorsDataTable({ subcontractors }: Subcontracto
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             {statuses.map((status) => (
-              <SelectItem key={status} value={status}>
+              <SelectItem key={status || 'null'} value={status || ''}>
                 {status ? status.charAt(0).toUpperCase() + status.slice(1) : "Unknown"}
               </SelectItem>
             ))}
