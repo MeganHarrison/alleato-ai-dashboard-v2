@@ -148,18 +148,14 @@ export default function FMGlobalChat() {
             <DynamicBreadcrumbs />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 mx-[5%] sm:ml-6 sm:mr-6">
+        <div className="flex flex-col h-[calc(100vh-4rem)] p-4 pt-0 mx-[5%] sm:ml-6 sm:mr-6">
           {/* Connection Status Alert */}
           {connectionStatus.status !== 'checking' && (
-            <Alert className={`
-              ${connectionStatus.status === 'railway' ? 'border-green-500 bg-green-50' : ''}
+            <Alert className={`mb-4 ${connectionStatus.status === 'railway' ? 'border-green-500 bg-green-50' : ''}
               ${connectionStatus.status === 'fallback' ? 'border-orange-500 bg-orange-50' : ''}
               ${connectionStatus.status === 'error' ? 'border-red-500 bg-red-50' : ''}
             `}>
               <div className="flex items-center gap-2">
-                {connectionStatus.status === 'checking' && (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                )}
                 {connectionStatus.status === 'railway' && (
                   <CheckCircle className="h-4 w-4 text-green-600" />
                 )}
@@ -185,9 +181,9 @@ export default function FMGlobalChat() {
             </Alert>
           )}
           
-          <div className="flex flex-col h-full bg-white">
+          <div className="flex flex-col flex-1 bg-white overflow-hidden rounded-lg border">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto min-h-0 pb-4">
+        <div className="flex-1 overflow-y-auto">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-full px-8 py-12">
               <h1 className="text-7xl font-bold text-black mb-4 tracking-tight">
@@ -299,13 +295,13 @@ export default function FMGlobalChat() {
                                 ),
                               }}
                             >
-                              {message.content}
+                              {(message as any).content || ''}
                             </ReactMarkdown>
                           </div>
                         </div>
                       )}
                       {message.role === "user" && (
-                        <p className="text-gray-800">{message.content}</p>
+                        <p className="text-gray-800">{(message as any).content || ''}</p>
                       )}
                     </div>
                   </div>

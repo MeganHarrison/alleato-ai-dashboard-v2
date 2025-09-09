@@ -1,22 +1,29 @@
-import { openai } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { convertToModelMessages, streamText, UIMessage } from "ai";
 
-export const runtime = 'edge';
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  try {
-    const { messages } = await req.json();
+  const {
+    messages,
+    model,
+    webSearch,
+  }: {
+    messages: UIMessage[];
+    model: string;
+    webSearch: boolean;
+  } = await req.json();
 
-    const result = await streamText({
-      model: openai('gpt-4-turbo'),
-      messages,
-      temperature: 0.7,
-      maxTokens: 4000,
-    });
+  const result = streamText({
+    model: webSearch ? "perplexity/sonar" : model,
+    messages: convertToModelMessages(messages),
+    system:
+      "You are a helpful assistant that can answer questions and help with tasks",
+  });
 
-    return result.toDataStreamResponse();
-  } catch (error) {
-    console.error('Chat API error:', error);
-    return new Response('Error processing chat request', { status: 500 });
-  }
+  // send sources and reasoning back to the client
+  return result.toUIMessageStreamResponse({
+    sendSources: true,
+    sendReasoning: true,
+  });
 }

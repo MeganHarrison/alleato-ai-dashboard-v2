@@ -59,16 +59,18 @@ import {
 
 interface Document {
   id: number;
-  title: string | null;
-  date: string | null;
-  summary: string | null;
-  project_id: number | null;
-  project: string | null;
-  storage_path: string | null;
   content: string | null;
+  document_type: string | null;
+  embedding: string | null;
   metadata: any;
-  created_at: string | null;
-  updated_at: string | null;
+  title?: string | null;
+  date?: string | null;
+  summary?: string | null;
+  project_id?: number | null;
+  project?: string | null;
+  storage_path?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 interface Project {
@@ -200,12 +202,15 @@ export default function MeetingsPage() {
       const { error } = await supabase
         .from('documents')
         .update({
-          title: editData.title,
-          date: editData.date,
-          summary: editData.summary,
-          project_id: editData.project_id,
-          project: editData.project,
-          updated_at: new Date().toISOString()
+          content: editData.title || editData.content,
+          metadata: {
+            ...editingDocument.metadata,
+            title: editData.title,
+            date: editData.date,
+            summary: editData.summary,
+            project_id: editData.project_id,
+            project: editData.project
+          }
         })
         .eq('id', editingDocument.id);
       

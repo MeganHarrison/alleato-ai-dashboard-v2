@@ -1243,6 +1243,36 @@ export default eslintConfig;
 
 ---
 
+## CRITICAL: Pydantic AI AgentRunResult Fix
+
+**⚠️ IMPORTANT: When working with Pydantic AI agents in the RAG endpoints, ALWAYS use safe attribute access for AgentRunResult objects.**
+
+The `agent.run()` method returns an AgentRunResult with varying structures across versions. Use this pattern:
+
+```python
+result = await agent.run(prompt, deps=deps)
+
+# Safe extraction with fallbacks
+if hasattr(result, 'data'):
+    response_text = result.data  # Most common
+elif hasattr(result, 'response'):
+    response_text = str(result.response)
+elif hasattr(result, 'output'):
+    response_text = str(result.output)
+else:
+    # Extract from string representation
+    result_str = str(result)
+```
+
+**Key Files to Check:**
+- FM Global: `/alleato-rag-agents/rag-agent-fmglobal/rag_agent/api/fm_global_app.py`
+- PM RAG: `/alleato-rag-agents/rag-agent-pm/app.py`
+
+**Documentation:**
+- Technical details: `/documentation/technical/pydantic-ai-agentrunresult-fix.md`
+- Common issues: `/documentation/guides/rag-agent-common-issues.md`
+- FM Global specific: `/alleato-rag-agents/rag-agent-fmglobal/TROUBLESHOOTING.md`
+
 ## Subagents
 Utilize subagents when possible.
 

@@ -20,7 +20,7 @@ export function AIChat() {
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hello! How can I help you today?" },
+    { role: "assistant", content: "Hello! I'm your Project Management Assistant. I can help you with project insights, meeting summaries, and task management. How can I assist you today?" },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -84,7 +84,7 @@ export function AIChat() {
       <div className="flex items-center justify-between p-3 border-b border-gray-100">
         <div className="flex items-center space-x-2">
           <Bot className="h-5 w-5" />
-          <h3 className="font-medium text-sm">AI Assistant</h3>
+          <h3 className="font-medium text-sm">PM Assistant</h3>
         </div>
         <div className="flex items-center space-x-0">
           <Button

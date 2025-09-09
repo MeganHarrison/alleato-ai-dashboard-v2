@@ -12,8 +12,8 @@ import { useState } from "react";
 
 const FMGlobalNavigator = () => {
   const [currentStep, setCurrentStep] = useState("start");
-  const [path, setPath] = useState([]);
-  const [answers, setAnswers] = useState({});
+  const [path, setPath] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isAnimating, setIsAnimating] = useState(false);
 
   // Decision tree structure based on FM Global 8-34 Figure 1
@@ -252,7 +252,7 @@ const FMGlobalNavigator = () => {
     },
   };
 
-  const handleAnswer = (answer) => {
+  const handleAnswer = (answer: any) => {
     setIsAnimating(true);
     const newAnswers = { ...answers, [currentStep]: answer };
     setAnswers(newAnswers);
@@ -288,10 +288,10 @@ const FMGlobalNavigator = () => {
     }, 300);
   };
 
-  const current = decisionTree[currentStep];
+  const current = (decisionTree as any)[currentStep];
   const isResult = current?.type === "result";
 
-  const getIcon = (iconName) => {
+  const getIcon = (iconName: any) => {
     switch (iconName) {
       case "shield":
         return <CheckCircle className="w-8 h-8" />;
@@ -306,7 +306,7 @@ const FMGlobalNavigator = () => {
     }
   };
 
-  const getColorClasses = (color) => {
+  const getColorClasses = (color: any) => {
     switch (color) {
       case "green":
         return "bg-green-50 border-green-200 text-green-800";
@@ -398,7 +398,7 @@ const FMGlobalNavigator = () => {
                 <div>
                   <h4 className="font-medium mb-2">Key Requirements:</h4>
                   <ul className="text-sm space-y-1">
-                    {current.details.keyRequirements.map((req, idx) => (
+                    {current.details.keyRequirements.map((req: any, idx: number) => (
                       <li key={idx} className="flex items-start">
                         <span className="w-2 h-2 bg-current rounded-full mt-2 mr-2 flex-shrink-0"></span>
                         {req}
@@ -414,7 +414,7 @@ const FMGlobalNavigator = () => {
               <h3 className="font-semibold mb-2">Your Selection Path:</h3>
               <div className="text-sm space-y-1">
                 {path.map((step, idx) => {
-                  const stepData = decisionTree[step];
+                  const stepData = (decisionTree as any)[step];
                   const answer = answers[step];
                   return (
                     <div key={idx} className="flex items-center">
@@ -441,7 +441,7 @@ const FMGlobalNavigator = () => {
             )}
 
             <div className="space-y-4">
-              {current?.options?.map((option, idx) => (
+              {current?.options?.map((option: any, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => handleAnswer(option)}

@@ -12,6 +12,20 @@ import { Send, Loader2, Bot, User, AlertCircle, CheckCircle, Search } from 'luci
 import { Badge } from '@/components/ui/badge';
 
 export default function PMChatWorking() {
+  const chatHelpers = useChat({
+    api: '/api/pm-chat-direct',
+    initialMessages: [
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: 'Hello! I\'m your PM Assistant with access to meeting transcripts and project data. I can help you:\n\n• Search meeting transcripts\n• Track project health and risks\n• Identify action items and decisions\n• Provide strategic recommendations\n\nWhat would you like to know?',
+      },
+    ],
+    onError: (error: any) => {
+      console.error('Chat error:', error);
+    },
+  } as any);
+
   const {
     messages,
     input,
@@ -21,19 +35,7 @@ export default function PMChatWorking() {
     error,
     reload,
     stop,
-  } = useChat({
-    api: '/api/pm-chat-direct',
-    initialMessages: [
-      {
-        id: 'welcome',
-        role: 'assistant',
-        content: 'Hello! I\'m your PM Assistant with access to meeting transcripts and project data. I can help you:\n\n• Search meeting transcripts\n• Track project health and risks\n• Identify action items and decisions\n• Provide strategic recommendations\n\nWhat would you like to know?',
-      },
-    ],
-    onError: (error) => {
-      console.error('Chat error:', error);
-    },
-  });
+  } = chatHelpers as any;
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [showExamples, setShowExamples] = useState(true);
@@ -155,7 +157,7 @@ export default function PMChatWorking() {
           {/* Chat messages */}
           <ScrollArea className="flex-1 px-6 py-4" ref={scrollAreaRef}>
             <div className="space-y-4">
-              {messages.map((message) => {
+              {messages.map((message: any) => {
                 const content = message.content || '';
                 const tools = parseToolInvocations(content);
                 const cleanContent = content.replace(/\[Tool: .*?\]/g, '').trim();

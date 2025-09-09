@@ -43,6 +43,7 @@
     "components/**/*.tsx",
     "lib/**/*.ts",
     "lib/**/*.tsx",
+    "types/**/*.d.ts",
     "middleware.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"

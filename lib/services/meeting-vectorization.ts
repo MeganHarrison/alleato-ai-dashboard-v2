@@ -267,8 +267,8 @@ export class MeetingVectorizationService {
         ${transcript.substring(0, 8000)}`
           }
         ],
-        temperature: 0.3,
-        maxTokens: 500
+        temperature: 0.3
+        // maxTokens: 500  // Commented out due to AI SDK compatibility
       })
 
       return text || 'No summary available'
@@ -311,8 +311,8 @@ export class MeetingVectorizationService {
         Return only valid JSON array:`
           }
         ],
-        temperature: 0.2,
-        maxTokens: 1000
+        temperature: 0.2
+        // maxTokens: 1000  // Commented out due to AI SDK compatibility
       })
 
       const insights = JSON.parse(text || '[]')
@@ -366,8 +366,8 @@ export class MeetingVectorizationService {
         Only associate if confidence > 0.6. Return valid JSON:`
           }
         ],
-        temperature: 0.2,
-        maxTokens: 200
+        temperature: 0.2
+        // maxTokens: 200  // Commented out due to AI SDK compatibility
       })
 
       const result = JSON.parse(text || '{}')

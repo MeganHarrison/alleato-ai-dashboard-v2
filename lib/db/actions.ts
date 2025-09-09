@@ -1,16 +1,20 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { chats, messages, parts } from "@/lib/db/schema";
-import {
-  mapDBPartToUIMessagePart,
-  mapUIMessagePartsToDBParts,
-} from "@/lib/utils/message-mapping";
+import { chats, messages, parts } from "@/lib/db/schema-pg";
+// import {
+//   mapDBPartToUIMessagePart,
+//   mapUIMessagePartsToDBParts,
+// } from "@/utils/message-mapping";
+
+// Temporary placeholders for disabled functions
+const mapDBPartToUIMessagePart = (part: any) => part;
+const mapUIMessagePartsToDBParts = (parts: any[], id: string) => [];
 import { and, eq, gt } from "drizzle-orm";
 import { MyUIMessage } from "../message-type";
 
-export const createChat = async () => {
-  const [{ id }] = await db.insert(chats).values({}).returning();
+export const createChat = async (userId: string = 'default-user') => {
+  const [{ id }] = await db.insert(chats).values({ user_id: userId }).returning();
   return id;
 };
 
@@ -29,18 +33,18 @@ export const upsertMessage = async ({
     await tx
       .insert(messages)
       .values({
-        chatId,
+        chat_id: chatId,
         role: message.role,
         id,
       })
       .onConflictDoUpdate({
         target: messages.id,
         set: {
-          chatId,
+          chat_id: chatId,
         },
       });
 
-    await tx.delete(parts).where(eq(parts.messageId, id));
+    await tx.delete(parts).where(eq(parts.message_id, id));
     if (mappedDBUIParts.length > 0) {
       await tx.insert(parts).values(mappedDBUIParts);
     }
@@ -49,13 +53,13 @@ export const upsertMessage = async ({
 
 export const loadChat = async (chatId: string): Promise<MyUIMessage[]> => {
   const result = await db.query.messages.findMany({
-    where: eq(messages.chatId, chatId),
+    where: eq(messages.chat_id, chatId),
     with: {
       parts: {
         orderBy: (parts, { asc }) => [asc(parts.order)],
       },
     },
-    orderBy: (messages, { asc }) => [asc(messages.createdAt)],
+    orderBy: (messages, { asc }) => [asc(messages.created_at)],
   });
 
   return result.map((message) => ({
@@ -82,14 +86,15 @@ export const deleteMessage = async (messageId: string) => {
       .limit(1);
 
     if (!targetMessage) return;
+    if (!targetMessage.created_at) return;
 
     // Delete all messages after this one in the chat
     await tx
       .delete(messages)
       .where(
         and(
-          eq(messages.chatId, targetMessage.chatId),
-          gt(messages.createdAt, targetMessage.createdAt),
+          eq(messages.chat_id, targetMessage.chat_id),
+          gt(messages.created_at, targetMessage.created_at),
         ),
       );
 

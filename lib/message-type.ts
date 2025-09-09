@@ -1,5 +1,5 @@
 import { tools } from "@/ai/tools";
-import { JSONValue, Message } from "ai";
+import { JSONValue, UIMessage } from "ai";
 import z from "zod";
 
 export const metadataSchema = z.object({});
@@ -19,8 +19,8 @@ export type MyDataPart = z.infer<typeof dataPartSchema>;
 
 export type MyToolSet = typeof tools;
 
-export type MyUIMessage = Message;
+export type MyUIMessage = UIMessage;
 
-export type MyUIMessagePart = Message;
+export type MyUIMessagePart = UIMessage;
 
 export type MyProviderMetadata = Record<string, Record<string, JSONValue>>;

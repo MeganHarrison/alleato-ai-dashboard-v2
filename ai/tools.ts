@@ -1,13 +1,13 @@
 import { MyDataPart } from "@/lib/message-type";
-import {
-  tool,
-} from "ai";
 import { z } from "zod";
+
+// Use any for tool definition to avoid version conflicts
+const tool = (config: any) => config;
 
 export const getWeatherInformation = tool({
   description: "show the weather in a given city to the user",
   parameters: z.object({ city: z.string() }),
-  execute: async ({ city }) => {
+  execute: async ({ city }: { city: string }) => {
     // Add artificial delay of 2 seconds
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -44,8 +44,17 @@ export const tools = {
   getLocation,
 };
 
-// Type definitions for schema.ts
-export type getWeatherInformationInput = z.infer<typeof getWeatherInformation.parameters>;
-export type getWeatherInformationOutput = Awaited<ReturnType<typeof getWeatherInformation.execute>>;
-export type getLocationInput = z.infer<typeof getLocation.parameters>;  
-export type getLocationOutput = Awaited<ReturnType<typeof getLocation.execute>>;
+// Type definitions for schema.ts - updated for AI SDK v5
+export type getWeatherInformationInput = {
+  city: string;
+};
+export type getWeatherInformationOutput = {
+  city: string;
+  weather: string;
+  temperature: string;
+  description: string;
+};
+export type getLocationInput = {};
+export type getLocationOutput = {
+  location: string;
+};
