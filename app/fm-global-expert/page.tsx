@@ -9,9 +9,10 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useChat } from '@ai-sdk/react';
-import { Mic, Paperclip, Send } from "lucide-react";
+import { Mic, Paperclip, Send, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Dynamically import ReactMarkdown to avoid SSR issues
 const ReactMarkdown = dynamic(() => import('react-markdown'), {
@@ -19,11 +20,15 @@ const ReactMarkdown = dynamic(() => import('react-markdown'), {
   loading: () => <p>Loading...</p>
 });
 
+interface ConnectionStatus {
+  status: 'checking' | 'railway' | 'fallback' | 'error';
+  message?: string;
+}
+
 export default function FMGlobalChat() {
   const [mounted, setMounted] = useState(false);
-  const chatHelpers = useChat({
-    api: "/api/fm-global",
-  });
+  const [localInput, setLocalInput] = useState("");
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({ status: 'checking' });
   
   const { 
     messages, 
@@ -33,14 +38,51 @@ export default function FMGlobalChat() {
     isLoading, 
     error, 
     setInput
-  } = chatHelpers;
+  } = useChat({
+    api: "/api/fm-global",
+  });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Check FM Global Railway status
+  const checkConnectionStatus = async () => {
+    try {
+      const response = await fetch('/api/fm-global', { method: 'GET' });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'healthy') {
+          setConnectionStatus({ 
+            status: 'railway', 
+            message: 'Connected to Railway RAG' 
+          });
+        } else {
+          setConnectionStatus({ 
+            status: 'fallback', 
+            message: 'Railway unavailable - Using OpenAI' 
+          });
+        }
+      } else {
+        setConnectionStatus({ 
+          status: 'fallback', 
+          message: 'Using OpenAI fallback' 
+        });
+      }
+    } catch (error) {
+      setConnectionStatus({ 
+        status: 'error', 
+        message: 'Connection check failed' 
+      });
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
+    checkConnectionStatus();
+    // Check status periodically
+    const interval = setInterval(checkConnectionStatus, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const scrollToBottom = () => {
@@ -51,13 +93,29 @@ export default function FMGlobalChat() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSuggestionClick = async (query: string) => {
-    // sendMessage is available in AI SDK v5 with @ai-sdk/react
-    const sendMessage = (chatHelpers as any).sendMessage;
+  const handleSuggestionClick = (query: string) => {
+    // Create a synthetic event and submit the form with the query
+    const syntheticEvent = {
+      preventDefault: () => {},
+      currentTarget: formRef.current
+    } as React.FormEvent<HTMLFormElement>;
     
-    if (sendMessage) {
-      // sendMessage expects an object with a 'text' property
-      await sendMessage({ text: query });
+    // Temporarily set the input value
+    const inputElement = formRef.current?.querySelector('input[type="text"]') as HTMLInputElement;
+    if (inputElement) {
+      inputElement.value = query;
+      // Trigger the change event to update the state
+      const changeEvent = new Event('change', { bubbles: true });
+      Object.defineProperty(changeEvent, 'target', { 
+        writable: false, 
+        value: inputElement 
+      });
+      handleInputChange(changeEvent as any);
+      
+      // Submit the form after a brief delay to ensure state is updated
+      setTimeout(() => {
+        handleSubmit(syntheticEvent);
+      }, 10);
     }
   };
 
@@ -91,6 +149,42 @@ export default function FMGlobalChat() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0 mx-[5%] sm:ml-6 sm:mr-6">
+          {/* Connection Status Alert */}
+          {connectionStatus.status !== 'checking' && (
+            <Alert className={`
+              ${connectionStatus.status === 'railway' ? 'border-green-500 bg-green-50' : ''}
+              ${connectionStatus.status === 'fallback' ? 'border-orange-500 bg-orange-50' : ''}
+              ${connectionStatus.status === 'error' ? 'border-red-500 bg-red-50' : ''}
+            `}>
+              <div className="flex items-center gap-2">
+                {connectionStatus.status === 'checking' && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                {connectionStatus.status === 'railway' && (
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                )}
+                {connectionStatus.status === 'fallback' && (
+                  <AlertCircle className="h-4 w-4 text-orange-600" />
+                )}
+                {connectionStatus.status === 'error' && (
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                )}
+                <AlertDescription className={`
+                  ${connectionStatus.status === 'railway' ? 'text-green-700' : ''}
+                  ${connectionStatus.status === 'fallback' ? 'text-orange-700' : ''}
+                  ${connectionStatus.status === 'error' ? 'text-red-700' : ''}
+                `}>
+                  <strong>FM Global Expert Status:</strong> {connectionStatus.message}
+                  {connectionStatus.status === 'fallback' && (
+                    <span className="block text-sm mt-1">
+                      Railway endpoint is not responding. Using OpenAI GPT-4 Turbo for FM Global expertise.
+                    </span>
+                  )}
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
+          
           <div className="flex flex-col h-full bg-white">
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto min-h-0 pb-4">

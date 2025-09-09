@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { PageHeader } from "@/components/page-header";
 import { 
   Table,
   TableBody,
@@ -32,27 +31,39 @@ import {
   FileText,
   Download,
   Trash2,
-  AlertCircle
+  MoreHorizontal,
+  Filter,
+  Columns3,
+  ChevronDown,
+  Pencil
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Document {
   id: number;
   title: string | null;
+  date: string | null;
   summary: string | null;
   project_id: number | null;
+  project: string | null;
   storage_path: string | null;
   content: string | null;
   metadata: any;
@@ -65,16 +76,26 @@ interface Project {
   name: string | null;
 }
 
-export default function DocumentsPage() {
+const COLUMNS = [
+  { id: "title", label: "Title", defaultVisible: true },
+  { id: "date", label: "Date", defaultVisible: true },
+  { id: "project", label: "Project", defaultVisible: true },
+  { id: "summary", label: "Summary", defaultVisible: true },
+];
+
+export default function MeetingsPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editedDocument, setEditedDocument] = useState<Partial<Document>>({});
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [projectFilter, setProjectFilter] = useState<string>("all");
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+    new Set(COLUMNS.filter(col => col.defaultVisible).map(col => col.id))
+  );
+  const [editingDocument, setEditingDocument] = useState<Document | null>(null);
+  const [editData, setEditData] = useState<Partial<Document>>({});
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const [supabase] = useState(() => {
     const client = createClient();
     if (!client) {
@@ -100,14 +121,12 @@ export default function DocumentsPage() {
       const { data: documentsData, error: documentsError } = await supabase
         .from('documents')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('date', { ascending: false });
       
       if (documentsError) {
         console.error("Error loading documents:", documentsError);
         throw new Error(documentsError.message || "Failed to load documents");
       }
-      
-      console.log("Documents loaded:", documentsData?.length || 0);
       
       // Load projects for the dropdown
       const { data: projectsData, error: projectsError } = await supabase
@@ -119,8 +138,6 @@ export default function DocumentsPage() {
         console.error("Error loading projects:", projectsError);
         throw new Error(projectsError.message || "Failed to load projects");
       }
-      
-      console.log("Projects loaded:", projectsData?.length || 0);
       
       setDocuments(documentsData || []);
       setProjects((projectsData || []).map(proj => ({
@@ -139,18 +156,41 @@ export default function DocumentsPage() {
     }
   };
 
-  const handleEdit = (document: Document) => {
-    setEditingId(document.id);
-    setEditedDocument({ ...document });
-  };
+  // Get unique projects for filter
+  const projectOptions = useMemo(() => {
+    const projectSet = new Set(documents.map(d => d.project_id).filter(Boolean));
+    const projectsWithDocs = projects.filter(p => projectSet.has(p.id));
+    return ["all", ...projectsWithDocs.map(p => String(p.id))];
+  }, [documents, projects]);
 
-  const handleCancel = () => {
-    setEditingId(null);
-    setEditedDocument({});
+  // Filter documents
+  const filteredDocuments = useMemo(() => {
+    return documents.filter(doc => {
+      const matchesSearch = 
+        doc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doc.project?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesProject = projectFilter === 'all' || 
+        (doc.project_id && String(doc.project_id) === projectFilter);
+
+      return matchesSearch && matchesProject;
+    });
+  }, [documents, searchTerm, projectFilter]);
+
+  const handleEdit = (document: Document) => {
+    setEditingDocument(document);
+    setEditData({
+      title: document.title,
+      date: document.date,
+      summary: document.summary,
+      project_id: document.project_id,
+      project: document.project,
+    });
   };
 
   const handleSave = async () => {
-    if (!editingId || !editedDocument) return;
+    if (!editingDocument) return;
     
     try {
       if (!supabase) {
@@ -160,27 +200,28 @@ export default function DocumentsPage() {
       const { error } = await supabase
         .from('documents')
         .update({
-          title: editedDocument.title,
-          summary: editedDocument.summary,
-          project_id: editedDocument.project_id,
-          metadata: editedDocument.metadata,
+          title: editData.title,
+          date: editData.date,
+          summary: editData.summary,
+          project_id: editData.project_id,
+          project: editData.project,
           updated_at: new Date().toISOString()
         })
-        .eq('id', editingId);
+        .eq('id', editingDocument.id);
       
       if (error) throw error;
       
       // Update local state
       setDocuments(documents => 
         documents.map(doc => 
-          doc.id === editingId 
-            ? { ...doc, ...editedDocument, updated_at: new Date().toISOString() }
+          doc.id === editingDocument.id 
+            ? { ...doc, ...editData, updated_at: new Date().toISOString() }
             : doc
         )
       );
       
-      setEditingId(null);
-      setEditedDocument({});
+      setEditingDocument(null);
+      setEditData({});
       toast.success("Document updated successfully");
     } catch (error) {
       console.error("Error updating document:", error);
@@ -188,29 +229,8 @@ export default function DocumentsPage() {
     }
   };
 
-  const handleFieldChange = (field: keyof Document, value: any) => {
-    if (field === 'metadata') {
-      // For date field in metadata
-      setEditedDocument(prev => ({ 
-        ...prev, 
-        metadata: { 
-          ...(prev.metadata || {}), 
-          date: value 
-        } 
-      }));
-    } else {
-      setEditedDocument(prev => ({ ...prev, [field]: value }));
-    }
-  };
-
-  const handleDelete = (document: Document) => {
-    setDocumentToDelete(document);
-    setDeleteDialogOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!documentToDelete) return;
-    
+  const handleDelete = async (id: number) => {
+    setIsDeleting(id);
     try {
       if (!supabase) {
         throw new Error('Database connection not available');
@@ -219,13 +239,12 @@ export default function DocumentsPage() {
       const { error } = await supabase
         .from('documents')
         .delete()
-        .eq('id', documentToDelete.id);
+        .eq('id', id);
       
       if (error) throw error;
       
-      // Update local state
       setDocuments(documents => 
-        documents.filter(doc => doc.id !== documentToDelete.id)
+        documents.filter(doc => doc.id !== id)
       );
       
       toast.success("Document deleted successfully");
@@ -233,80 +252,60 @@ export default function DocumentsPage() {
       console.error("Error deleting document:", error);
       toast.error("Failed to delete document");
     } finally {
-      setDeleteDialogOpen(false);
-      setDocumentToDelete(null);
+      setIsDeleting(null);
     }
   };
 
   const handleDownload = async (document: Document) => {
     try {
-      if (!document.storage_path) {
-        // If no storage path, try to download content as text file
-        if (document.content) {
-          const blob = new Blob([document.content], { type: 'text/plain' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${document.title || 'document'}.txt`;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        } else {
-          toast.error("No content available to download");
-        }
-        return;
+      if (document.content) {
+        const blob = new Blob([document.content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = window.document.createElement('a');
+        a.href = url;
+        a.download = `${document.title || 'document'}.txt`;
+        window.document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        window.document.body.removeChild(a);
+        toast.success("Document downloaded successfully");
+      } else {
+        toast.error("No content available to download");
       }
-
-      if (!supabase) {
-        throw new Error('Database connection not available');
-      }
-
-      // Download from Supabase storage
-      const { data, error } = await supabase.storage
-        .from('documents')
-        .download(document.storage_path);
-      
-      if (error) throw error;
-      
-      const url = window.URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = document.title || 'document';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success("Document downloaded successfully");
     } catch (error) {
       console.error("Error downloading document:", error);
       toast.error("Failed to download document");
     }
   };
 
-  const getDocumentDate = (document: Document) => {
-    // Try to get date from metadata first
-    if (document.metadata && typeof document.metadata === 'object') {
-      const metadata = document.metadata as any;
-      if (metadata.date) return metadata.date;
-    }
-    // Fallback to created_at
-    return document.created_at;
+  const exportToCSV = () => {
+    const headers = ['Title', 'Date', 'Project', 'Summary'];
+    const rows = filteredDocuments.map(d => [
+      d.title || '',
+      d.date ? format(new Date(d.date), 'yyyy-MM-dd') : '',
+      d.project || projects.find(p => p.id === d.project_id)?.name || '',
+      d.summary || ''
+    ]);
+    
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `meetings-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
-
-  const filteredDocuments = documents.filter(doc =>
-    searchTerm === "" ||
-    doc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.summary?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
-          <span>Loading documents...</span>
+          <span>Loading meetings...</span>
         </div>
       </div>
     );
@@ -321,227 +320,256 @@ export default function DocumentsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Header Section */}
-      <div className="flex items-start justify-between">
-        <PageHeader 
-          title="Documents" 
-          description="View and manage all documents in the system" 
-        />
-      </div>
+    <>
+      <div className="space-y-4 p-2 sm:p-4 md:p-6 w-[95%] sm:w-full mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Meetings</h2>
+            <p className="text-muted-foreground">
+              View and manage all meeting documents and transcripts
+            </p>
+          </div>
+          <Button onClick={exportToCSV} variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </div>
 
-      {/* Search Bar */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Search documents..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search meetings..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Select value={projectFilter} onValueChange={setProjectFilter}>
+            <SelectTrigger className="w-[200px]">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Filter by project" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Projects</SelectItem>
+              {projects.map(project => (
+                <SelectItem key={project.id} value={String(project.id)}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Columns3 className="h-4 w-4 mr-2" />
+                Columns
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {COLUMNS.map(column => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  checked={visibleColumns.has(column.id)}
+                  onCheckedChange={(checked) => {
+                    const newColumns = new Set(visibleColumns);
+                    if (checked) {
+                      newColumns.add(column.id);
+                    } else {
+                      newColumns.delete(column.id);
+                    }
+                    setVisibleColumns(newColumns);
+                  }}
+                >
+                  {column.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-      {/* Table */}
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-gray-50/50">
-            <TableRow className="border-b border-gray-200 hover:bg-transparent">
-              <TableHead className="w-[25%] font-semibold text-gray-900 px-6 py-4">Title</TableHead>
-              <TableHead className="w-[12%] font-semibold text-gray-900 px-4 py-4">Date</TableHead>
-              <TableHead className="w-[18%] font-semibold text-gray-900 px-4 py-4">Project</TableHead>
-              <TableHead className="w-[30%] font-semibold text-gray-900 px-4 py-4">Summary</TableHead>
-              <TableHead className="w-[15%] text-center font-semibold text-gray-900 px-6 py-4">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredDocuments.length === 0 ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="text-center py-12 text-gray-500">
-                  <div className="flex flex-col items-center gap-2">
-                    <FileText className="h-8 w-8 text-gray-300" />
-                    <span className="text-sm font-medium">No documents found</span>
-                    <span className="text-xs text-gray-400">Try adjusting your search criteria</span>
-                  </div>
-                </TableCell>
+        {/* Table */}
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {visibleColumns.has('title') && <TableHead>Title</TableHead>}
+                {visibleColumns.has('date') && <TableHead>Date</TableHead>}
+                {visibleColumns.has('project') && <TableHead>Project</TableHead>}
+                {visibleColumns.has('summary') && <TableHead>Summary</TableHead>}
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : (
-              filteredDocuments.map((document) => {
-                const isEditing = editingId === document.id;
-                const currentDocument = isEditing ? editedDocument : document;
-                const documentDate = getDocumentDate(currentDocument as Document);
-                
-                return (
-                  <TableRow key={document.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
-                    <TableCell className="px-6 py-4">
-                      {isEditing ? (
-                        <Input
-                          value={currentDocument.title || ""}
-                          onChange={(e) => handleFieldChange("title", e.target.value)}
-                          className="w-full"
-                          placeholder="Enter title..."
-                        />
-                      ) : (
-                        <div className="font-semibold text-gray-900 text-sm">
-                          {document.title || <span className="text-gray-400 italic">Untitled</span>}
+            </TableHeader>
+            <TableBody>
+              {filteredDocuments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    No meetings found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredDocuments.map((document) => (
+                  <TableRow key={document.id} className="cursor-pointer hover:bg-muted/50">
+                    {visibleColumns.has('title') && (
+                      <TableCell>
+                        <div className="font-medium">
+                          {document.title || <span className="text-muted-foreground">Untitled</span>}
                         </div>
-                      )}
-                    </TableCell>
-                    
-                    <TableCell className="px-4 py-4">
-                      {isEditing ? (
-                        <Input
-                          type="date"
-                          value={currentDocument.metadata?.date ? 
-                            new Date(currentDocument.metadata.date).toISOString().split('T')[0] : 
-                            ''
-                          }
-                          onChange={(e) => handleFieldChange("metadata", e.target.value)}
-                          className="w-full text-xs"
-                        />
-                      ) : (
-                        <div className="flex items-center gap-1.5 text-xs text-gray-600">
-                          <Calendar className="h-3 w-3 text-gray-400" />
-                          <span className="font-medium">
-                            {documentDate 
-                              ? format(new Date(documentDate), "MMM d, yyyy")
-                              : "No date"
-                            }
-                          </span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.has('date') && (
+                      <TableCell>
+                        {document.date && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Calendar className="h-3 w-3 text-muted-foreground" />
+                            {format(new Date(document.date), 'MMM d, yyyy')}
+                          </div>
+                        )}
+                      </TableCell>
+                    )}
+                    {visibleColumns.has('project') && (
+                      <TableCell>
+                        {(document.project || projects.find(p => p.id === document.project_id)?.name) && (
+                          <Badge variant="secondary" className="font-normal">
+                            {document.project || projects.find(p => p.id === document.project_id)?.name}
+                          </Badge>
+                        )}
+                      </TableCell>
+                    )}
+                    {visibleColumns.has('summary') && (
+                      <TableCell>
+                        <div className="text-sm text-muted-foreground line-clamp-2">
+                          {document.summary || '—'}
                         </div>
-                      )}
-                    </TableCell>
-                    
-                    <TableCell className="px-4 py-4">
-                      {isEditing ? (
-                        <Select
-                          value={currentDocument.project_id ? String(currentDocument.project_id) : "none"}
-                          onValueChange={(value) => handleFieldChange("project_id", value === "none" ? null : Number(value))}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select project" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">No project</SelectItem>
-                            {projects.map((project) => (
-                              <SelectItem key={project.id} value={String(project.id)}>
-                                {project.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <div className="text-sm">
-                          {document.project_id 
-                            ? <span className="font-medium text-gray-900">
-                                {projects.find(p => p.id === document.project_id)?.name || "Unknown"}
-                              </span>
-                            : <span className="text-gray-400 italic text-xs">No project</span>
-                          }
-                        </div>
-                      )}
-                    </TableCell>
-                    
-                    <TableCell className="px-4 py-4">
-                      {isEditing ? (
-                        <Textarea
-                          value={currentDocument.summary || ""}
-                          onChange={(e) => handleFieldChange("summary", e.target.value)}
-                          className="w-full min-h-[60px] text-xs"
-                          placeholder="Enter summary..."
-                        />
-                      ) : (
-                        <div className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                          {document.summary || <span className="text-gray-400 italic">No summary</span>}
-                        </div>
-                      )}
-                    </TableCell>
-                    
-                    <TableCell className="px-6 py-4">
-                      {isEditing ? (
-                        <div className="flex items-center gap-1 justify-center">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={handleSave}
-                            className="h-7 w-7 p-0 hover:bg-green-50 hover:text-green-600"
-                            title="Save changes"
-                          >
-                            <Save className="h-3.5 w-3.5" />
+                      </TableCell>
+                    )}
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
                           <Button
-                            size="sm"
                             variant="ghost"
-                            onClick={handleCancel}
-                            className="h-7 w-7 p-0 hover:bg-red-50 hover:text-red-600"
-                            title="Cancel"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-1 justify-center">
-                          <Button
                             size="sm"
-                            variant="ghost"
+                            className="w-full justify-start"
                             onClick={() => handleEdit(document)}
-                            className="h-7 w-7 p-0 hover:bg-blue-50 hover:text-blue-600"
-                            title="Edit document"
                           >
-                            <Edit className="h-3.5 w-3.5" />
+                            <Pencil className="h-4 w-4 mr-2" />
+                            Edit
                           </Button>
                           <Button
-                            size="sm"
                             variant="ghost"
+                            size="sm"
+                            className="w-full justify-start"
                             onClick={() => handleDownload(document)}
-                            className="h-7 w-7 p-0 hover:bg-green-50 hover:text-green-600"
-                            title="Download document"
                           >
-                            <Download className="h-3.5 w-3.5" />
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
                           </Button>
                           <Button
-                            size="sm"
                             variant="ghost"
-                            onClick={() => handleDelete(document)}
-                            className="h-7 w-7 p-0 hover:bg-red-50 hover:text-red-600"
-                            title="Delete document"
+                            size="sm"
+                            className="w-full justify-start text-destructive"
+                            onClick={() => handleDelete(document.id)}
+                            disabled={isDeleting === document.id}
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
                           </Button>
-                        </div>
-                      )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete "{documentToDelete?.title || 'this document'}". 
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
+      {/* Edit Dialog */}
+      <Dialog open={!!editingDocument} onOpenChange={() => setEditingDocument(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Meeting Document</DialogTitle>
+            <DialogDescription>
+              Make changes to the meeting document information below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Title</label>
+              <Input
+                value={editData.title || ''}
+                onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                placeholder="Enter meeting title..."
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Date</label>
+                <Input
+                  type="date"
+                  value={editData.date ? new Date(editData.date).toISOString().split('T')[0] : ''}
+                  onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Project</label>
+                <Select
+                  value={editData.project_id ? String(editData.project_id) : "none"}
+                  onValueChange={(value) => {
+                    const projectId = value === "none" ? null : Number(value);
+                    const project = projectId ? projects.find(p => p.id === projectId)?.name : null;
+                    setEditData({ 
+                      ...editData, 
+                      project_id: projectId,
+                      project: project || editData.project
+                    });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No project</SelectItem>
+                    {projects.map((project) => (
+                      <SelectItem key={project.id} value={String(project.id)}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Summary</label>
+              <Textarea
+                value={editData.summary || ''}
+                onChange={(e) => setEditData({ ...editData, summary: e.target.value })}
+                placeholder="Enter meeting summary..."
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingDocument(null)}>
               Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+            </Button>
+            <Button onClick={handleSave}>Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

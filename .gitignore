@@ -98,6 +98,7 @@ manual-*.ts
 astro-docs/
 monorepo-agents/
 temp-fm-global-pdf-backup/
+alleato-rag-agents/
 
 # Database files
 *.db

@@ -44,12 +44,15 @@ import { toast } from "sonner";
 
 interface Document {
   id: number;
+  title: string | null;
+  date: string | null;
+  summary: string | null;
+  project: string | null;
+  project_id?: number | null;
   content: string | null;
-  document_type: string | null;
   metadata: any;
   created_at?: string | null;
   updated_at?: string | null;
-  project_id?: number | null;
 }
 
 interface Project {
@@ -79,42 +82,6 @@ export function DocumentsTable({
   );
   const [supabase] = useState(() => createClient());
 
-  // Extract title from document
-  const extractTitle = (doc: Document): string => {
-    if (doc.metadata?.title) return doc.metadata.title;
-    if (doc.metadata?.file_path) {
-      const parts = doc.metadata.file_path.split("/");
-      return parts[parts.length - 1].replace(/\.[^/.]+$/, "");
-    }
-    if (doc.content) {
-      const firstLine = doc.content.split("\n")[0];
-      return firstLine.substring(0, 100);
-    }
-    return `Document ${doc.id}`;
-  };
-
-  // Extract date from document
-  const extractDate = (doc: Document): string | null => {
-    if (doc.metadata?.date) return doc.metadata.date;
-    if (doc.metadata?.created_at) return doc.metadata.created_at;
-    if (doc.metadata?.updated_at) return doc.metadata.updated_at;
-    if (doc.created_at) return doc.created_at;
-    return null;
-  };
-
-  // Extract summary from document
-  const extractSummary = (doc: Document): string => {
-    if (doc.metadata?.summary) return doc.metadata.summary;
-    if (doc.metadata?.description) return doc.metadata.description;
-    if (doc.metadata?.ai_summary) return doc.metadata.ai_summary;
-    if (doc.content) {
-      return (
-        doc.content.substring(0, 200) + (doc.content.length > 200 ? "..." : "")
-      );
-    }
-    return "";
-  };
-
   const handleEdit = (document: Document) => {
     setEditingId(document.id);
     setEditedDocument({ ...document });
@@ -134,9 +101,10 @@ export function DocumentsTable({
       }
 
       const updateData: any = {
-        content: editedDocument.content,
-        document_type: editedDocument.document_type,
-        metadata: editedDocument.metadata,
+        title: editedDocument.title,
+        date: editedDocument.date,
+        summary: editedDocument.summary,
+        project: editedDocument.project,
       };
 
       // Only include project_id if it's not already set by the parent
@@ -172,18 +140,7 @@ export function DocumentsTable({
   };
 
   const handleFieldChange = (field: keyof Document, value: any) => {
-    if (field === "metadata") {
-      // For metadata updates, merge with existing metadata
-      setEditedDocument((prev) => ({
-        ...prev,
-        metadata: {
-          ...(prev.metadata || {}),
-          ...value,
-        },
-      }));
-    } else {
-      setEditedDocument((prev) => ({ ...prev, [field]: value }));
-    }
+    setEditedDocument((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleDelete = (document: Document) => {
@@ -232,7 +189,7 @@ export function DocumentsTable({
         const url = window.URL.createObjectURL(blob);
         const a = window.document.createElement("a");
         a.href = url;
-        a.download = `${extractTitle(document)}.txt`;
+        a.download = `${document.title || `document-${document.id}`}.txt`;
         window.document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -286,10 +243,11 @@ export function DocumentsTable({
                   <div className="flex flex-col items-center gap-2">
                     <FileText className="h-8 w-8 text-gray-300" />
                     <span className="text-sm font-medium">
-                      No documents found
+                      No meetings found
                     </span>
                     <span className="text-xs text-gray-400">
-                      Documents will appear here when added
+                      Meeting documents for this project will appear here when
+                      added
                     </span>
                   </div>
                 </TableCell>
@@ -298,7 +256,6 @@ export function DocumentsTable({
               documents.map((document) => {
                 const isEditing = editingId === document.id;
                 const currentDocument = isEditing ? editedDocument : document;
-                const documentDate = extractDate(currentDocument as Document);
 
                 return (
                   <TableRow
@@ -308,21 +265,16 @@ export function DocumentsTable({
                     <TableCell className="px-6 py-4">
                       {isEditing ? (
                         <Input
-                          value={
-                            currentDocument.metadata?.title ||
-                            extractTitle(currentDocument as Document)
-                          }
+                          value={currentDocument.title || ""}
                           onChange={(e) =>
-                            handleFieldChange("metadata", {
-                              title: e.target.value,
-                            })
+                            handleFieldChange("title", e.target.value)
                           }
                           className="w-full"
                           placeholder="Enter title..."
                         />
                       ) : (
                         <div className="font-semibold text-gray-900 text-sm">
-                          {extractTitle(document)}
+                          {document.title || `Document ${document.id}`}
                         </div>
                       )}
                     </TableCell>
@@ -332,16 +284,14 @@ export function DocumentsTable({
                         <Input
                           type="date"
                           value={
-                            currentDocument.metadata?.date
-                              ? new Date(currentDocument.metadata.date)
+                            currentDocument.date
+                              ? new Date(currentDocument.date)
                                   .toISOString()
                                   .split("T")[0]
                               : ""
                           }
                           onChange={(e) =>
-                            handleFieldChange("metadata", {
-                              date: e.target.value,
-                            })
+                            handleFieldChange("date", e.target.value)
                           }
                           className="w-full text-xs"
                         />
@@ -349,8 +299,8 @@ export function DocumentsTable({
                         <div className="flex items-center gap-1.5 text-xs text-gray-600">
                           <Calendar className="h-3 w-3 text-gray-400" />
                           <span className="font-medium">
-                            {documentDate
-                              ? format(new Date(documentDate), "MMM d, yyyy")
+                            {document.date
+                              ? format(new Date(document.date), "MMM d, yyyy")
                               : "No date"}
                           </span>
                         </div>
@@ -360,41 +310,25 @@ export function DocumentsTable({
                     {!projectId && (
                       <TableCell className="px-4 py-4">
                         {isEditing ? (
-                          <Select
-                            value={
-                              currentDocument.project_id
-                                ? String(currentDocument.project_id)
-                                : "none"
+                          <Input
+                            value={currentDocument.project || ""}
+                            onChange={(e) =>
+                              handleFieldChange("project", e.target.value)
                             }
-                            onValueChange={(value) =>
-                              handleFieldChange(
-                                "project_id",
-                                value === "none" ? null : Number(value)
-                              )
-                            }
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select project" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">No project</SelectItem>
-                              {projects.map((project) => (
-                                <SelectItem
-                                  key={project.id}
-                                  value={String(project.id)}
-                                >
-                                  {project.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            className="w-full"
+                            placeholder="Enter project name..."
+                          />
                         ) : (
                           <div className="text-sm">
-                            {document.project_id ? (
+                            {document.project ? (
+                              <span className="font-medium text-gray-900">
+                                {document.project}
+                              </span>
+                            ) : document.project_id ? (
                               <span className="font-medium text-gray-900">
                                 {projects.find(
                                   (p) => p.id === document.project_id
-                                )?.name || "Unknown"}
+                                )?.name || `Project ${document.project_id}`}
                               </span>
                             ) : (
                               <span className="text-gray-400 italic text-xs">
@@ -409,21 +343,16 @@ export function DocumentsTable({
                     <TableCell className="px-4 py-4">
                       {isEditing ? (
                         <Textarea
-                          value={
-                            currentDocument.metadata?.summary ||
-                            extractSummary(currentDocument as Document)
-                          }
+                          value={currentDocument.summary || ""}
                           onChange={(e) =>
-                            handleFieldChange("metadata", {
-                              summary: e.target.value,
-                            })
+                            handleFieldChange("summary", e.target.value)
                           }
                           className="w-full min-h-[60px] text-xs"
                           placeholder="Enter summary..."
                         />
                       ) : (
                         <div className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                          {extractSummary(document) || (
+                          {document.summary || (
                             <span className="text-gray-400 italic">
                               No summary
                             </span>
@@ -501,7 +430,7 @@ export function DocumentsTable({
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete "
-              {extractTitle(documentToDelete || ({} as Document))}". This action
+              {documentToDelete?.title || `Document ${documentToDelete?.id}`}". This action
               cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

@@ -1,21 +1,11 @@
 import { getProjectMeetingInsights } from "@/app/actions/meeting-insights-actions";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProjectInsights } from "@/lib/actions/project-documents-actions";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/types/database.types";
 import { createServerClient } from "@supabase/ssr";
-import { format } from "date-fns";
-import {
-  Activity,
-  AlertCircle,
-  Brain,
-  Calendar,
-  CheckCircle2,
-  DollarSign,
-  MapPin,
-  Users,
-  XCircle,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, XCircle } from "lucide-react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { DocumentsTable } from "./DocumentsTable";
@@ -83,36 +73,15 @@ async function getProjectDetails(id: string) {
     return null;
   }
 
-  // Get all documents and filter by project
-  // Since documents table doesn't have a project_id column, we'll check metadata
-  const { data: allDocuments } = await supabase
+  // Get documents for this project - documents table HAS a project_id column!
+  const { data: projectDocuments } = await supabase
     .from("documents")
     .select("*")
-    .order("id", { ascending: false })
-    .limit(500);
+    .eq("project_id", parseInt(id))
+    .order("date", { ascending: false });
 
-  // Filter documents that belong to this project
-  // Check metadata for project association
-  const projectDocuments = (allDocuments || []).filter((doc) => {
-    if (!doc.metadata || typeof doc.metadata !== "object") return false;
-    const metadata = doc.metadata as any;
-
-    // Check various ways the project might be referenced in metadata
-    return (
-      metadata.project_id === parseInt(id) ||
-      metadata.project_id === id ||
-      metadata.project === project.name ||
-      metadata.project_name === project.name ||
-      metadata.projectId === parseInt(id) ||
-      metadata.projectId === id
-    );
-  });
-
-  // If no project-specific documents found, show some recent documents
-  const uniqueDocuments =
-    projectDocuments.length > 0
-      ? projectDocuments
-      : (allDocuments || []).slice(0, 20); // Show 20 most recent as fallback
+  // Use the documents directly - no transformation needed
+  const uniqueDocuments = projectDocuments || [];
 
   // Get insights for this project (both project_insights and ai_insights)
   const insightsResult = await getProjectInsights(parseInt(id));
@@ -180,6 +149,19 @@ export default async function ProjectDetailPage({
     }).format(amount);
   };
 
+  const formatDate = (date: string | null) => {
+    if (!date) return "—";
+    try {
+      return new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch {
+      return "—";
+    }
+  };
+
   const getPhaseColor = (phase: string | null) => {
     if (!phase) return "bg-gray-100 text-gray-700";
     const lowerPhase = phase.toLowerCase();
@@ -212,15 +194,26 @@ export default async function ProjectDetailPage({
     <div className="min-h-screen">
       {/* Modern Header Section */}
       <div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-medium text-gray-900">
+              <h1 className="text-3xl pb-4 font-medium text-gray-900">
                 {project.name || `Project ${project.id}`}
               </h1>
+              <h4 className="text-sm text-gray-600">
+                Client:{" "}
+                <span className="font-medium text-gray-900">
+                  {project.client ||
+                    project.clients?.name ||
+                    "No client assigned"}
+                </span>
+              </h4>
               {project["job number"] && (
-                <p className="mt-2 text-base text-gray-700">
-                  Job #{project["job number"]}
+                <p className="mt-1 text-sm text-gray-600">
+                  Job Number:{" "}
+                  <span className="font-medium text-gray-900">
+                    {project["job number"]}
+                  </span>
                 </p>
               )}
             </div>
@@ -234,286 +227,221 @@ export default async function ProjectDetailPage({
             </Badge>
           </div>
 
-          {project.description && (
-            <p className="mt-4 text-gray-600 max-w-3xl leading-relaxed">
-              {project.description}
-            </p>
-          )}
+          {/* Two Column Layout for Summary and Details - Even Width */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mt-6">
+            {/* Summary Column - 50% width */}
+            <div>
+              {project.description && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">
+                    Project Summary
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {project.description}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Details Column - 50% width */}
+            <div className="bg-gray-50 p-4">
+              <h3 className="text-sm font-medium text-gray-500 mb-3">
+                Project Details
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Start Date:</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {formatDate(project["start date"])}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Est Revenue:</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {formatCurrency(project["est revenue"])}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Est Profit:</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {formatCurrency(project["est profit"])}
+                  </span>
+                </div>
+                {project["est completion date"] && (
+                  <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                    <span className="text-sm text-gray-600">
+                      Est Completion:
+                    </span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {formatDate(project["est completion date"])}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Minimalist Stats Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {/* Revenue Card */}
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all border border-gray-100">
-            <div className="flex items-center mb-3">
-              <div className="p-2">
-                <DollarSign className="h-5 w-5" />
-              </div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Revenue
-              </span>
-            </div>
-            <div className="text-l font-semibold text-gray-900">
-              {formatCurrency(project["est revenue"])}
-            </div>
-            {project["est profit"] && (
-              <p className="text-sm text-gray-500 mt-2">
-                <span className="font-medium">
-                  {formatCurrency(project["est profit"])}
-                </span>{" "}
-                profit
-              </p>
-            )}
-          </div>
-
-          {/* Timeline Card */}
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all border border-gray-100">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <Calendar className="h-5 w-5 text-blue-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Timeline
-              </span>
-            </div>
-            <div className="space-y-1">
-              {project["start date"] && (
-                <p className="text-sm">
-                  <span className="text-gray-500">Start:</span>{" "}
-                  <span className="font-medium text-gray-900">
-                    {format(new Date(project["start date"]), "MMM d, yyyy")}
-                  </span>
-                </p>
-              )}
-              {project["est completion"] && (
-                <p className="text-sm">
-                  <span className="text-gray-500">End:</span>{" "}
-                  <span className="font-medium text-gray-900">
-                    {format(new Date(project["est completion"]), "MMM d, yyyy")}
-                  </span>
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Location Card */}
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all border border-gray-100">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 bg-purple-50 rounded-lg">
-                <MapPin className="h-5 w-5 text-purple-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Location
-              </span>
-            </div>
-            <p className="text-sm font-medium text-gray-900">
-              {project.address || "Not specified"}
-            </p>
-            {project.state && (
-              <p className="text-sm text-gray-500 mt-1">{project.state}</p>
-            )}
-          </div>
-
-          {/* Client Card */}
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all border border-gray-100">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 bg-orange-50 rounded-lg">
-                <Users className="h-5 w-5 text-orange-600" />
-              </div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Client
-              </span>
-            </div>
-            <p className="text-sm font-medium text-gray-900">
-              {project.clients?.name || "Direct Client"}
-            </p>
-            {project.clients?.status && (
-              <Badge variant="outline" className="mt-2 text-xs capitalize">
-                {project.clients.status}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        {/* Documents Section - Table View */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-          <div className="px-6 py-4 border-b bg-gray-50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <h2 className="text-lg font-medium text-gray-900">Documents</h2>
-                <Badge variant="secondary" className="rounded-full">
-                  {documents.length}
-                </Badge>
-              </div>
-            </div>
-          </div>
-          <div className="p-6">
-            <DocumentsTable documents={documents} projectId={parseInt(id)} />
-          </div>
-        </div>
-
-        {/* Modern Insights Section */}
-        {(safeInsights.length > 0 ||
-          projectInsights.length > 0 ||
-          aiInsights.length > 0) && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-light text-gray-900">
-              Project Insights
-            </h2>
-
-            {/* AI-Generated Insights */}
-            {aiInsights.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                <div className="px-6 py-4 border-b bg-gradient-to-r from-purple-50 to-pink-50">
-                  <div className="flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-purple-600" />
-                    <h3 className="text-md font-medium text-gray-900">
-                      AI-Generated Insights
-                    </h3>
-                    <Badge variant="secondary" className="rounded-full text-xs">
-                      {aiInsights.length}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="p-6 space-y-4">
-                  {aiInsights.slice(0, 5).map((insight) => (
-                    <div
-                      key={insight.id}
-                      className="p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            {insight.insight_type && (
-                              <Badge
-                                variant="outline"
-                                className="capitalize text-xs"
-                              >
-                                {insight.insight_type}
-                              </Badge>
-                            )}
-                            {insight.severity && (
-                              <Badge
-                                className={cn(
-                                  "text-xs",
-                                  insight.severity === "high" &&
-                                    "bg-red-100 text-red-700",
-                                  insight.severity === "medium" &&
-                                    "bg-yellow-100 text-yellow-700",
-                                  insight.severity === "low" &&
-                                    "bg-green-100 text-green-700"
-                                )}
-                              >
-                                {insight.severity}
-                              </Badge>
-                            )}
-                          </div>
-                          <h4 className="font-medium text-sm text-gray-900 mb-1">
-                            {insight.title}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {insight.description}
-                          </p>
-                          {insight.confidence_score && (
-                            <div className="mt-2 flex items-center gap-2">
-                              <div className="text-xs text-gray-500">
-                                Confidence:{" "}
-                                {Math.round(insight.confidence_score * 100)}%
-                              </div>
-                              <div className="flex-1 max-w-[100px] h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
-                                  style={{
-                                    width: `${insight.confidence_score * 100}%`,
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Modern Timeline Section */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-          <div className="px-6 py-4 border-b bg-gray-50">
-            <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-gray-600" />
-              <h2 className="text-lg font-medium text-gray-900">
-                Project Timeline
-              </h2>
-            </div>
-          </div>
-          <div className="p-6">
-            <div className="relative">
-              <div className="absolute left-8 top-8 bottom-0 w-0.5 bg-gray-200"></div>
-              <div className="space-y-6">
+      {/* Two Column Layout for Summary and Details - Even Width */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mt-6">
+        {/* Summary Column - 50% width */}
+        <div>
+          {/* Activity Feed */}
+          <Card className="lg:col-span-4 bg-white">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-sm font-semibold tracking-[0.1em] uppercase">
+                Project Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <h6>Meeting Name: Sep 5, 2025</h6>
+              <div className="pt-4 space-y-4 max-h-80 overflow-y-auto">
                 {[
                   {
-                    date: "2024-01-15",
-                    event: "Project kickoff",
-                    status: "completed",
+                    time: "25/06/2025 09:29",
+                    user: "Sarah Chen",
+                    action: "completed project milestone in",
+                    location: "Berlin Office",
+                    target: null,
                   },
                   {
-                    date: "2024-02-01",
-                    event: "Requirements finalized",
-                    status: "completed",
+                    time: "25/06/2025 08:12",
+                    user: "Marcus Rivera",
+                    action: "delivered client presentation in",
+                    location: "Cairo Branch",
+                    target: null,
                   },
                   {
-                    date: "2024-03-15",
-                    event: "Phase 1 complete",
-                    status: "completed",
+                    time: "24/06/2025 22:55",
+                    user: "Elena Volkov",
+                    action: "lost connection during meeting in",
+                    location: "Havana Office",
+                    target: null,
                   },
                   {
-                    date: "2024-04-30",
-                    event: "Phase 2 delivery",
-                    status: "in-progress",
+                    time: "24/06/2025 21:33",
+                    user: "James Park",
+                    action: "initiated research project in",
+                    location: "Tokyo Hub",
+                    target: null,
                   },
                   {
-                    date: "2024-06-01",
-                    event: "Final delivery",
-                    status: "upcoming",
+                    time: "24/06/2025 19:45",
+                    user: "Alex Thompson",
+                    action: "updated security protocols in",
+                    location: "Moscow Center",
+                    target: "Data Systems",
                   },
-                ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="relative z-10 flex items-center justify-center w-16 h-16 bg-white rounded-full border-2 border-gray-200">
-                      {getStatusIcon(item.status)}
-                    </div>
-                    <div className="flex-1 pt-4">
-                      <p className="font-medium text-gray-900">{item.event}</p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {format(new Date(item.date), "MMMM d, yyyy")}
-                      </p>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "capitalize text-xs",
-                        item.status === "completed" &&
-                          "bg-green-50 text-green-700 border-green-200",
-                        item.status === "in-progress" &&
-                          "bg-blue-50 text-blue-700 border-blue-200",
-                        item.status === "upcoming" &&
-                          "bg-gray-50 text-gray-700 border-gray-200"
+                ].map((log, index) => (
+                  <div
+                    key={index}
+                    className="border-l-2 border-amber-400/50 pl-4 p-3 rounded-r-lg transition-all duration-200"
+                  >
+                    <div className="text-xs mb-1">{log.time}</div>
+                    <div className="text-sm leading-relaxed">
+                      <span className="text-brand font-medium">{log.user}</span>{" "}
+                      {log.action} <span>{log.location}</span>
+                      {log.target && (
+                        <span>
+                          {" "}
+                          with{" "}
+                          <span className="text-amber-400 font-medium">
+                            {log.target}
+                          </span>
+                        </span>
                       )}
-                    >
-                      {item.status.replace("-", " ")}
-                    </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Activity Column - 50% width */}
+        <div className="p-2">
+          <div className="mx-auto sm:px-2 lg:px-2 py-2">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg text-gray-900">Meetings</h2>
+              <Badge variant="secondary" className="rounded-full">
+                {documents.length}
+              </Badge>
+            </div>
+            <div className="p-6">
+              <DocumentsTable documents={documents} projectId={parseInt(id)} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modern Insights Section */}
+      {(safeInsights.length > 0 ||
+        projectInsights.length > 0 ||
+        aiInsights.length > 0) && (
+        <div className="space-y-6">
+          {/* AI-Generated Insights */}
+          {aiInsights.length > 0 && (
+            <div>
+              <div className="px-6 py-6">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-md font-medium text-gray-900">
+                    Project Insights
+                  </h3>
+                  <Badge variant="secondary" className="rounded-full text-xs">
+                    {aiInsights.length}
+                  </Badge>
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                {aiInsights.slice(0, 5).map((insight) => (
+                  <div
+                    key={insight.id}
+                    className="p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    {/* First Row: Title, Type, and Priority */}
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium text-sm text-gray-900">
+                        {insight.title}
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        {insight.insight_type && (
+                          <Badge
+                            variant="outline"
+                            className="capitalize text-xs"
+                          >
+                            {insight.insight_type}
+                          </Badge>
+                        )}
+                        {insight.severity && (
+                          <Badge
+                            className={cn(
+                              "text-xs",
+                              insight.severity === "high" &&
+                                "bg-red-100 text-red-700",
+                              insight.severity === "medium" &&
+                                "bg-yellow-100 text-yellow-700",
+                              insight.severity === "low" &&
+                                "bg-green-100 text-green-700"
+                            )}
+                          >
+                            {insight.severity}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Second Row: Summary/Description */}
+                    <p className="text-sm text-gray-600">
+                      {insight.description}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }

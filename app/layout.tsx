@@ -1,3 +1,4 @@
+import { AIChat } from "@/components/ai-chat";
 import "@/components/docs/documentation-styles.css";
 import type { Metadata } from "next";
 import React, { type ReactElement } from "react";
@@ -15,7 +16,10 @@ export default function RootLayout({
 }>): ReactElement {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased bg-white pb-6">{children}</body>
+      <body className="font-sans antialiased bg-white pb-6">
+        {children}
+        <AIChat />
+      </body>
     </html>
   );
 }

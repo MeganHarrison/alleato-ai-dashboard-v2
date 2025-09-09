@@ -1,16 +1,16 @@
 "use server";
 
-import { and, eq, gt } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { chats, messages, parts } from "@/lib/db/schema-pg";
+import { chats, messages, parts } from "@/lib/db/schema";
+import {
+  mapDBPartToUIMessagePart,
+  mapUIMessagePartsToDBParts,
+} from "@/lib/utils/message-mapping";
+import { and, eq, gt } from "drizzle-orm";
 import { MyUIMessage } from "../message-type";
-// import {
-//   mapUIMessagePartsToDBParts,
-//   mapDBPartToUIMessagePart,
-// } from "@/utils/message-mapping";
 
 export const createChat = async () => {
-  const [{ id }] = await db.insert(chats).values({ user_id: 'temp' }).returning();
+  const [{ id }] = await db.insert(chats).values({}).returning();
   return id;
 };
 
@@ -23,24 +23,24 @@ export const upsertMessage = async ({
   chatId: string;
   message: MyUIMessage;
 }) => {
-  const mappedDBUIParts: any[] = [];
+  const mappedDBUIParts = mapUIMessagePartsToDBParts(message.parts, id);
 
   await db.transaction(async (tx) => {
     await tx
       .insert(messages)
       .values({
-        chat_id: chatId,
+        chatId,
         role: message.role,
         id,
       })
       .onConflictDoUpdate({
         target: messages.id,
         set: {
-          chat_id: chatId,
+          chatId,
         },
       });
 
-    await tx.delete(parts).where(eq(parts.message_id, id));
+    await tx.delete(parts).where(eq(parts.messageId, id));
     if (mappedDBUIParts.length > 0) {
       await tx.insert(parts).values(mappedDBUIParts);
     }
@@ -49,20 +49,19 @@ export const upsertMessage = async ({
 
 export const loadChat = async (chatId: string): Promise<MyUIMessage[]> => {
   const result = await db.query.messages.findMany({
-    where: eq(messages.chat_id, chatId),
+    where: eq(messages.chatId, chatId),
     with: {
       parts: {
         orderBy: (parts, { asc }) => [asc(parts.order)],
       },
     },
-    orderBy: (messages, { asc }) => [asc(messages.created_at)],
+    orderBy: (messages, { asc }) => [asc(messages.createdAt)],
   });
 
   return result.map((message) => ({
     id: message.id,
     role: message.role,
-    content: message.content || '',
-    parts: [],
+    parts: message.parts.map((part) => mapDBPartToUIMessagePart(part)),
   }));
 };
 
@@ -89,8 +88,8 @@ export const deleteMessage = async (messageId: string) => {
       .delete(messages)
       .where(
         and(
-          eq(messages.chat_id, targetMessage.chat_id),
-          gt(messages.created_at, targetMessage.created_at || new Date()),
+          eq(messages.chatId, targetMessage.chatId),
+          gt(messages.createdAt, targetMessage.createdAt),
         ),
       );
 

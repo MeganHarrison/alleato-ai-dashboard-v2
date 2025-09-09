@@ -1,34 +1,36 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Play, 
-  RefreshCw, 
-  Clock, 
-  Database, 
-  Brain, 
-  FileText, 
-  Zap,
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import {
   Activity,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  Loader2,
-  BarChart3,
-  Users,
+  Brain,
   Calendar,
+  CheckCircle2,
+  Clock,
+  Database,
+  FileText,
+  Loader2,
+  RefreshCw,
+  Server,
   Sparkles,
-  Search,
   TrendingUp,
-  Server
-} from 'lucide-react';
+  Users,
+  XCircle,
+  Zap,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface WorkerStats {
   meetings: {
@@ -73,51 +75,61 @@ export default function RAGDashboard() {
   const [processing, setProcessing] = useState<Record<string, boolean>>({});
   const [results, setResults] = useState<ActionResult[]>([]);
   const [selectedMeetings, setSelectedMeetings] = useState<string[]>([]);
-  const [workerHealth, setWorkerHealth] = useState<'healthy' | 'degraded' | 'offline'>('offline');
+  const [workerHealth, setWorkerHealth] = useState<
+    "healthy" | "degraded" | "offline"
+  >("offline");
   const [autoRefresh, setAutoRefresh] = useState(false);
 
   // Worker URL - update this based on environment
-  const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_URL || 'http://localhost:57097';
+  const WORKER_URL =
+    process.env.NEXT_PUBLIC_WORKER_URL || "http://localhost:57097";
 
   // Fetch stats from database
   const fetchStats = useCallback(async () => {
     try {
       // Get meeting stats
       const { data: meetings, error: meetingsError } = await supabase
-        .from('meetings')
-        .select('id, created_at, project_id');
+        .from("meetings")
+        .select("id, created_at, project_id");
 
       const { data: chunks } = await supabase
-        .from('meeting_chunks')
-        .select('meeting_id');
+        .from("meeting_chunks")
+        .select("meeting_id");
 
       const { data: embeddings } = await supabase
-        .from('meeting_embeddings')
-        .select('meeting_id');
+        .from("meeting_embeddings")
+        .select("meeting_id");
 
-      const { data: insights } = await supabase
-        .from('ai_insights')
-        .select('*');
+      const { data: insights } = await supabase.from("ai_insights").select("*");
 
-      const { data: projects } = await supabase
-        .from('projects')
-        .select('*');
+      const { data: projects } = await supabase.from("projects").select("*");
 
       // Calculate stats
-      const uniqueChunkMeetings = new Set(chunks?.map(c => c.meeting_id) || []);
-      const uniqueEmbeddingMeetings = new Set(embeddings?.map(e => e.meeting_id) || []);
-      const uniqueInsightMeetings = new Set(insights?.map(i => i.meeting_id) || []);
+      const uniqueChunkMeetings = new Set(
+        chunks?.map((c) => c.meeting_id) || []
+      );
+      const uniqueEmbeddingMeetings = new Set(
+        embeddings?.map((e) => e.meeting_id) || []
+      );
+      const uniqueInsightMeetings = new Set(
+        insights?.map((i) => i.meeting_id) || []
+      );
 
       // Count insights by type
       const insightsByType: Record<string, number> = {};
-      insights?.forEach(insight => {
-        insightsByType[insight.insight_type] = (insightsByType[insight.insight_type] || 0) + 1;
+      insights?.forEach((insight) => {
+        insightsByType[insight.insight_type] =
+          (insightsByType[insight.insight_type] || 0) + 1;
       });
 
       // Recent processing (last 24 hours)
-      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const recentMeetings = meetings?.filter(m => m.created_at > oneDayAgo).length || 0;
-      const recentInsights = insights?.filter(i => i.created_at > oneDayAgo) || [];
+      const oneDayAgo = new Date(
+        Date.now() - 24 * 60 * 60 * 1000
+      ).toISOString();
+      const recentMeetings =
+        meetings?.filter((m) => m.created_at > oneDayAgo).length || 0;
+      const recentInsights =
+        insights?.filter((i) => i.created_at > oneDayAgo) || [];
 
       const newStats: WorkerStats = {
         meetings: {
@@ -132,23 +144,24 @@ export default function RAGDashboard() {
           total: insights?.length || 0,
           byType: insightsByType,
           lastGenerated: recentInsights[0]?.created_at || null,
-          withProjects: insights?.filter(i => i.project_id).length || 0,
-          withoutProjects: insights?.filter(i => !i.project_id).length || 0,
+          withProjects: insights?.filter((i) => i.project_id).length || 0,
+          withoutProjects: insights?.filter((i) => !i.project_id).length || 0,
         },
         projects: {
           total: projects?.length || 0,
-          withMeetings: projects?.filter(p => 
-            meetings?.some(m => m.project_id === p.id)
-          ).length || 0,
-          active: projects?.filter(p => p.state === 'active').length || 0,
+          withMeetings:
+            projects?.filter((p) =>
+              meetings?.some((m) => m.project_id === p.id)
+            ).length || 0,
+          active: projects?.filter((p) => p.state === "active").length || 0,
         },
         processing: {
-          vectorizationQueue: meetings?.filter(m => 
-            !uniqueEmbeddingMeetings.has(m.id)
-          ).length || 0,
-          insightQueue: meetings?.filter(m => 
-            !uniqueInsightMeetings.has(m.id)
-          ).length || 0,
+          vectorizationQueue:
+            meetings?.filter((m) => !uniqueEmbeddingMeetings.has(m.id))
+              .length || 0,
+          insightQueue:
+            meetings?.filter((m) => !uniqueInsightMeetings.has(m.id)).length ||
+            0,
           lastRun: null,
           averageProcessingTime: 0,
         },
@@ -156,7 +169,7 @@ export default function RAGDashboard() {
 
       setStats(newStats);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error("Error fetching stats:", error);
     } finally {
       setLoading(false);
     }
@@ -167,70 +180,73 @@ export default function RAGDashboard() {
     try {
       const response = await fetch(`${WORKER_URL}/health`);
       if (response.ok) {
-        setWorkerHealth('healthy');
+        setWorkerHealth("healthy");
       } else {
-        setWorkerHealth('degraded');
+        setWorkerHealth("degraded");
       }
     } catch (error) {
-      setWorkerHealth('offline');
+      setWorkerHealth("offline");
     }
   }, [WORKER_URL]);
 
   // Trigger worker actions
   const triggerAction = async (action: string, meetingId?: string) => {
-    setProcessing(prev => ({ ...prev, [action]: true }));
-    
+    setProcessing((prev) => ({ ...prev, [action]: true }));
+
     const result: ActionResult = {
       success: false,
-      message: '',
+      message: "",
       timestamp: new Date().toISOString(),
     };
 
     try {
-      let endpoint = '';
-      let method = 'POST';
+      let endpoint = "";
+      let method = "POST";
       let body: any = {};
 
       switch (action) {
-        case 'vectorize-all':
-          endpoint = '/vectorize/batch';
+        case "vectorize-all":
+          endpoint = "/vectorize/batch";
           const { data: meetingsToVectorize } = await supabase
-            .from('meetings')
-            .select('id')
-            .is('project_id', null);
-          body = { meetingIds: meetingsToVectorize?.map(m => m.id) || [] };
+            .from("meetings")
+            .select("id")
+            .is("project_id", null);
+          body = { meetingIds: meetingsToVectorize?.map((m) => m.id) || [] };
           break;
 
-        case 'vectorize-single':
+        case "vectorize-single":
           endpoint = `/vectorize/meeting/${meetingId}`;
           break;
 
-        case 'insights-all':
-          endpoint = '/insights/batch';
+        case "insights-all":
+          endpoint = "/insights/batch";
           const { data: meetingsForInsights } = await supabase
-            .from('meetings')
-            .select('id');
-          body = { meetingIds: meetingsForInsights?.map(m => m.id) || [] };
+            .from("meetings")
+            .select("id");
+          body = { meetingIds: meetingsForInsights?.map((m) => m.id) || [] };
           break;
 
-        case 'insights-single':
+        case "insights-single":
           endpoint = `/insights/meeting/${meetingId}`;
           body = { auto_assign_project: true };
           break;
 
-        case 'assign-projects':
+        case "assign-projects":
           const { data: unassignedMeetings } = await supabase
-            .from('meetings')
-            .select('id')
-            .is('project_id', null);
-          
+            .from("meetings")
+            .select("id")
+            .is("project_id", null);
+
           let assigned = 0;
           for (const meeting of unassignedMeetings || []) {
-            const response = await fetch(`${WORKER_URL}/project/assign/${meeting.id}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({})
-            });
+            const response = await fetch(
+              `${WORKER_URL}/project/assign/${meeting.id}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+              }
+            );
             if (response.ok) {
               const data = await response.json();
               if (data.projectId) assigned++;
@@ -241,35 +257,43 @@ export default function RAGDashboard() {
           result.details = { assigned, total: unassignedMeetings?.length || 0 };
           break;
 
-        case 'health-check':
-          endpoint = '/health';
-          method = 'GET';
+        case "health-check":
+          endpoint = "/health";
+          method = "GET";
           break;
 
-        case 'process-recent':
+        case "process-recent":
           // Process meetings from last 7 days
-          const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+          const sevenDaysAgo = new Date(
+            Date.now() - 7 * 24 * 60 * 60 * 1000
+          ).toISOString();
           const { data: recentMeetings } = await supabase
-            .from('meetings')
-            .select('id')
-            .gt('created_at', sevenDaysAgo);
-          
+            .from("meetings")
+            .select("id")
+            .gt("created_at", sevenDaysAgo);
+
           let processed = 0;
           for (const meeting of recentMeetings || []) {
             // Assign project
-            const assignResponse = await fetch(`${WORKER_URL}/project/assign/${meeting.id}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({})
-            });
-            
+            const assignResponse = await fetch(
+              `${WORKER_URL}/project/assign/${meeting.id}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+              }
+            );
+
             // Generate insights
-            const insightResponse = await fetch(`${WORKER_URL}/insights/meeting/${meeting.id}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({})
-            });
-            
+            const insightResponse = await fetch(
+              `${WORKER_URL}/insights/meeting/${meeting.id}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+              }
+            );
+
             if (insightResponse.ok) processed++;
           }
           result.success = true;
@@ -281,29 +305,35 @@ export default function RAGDashboard() {
       if (endpoint && !result.success) {
         const response = await fetch(`${WORKER_URL}${endpoint}`, {
           method,
-          headers: method === 'POST' ? { 'Content-Type': 'application/json' } : undefined,
-          body: method === 'POST' ? JSON.stringify(body) : undefined,
+          headers:
+            method === "POST"
+              ? { "Content-Type": "application/json" }
+              : undefined,
+          body: method === "POST" ? JSON.stringify(body) : undefined,
         });
 
         result.success = response.ok;
-        const data = response.ok ? await response.json() : await response.text();
-        result.message = response.ok 
+        const data = response.ok
+          ? await response.json()
+          : await response.text();
+        result.message = response.ok
           ? `Successfully triggered ${action}`
           : `Failed: ${data}`;
         result.details = data;
       }
-
     } catch (error) {
       result.success = false;
-      result.message = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      result.message = `Error: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`;
     }
 
-    setProcessing(prev => ({ ...prev, [action]: false }));
-    setResults(prev => [result, ...prev].slice(0, 10));
-    
+    setProcessing((prev) => ({ ...prev, [action]: false }));
+    setResults((prev) => [result, ...prev].slice(0, 10));
+
     // Refresh stats after action
     setTimeout(fetchStats, 2000);
-    
+
     return result;
   };
 
@@ -312,10 +342,12 @@ export default function RAGDashboard() {
     fetchStats();
     checkWorkerHealth();
 
-    const interval = autoRefresh ? setInterval(() => {
-      fetchStats();
-      checkWorkerHealth();
-    }, 10000) : null;
+    const interval = autoRefresh
+      ? setInterval(() => {
+          fetchStats();
+          checkWorkerHealth();
+        }, 10000)
+      : null;
 
     return () => {
       if (interval) clearInterval(interval);
@@ -331,15 +363,25 @@ export default function RAGDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">PM RAG Worker Dashboard</h1>
-          <p className="text-muted-foreground">Monitor and control the Project Management RAG system</p>
+          <h1 className="text-3xl font-bold">Todays Stats</h1>
+          <p className="text-muted-foreground">
+            Monitor and control the Project Management RAG system
+          </p>
         </div>
         <div className="flex gap-2">
-          <Badge variant={workerHealth === 'healthy' ? 'default' : workerHealth === 'degraded' ? 'secondary' : 'destructive'}>
+          <Badge
+            variant={
+              workerHealth === "healthy"
+                ? "default"
+                : workerHealth === "degraded"
+                ? "secondary"
+                : "destructive"
+            }
+          >
             <Server className="h-3 w-3 mr-1" />
             Worker: {workerHealth}
           </Badge>
@@ -348,8 +390,10 @@ export default function RAGDashboard() {
             size="sm"
             onClick={() => setAutoRefresh(!autoRefresh)}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
-            {autoRefresh ? 'Auto-refreshing' : 'Auto-refresh off'}
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${autoRefresh ? "animate-spin" : ""}`}
+            />
+            {autoRefresh ? "Auto-refreshing" : "Auto-refresh off"}
           </Button>
         </div>
       </div>
@@ -358,16 +402,24 @@ export default function RAGDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Meetings</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Todays Meetings
+            </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.meetings.total || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.meetings.total || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.meetings.recentlyProcessed || 0} in last 24h
             </p>
-            <Progress 
-              value={(stats?.meetings.withInsights || 0) / (stats?.meetings.total || 1) * 100} 
+            <Progress
+              value={
+                ((stats?.meetings.withInsights || 0) /
+                  (stats?.meetings.total || 1)) *
+                100
+              }
               className="mt-2"
             />
             <p className="text-xs text-muted-foreground mt-1">
@@ -382,17 +434,21 @@ export default function RAGDashboard() {
             <Brain className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.insights.total || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.insights.total || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.insights.withProjects || 0} mapped to projects
             </p>
             <div className="mt-2 space-y-1">
-              {Object.entries(stats?.insights.byType || {}).slice(0, 3).map(([type, count]) => (
-                <div key={type} className="flex justify-between text-xs">
-                  <span className="capitalize">{type}:</span>
-                  <span className="font-medium">{count}</span>
-                </div>
-              ))}
+              {Object.entries(stats?.insights.byType || {})
+                .slice(0, 3)
+                .map(([type, count]) => (
+                  <div key={type} className="flex justify-between text-xs">
+                    <span className="capitalize">{type}:</span>
+                    <span className="font-medium">{count}</span>
+                  </div>
+                ))}
             </div>
           </CardContent>
         </Card>
@@ -403,12 +459,18 @@ export default function RAGDashboard() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.projects.total || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.projects.total || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.projects.withMeetings || 0} with meetings
             </p>
-            <Progress 
-              value={(stats?.projects.withMeetings || 0) / (stats?.projects.total || 1) * 100} 
+            <Progress
+              value={
+                ((stats?.projects.withMeetings || 0) /
+                  (stats?.projects.total || 1)) *
+                100
+              }
               className="mt-2"
             />
           </CardContent>
@@ -416,21 +478,28 @@ export default function RAGDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Processing Queue</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Processing Queue
+            </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(stats?.processing.vectorizationQueue || 0) + (stats?.processing.insightQueue || 0)}
+              {(stats?.processing.vectorizationQueue || 0) +
+                (stats?.processing.insightQueue || 0)}
             </div>
             <div className="mt-2 space-y-1 text-xs">
               <div className="flex justify-between">
                 <span>Need Vectorization:</span>
-                <span className="font-medium">{stats?.processing.vectorizationQueue || 0}</span>
+                <span className="font-medium">
+                  {stats?.processing.vectorizationQueue || 0}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Need Insights:</span>
-                <span className="font-medium">{stats?.processing.insightQueue || 0}</span>
+                <span className="font-medium">
+                  {stats?.processing.insightQueue || 0}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -440,10 +509,10 @@ export default function RAGDashboard() {
       {/* Control Panels */}
       <Tabs defaultValue="actions" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="actions">Quick Actions</TabsTrigger>
-          <TabsTrigger value="batch">Batch Operations</TabsTrigger>
-          <TabsTrigger value="results">Recent Results</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="actions">Insights</TabsTrigger>
+          <TabsTrigger value="batch">Meetings</TabsTrigger>
+          <TabsTrigger value="results">Chat</TabsTrigger>
+          <TabsTrigger value="analytics">Notes</TabsTrigger>
         </TabsList>
 
         <TabsContent value="actions" className="space-y-4">
@@ -454,12 +523,12 @@ export default function RAGDashboard() {
                 <CardDescription>Verify worker is responding</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
-                  onClick={() => triggerAction('health-check')}
-                  disabled={processing['health-check']}
+                  onClick={() => triggerAction("health-check")}
+                  disabled={processing["health-check"]}
                 >
-                  {processing['health-check'] ? (
+                  {processing["health-check"] ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <Activity className="h-4 w-4 mr-2" />
@@ -471,17 +540,21 @@ export default function RAGDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Process Recent Meetings</CardTitle>
-                <CardDescription>Process meetings from last 7 days</CardDescription>
+                <CardTitle className="text-lg">
+                  Process Recent Meetings
+                </CardTitle>
+                <CardDescription>
+                  Process meetings from last 7 days
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="secondary"
-                  onClick={() => triggerAction('process-recent')}
-                  disabled={processing['process-recent']}
+                  onClick={() => triggerAction("process-recent")}
+                  disabled={processing["process-recent"]}
                 >
-                  {processing['process-recent'] ? (
+                  {processing["process-recent"] ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <Zap className="h-4 w-4 mr-2" />
@@ -494,16 +567,18 @@ export default function RAGDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Assign Projects</CardTitle>
-                <CardDescription>Match unassigned meetings to projects</CardDescription>
+                <CardDescription>
+                  Match unassigned meetings to projects
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   className="w-full"
                   variant="secondary"
-                  onClick={() => triggerAction('assign-projects')}
-                  disabled={processing['assign-projects']}
+                  onClick={() => triggerAction("assign-projects")}
+                  disabled={processing["assign-projects"]}
                 >
-                  {processing['assign-projects'] ? (
+                  {processing["assign-projects"] ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <Users className="h-4 w-4 mr-2" />
@@ -520,25 +595,36 @@ export default function RAGDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Vectorization</CardTitle>
-                <CardDescription>Generate embeddings for meeting chunks</CardDescription>
+                <CardDescription>
+                  Generate embeddings for meeting chunks
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Meetings without embeddings:</span>
-                    <Badge variant="outline">{stats?.processing.vectorizationQueue || 0}</Badge>
+                    <Badge variant="outline">
+                      {stats?.processing.vectorizationQueue || 0}
+                    </Badge>
                   </div>
-                  <Progress 
-                    value={(stats?.meetings.withEmbeddings || 0) / (stats?.meetings.total || 1) * 100} 
+                  <Progress
+                    value={
+                      ((stats?.meetings.withEmbeddings || 0) /
+                        (stats?.meetings.total || 1)) *
+                      100
+                    }
                   />
                 </div>
-                <Button 
+                <Button
                   className="w-full"
                   variant="default"
-                  onClick={() => triggerAction('vectorize-all')}
-                  disabled={processing['vectorize-all'] || stats?.processing.vectorizationQueue === 0}
+                  onClick={() => triggerAction("vectorize-all")}
+                  disabled={
+                    processing["vectorize-all"] ||
+                    stats?.processing.vectorizationQueue === 0
+                  }
                 >
-                  {processing['vectorize-all'] ? (
+                  {processing["vectorize-all"] ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <Database className="h-4 w-4 mr-2" />
@@ -551,25 +637,36 @@ export default function RAGDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Insight Generation</CardTitle>
-                <CardDescription>Extract insights from meetings using GPT-5</CardDescription>
+                <CardDescription>
+                  Extract insights from meetings using GPT-5
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Meetings without insights:</span>
-                    <Badge variant="outline">{stats?.processing.insightQueue || 0}</Badge>
+                    <Badge variant="outline">
+                      {stats?.processing.insightQueue || 0}
+                    </Badge>
                   </div>
-                  <Progress 
-                    value={(stats?.meetings.withInsights || 0) / (stats?.meetings.total || 1) * 100} 
+                  <Progress
+                    value={
+                      ((stats?.meetings.withInsights || 0) /
+                        (stats?.meetings.total || 1)) *
+                      100
+                    }
                   />
                 </div>
-                <Button 
+                <Button
                   className="w-full"
                   variant="default"
-                  onClick={() => triggerAction('insights-all')}
-                  disabled={processing['insights-all'] || stats?.processing.insightQueue === 0}
+                  onClick={() => triggerAction("insights-all")}
+                  disabled={
+                    processing["insights-all"] ||
+                    stats?.processing.insightQueue === 0
+                  }
                 >
-                  {processing['insights-all'] ? (
+                  {processing["insights-all"] ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <Sparkles className="h-4 w-4 mr-2" />
@@ -595,7 +692,10 @@ export default function RAGDashboard() {
                   </p>
                 ) : (
                   results.map((result, index) => (
-                    <Alert key={index} variant={result.success ? 'default' : 'destructive'}>
+                    <Alert
+                      key={index}
+                      variant={result.success ? "default" : "destructive"}
+                    >
                       <div className="flex items-start gap-2">
                         {result.success ? (
                           <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -637,33 +737,60 @@ export default function RAGDashboard() {
                     <div className="flex justify-between mb-2">
                       <span className="text-sm">Vectorization Coverage</span>
                       <span className="text-sm font-medium">
-                        {Math.round((stats?.meetings.withEmbeddings || 0) / (stats?.meetings.total || 1) * 100)}%
+                        {Math.round(
+                          ((stats?.meetings.withEmbeddings || 0) /
+                            (stats?.meetings.total || 1)) *
+                            100
+                        )}
+                        %
                       </span>
                     </div>
-                    <Progress 
-                      value={(stats?.meetings.withEmbeddings || 0) / (stats?.meetings.total || 1) * 100} 
+                    <Progress
+                      value={
+                        ((stats?.meetings.withEmbeddings || 0) /
+                          (stats?.meetings.total || 1)) *
+                        100
+                      }
                     />
                   </div>
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="text-sm">Insight Coverage</span>
                       <span className="text-sm font-medium">
-                        {Math.round((stats?.meetings.withInsights || 0) / (stats?.meetings.total || 1) * 100)}%
+                        {Math.round(
+                          ((stats?.meetings.withInsights || 0) /
+                            (stats?.meetings.total || 1)) *
+                            100
+                        )}
+                        %
                       </span>
                     </div>
-                    <Progress 
-                      value={(stats?.meetings.withInsights || 0) / (stats?.meetings.total || 1) * 100} 
+                    <Progress
+                      value={
+                        ((stats?.meetings.withInsights || 0) /
+                          (stats?.meetings.total || 1)) *
+                        100
+                      }
                     />
                   </div>
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="text-sm">Project Assignment</span>
                       <span className="text-sm font-medium">
-                        {Math.round((stats?.insights.withProjects || 0) / (stats?.insights.total || 1) * 100)}%
+                        {Math.round(
+                          ((stats?.insights.withProjects || 0) /
+                            (stats?.insights.total || 1)) *
+                            100
+                        )}
+                        %
                       </span>
                     </div>
-                    <Progress 
-                      value={(stats?.insights.withProjects || 0) / (stats?.insights.total || 1) * 100} 
+                    <Progress
+                      value={
+                        ((stats?.insights.withProjects || 0) /
+                          (stats?.insights.total || 1)) *
+                        100
+                      }
                     />
                   </div>
                 </div>
@@ -677,22 +804,27 @@ export default function RAGDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {Object.entries(stats?.insights.byType || {}).map(([type, count]) => (
-                    <div key={type} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="capitalize">
-                          {type}
-                        </Badge>
+                  {Object.entries(stats?.insights.byType || {}).map(
+                    ([type, count]) => (
+                      <div
+                        key={type}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="capitalize">
+                            {type}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{count}</span>
+                          <Progress
+                            value={(count / (stats?.insights.total || 1)) * 100}
+                            className="w-20"
+                          />
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{count}</span>
-                        <Progress 
-                          value={(count / (stats?.insights.total || 1)) * 100} 
-                          className="w-20"
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -708,9 +840,9 @@ export default function RAGDashboard() {
               <Clock className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">Last Meeting:</span>
               <span className="font-medium">
-                {stats?.meetings.lastProcessed 
+                {stats?.meetings.lastProcessed
                   ? new Date(stats.meetings.lastProcessed).toLocaleString()
-                  : 'N/A'}
+                  : "N/A"}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -719,7 +851,7 @@ export default function RAGDashboard() {
               <span className="font-medium">
                 {stats?.insights.lastGenerated
                   ? new Date(stats.insights.lastGenerated).toLocaleString()
-                  : 'N/A'}
+                  : "N/A"}
               </span>
             </div>
             <div className="flex items-center gap-2">

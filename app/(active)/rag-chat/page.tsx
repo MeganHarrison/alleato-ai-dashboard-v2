@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Loader2, Bot, User, MessageSquare } from "lucide-react";
+import { Send, Loader2, Bot, User, MessageSquare, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import type { ReactElement } from "react";
 
@@ -16,11 +16,17 @@ interface Message {
   timestamp: Date;
 }
 
+interface HealthStatus {
+  status: 'healthy' | 'unhealthy' | 'checking';
+  endpoint?: string;
+  error?: string;
+}
+
 /**
- * RAG Chat Page component for interacting with the deployed RAG AI agent on Render.
+ * RAG Chat Page component for interacting with the deployed RAG AI agent.
  *
  * Provides a chat interface that communicates with the RAG agent endpoint
- * deployed at https://rag-agent-pm.onrender.com for project management insights.
+ * which can be deployed on Railway, Render, or any custom platform.
  *
  * @component
  * @returns {ReactElement} The RAG chat interface
@@ -36,8 +42,46 @@ export default function RAGChatPage(): ReactElement {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [healthStatus, setHealthStatus] = useState<HealthStatus>({ status: 'checking' });
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Check RAG API health status
+  const checkHealth = async (): Promise<void> => {
+    setHealthStatus({ status: 'checking' });
+    try {
+      const response = await fetch('/api/rag-proxy', {
+        method: 'GET',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setHealthStatus({
+          status: 'healthy',
+          endpoint: data.endpoint || 'Connected',
+        });
+      } else {
+        const data = await response.json();
+        setHealthStatus({
+          status: 'unhealthy',
+          endpoint: data.endpoint,
+          error: data.error || 'Service unavailable',
+        });
+      }
+    } catch (error) {
+      setHealthStatus({
+        status: 'unhealthy',
+        error: 'Failed to check service status',
+      });
+    }
+  };
+
+  // Check health on mount and periodically
+  useEffect(() => {
+    checkHealth();
+    const interval = setInterval(checkHealth, 30000); // Check every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
@@ -120,14 +164,44 @@ export default function RAGChatPage(): ReactElement {
 
       <Card className="h-[700px] flex flex-col">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            Project Management RAG Chat
-            <div className="ml-auto">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                Connected to Render
-              </div>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Project Management RAG Chat
+            </div>
+            <div className="flex items-center gap-2">
+              {healthStatus.status === 'checking' && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Checking connection...</span>
+                </div>
+              )}
+              {healthStatus.status === 'healthy' && (
+                <div className="flex items-center gap-2 text-sm text-green-600">
+                  <CheckCircle className="h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {healthStatus.endpoint?.includes('railway') ? 'Railway' : 
+                     healthStatus.endpoint?.includes('render') ? 'Render' : 
+                     'Connected'}
+                  </span>
+                </div>
+              )}
+              {healthStatus.status === 'unhealthy' && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-sm text-orange-600">
+                    <AlertCircle className="h-4 w-4" />
+                    <span className="hidden sm:inline">Offline</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={checkHealth}
+                    className="h-7 px-2"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
             </div>
           </CardTitle>
         </CardHeader>
