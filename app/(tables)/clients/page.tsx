@@ -6,9 +6,5 @@ export const dynamic = "force-dynamic"
 export default async function ClientsPage() {
   const clients = await getClients()
 
-  return (
-    <main className="flex flex-1 flex-col">
-      <ClientsDataTable clients={clients} />
-    </main>
-  )
+  return <ClientsDataTable clients={clients} />
 }

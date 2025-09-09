@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: "Transform your data into powerful insights",
 };
 
-export default function FM834Layout({ children }: { children: ReactNode }) {
+export default function TablesLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -31,7 +31,7 @@ export default function FM834Layout({ children }: { children: ReactNode }) {
             <DynamicBreadcrumbs />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 ml-6 mr-6">
+        <div className="flex flex-1 flex-col">
           <ErrorBoundary>
             {children}
           </ErrorBoundary>

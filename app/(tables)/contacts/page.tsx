@@ -6,9 +6,5 @@ export const dynamic = "force-dynamic"
 export default async function ContactsPage() {
   const contacts = await getContacts()
 
-  return (
-    <main className="flex flex-1 flex-col">
-      <ContactsDataTable contacts={contacts} />
-    </main>
-  )
+  return <ContactsDataTable contacts={contacts} />
 }

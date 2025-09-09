@@ -10,16 +10,29 @@ import {
 } from "@/components/ui/sidebar";
 import { useChat } from '@ai-sdk/react';
 import { Mic, Paperclip, Send } from "lucide-react";
-import { useEffect, useRef } from "react";
-import ReactMarkdown from "react-markdown";
+import dynamic from 'next/dynamic';
+import { useEffect, useRef, useState } from "react";
+
+// Dynamically import ReactMarkdown to avoid SSR issues
+const ReactMarkdown = dynamic(() => import('react-markdown'), {
+  ssr: false,
+  loading: () => <p>Loading...</p>
+});
 
 export default function FMGlobalChat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error, append } =
+  const [mounted, setMounted] = useState(false);
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error, setInput } =
     useChat({
       api: "/api/fm-global",
     });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,12 +42,31 @@ export default function FMGlobalChat() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSuggestionClick = async (query: string) => {
-    // Use append instead of handleInputChange + submit to avoid infinite loops
-    await append({
-      role: "user",
-      content: query,
-    });
+  const handleSuggestionClick = (query: string) => {
+    // Set the input value using the setInput function from useChat
+    if (setInput) {
+      setInput(query);
+    } else {
+      // Fallback: manually set the input value
+      const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement;
+      if (inputElement) {
+        inputElement.value = query;
+        // Trigger a change event to update React state
+        const event = new Event('input', { bubbles: true });
+        inputElement.dispatchEvent(event);
+      }
+    }
+    
+    // Small delay to ensure state updates
+    setTimeout(() => {
+      // Programmatically click the submit button
+      if (submitButtonRef.current) {
+        submitButtonRef.current.click();
+      } else if (formRef.current) {
+        // Fallback: submit the form directly
+        formRef.current.requestSubmit();
+      }
+    }, 50);
   };
 
   const suggestions = [
@@ -42,6 +74,15 @@ export default function FMGlobalChat() {
     "How do I calculate water demand for Class 3 commodities?",
     "What K-factor sprinklers are needed for 38ft storage height?",
   ];
+
+  // Don't render until client-side
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-500">Loading FM Global Expert...</div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -231,6 +272,7 @@ export default function FMGlobalChat() {
         {/* Input Area - Fixed at bottom */}
         <div className="border-t border-gray-200 bg-white flex-shrink-0">
           <form
+            ref={formRef}
             onSubmit={handleSubmit}
             className="flex items-center gap-2 px-8 py-4"
           >
@@ -280,8 +322,9 @@ export default function FMGlobalChat() {
             </button>
 
             <button
+              ref={submitButtonRef}
               type="submit"
-              disabled={isLoading || !input?.trim()}
+              disabled={isLoading || !input || input.trim().length === 0}
               className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               aria-label="Send message"
             >

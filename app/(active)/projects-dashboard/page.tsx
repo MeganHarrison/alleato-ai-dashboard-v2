@@ -37,7 +37,6 @@ import {
   Filter,
   LayoutGrid,
   List,
-  MapPin,
   Phone,
   Plus,
   Search,
@@ -331,13 +330,13 @@ export default function ProjectsPage() {
   }
 
   const CardView = () => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
       {filteredProjects.map((project) => (
         <Card
           key={project.id}
           className="group bg-white border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-200"
         >
-          <CardContent className="p-5">
+          <CardContent className="p-8">
             {/* Header */}
             <div className="flex items-start justify-between text-sm mb-3">
               <div className="flex-1">
@@ -348,44 +347,10 @@ export default function ProjectsPage() {
                   {project.name}
                   <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Link>
-                {project.meetings && project.meetings.length > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Phone className="h-3 w-3" />
-                    <span>{project.meetings.length} meetings</span>
-                  </div>
-                )}
               </div>
               {project.clients?.name && (
                 <div className="flex items-center gap-1 text-sm text-brand font-medium mt-1">
                   <span>{project.clients.name}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Metadata */}
-            <div className="space-y-2 mb-3">
-              {project.category && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Briefcase className="h-3.5 w-3.5" />
-                  <span>{project.category}</span>
-                </div>
-              )}
-              {project["est revenue"] && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <DollarSign className="h-3.5 w-3.5" />
-                  <span className="font-medium">
-                    {formatCurrency(project["est revenue"])}
-                  </span>
-                </div>
-              )}
-              {(project.address || project.state) && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <MapPin className="h-3.5 w-3.5" />
-                  <span>
-                    {project.state
-                      ? `${project.address || ""} ${project.state}`.trim()
-                      : project.address}
-                  </span>
                 </div>
               )}
             </div>
@@ -396,6 +361,36 @@ export default function ProjectsPage() {
                 {project.description}
               </p>
             )}
+
+            {/* Metadata */}
+            <div className="flex items-start justify-between space-y-2 mb-3">
+              {project.category && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Briefcase className="h-3.5 w-3.5" />
+                  <span>{project.category}</span>
+                </div>
+              )}
+
+              {project["est revenue"] && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <DollarSign className="h-3.5 w-3.5" />
+                  <span className="font-medium">
+                    {formatCurrency(project["est revenue"])}
+                  </span>
+                </div>
+              )}
+
+              {(project.address || project.state) && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  {project.meetings && project.meetings.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Phone className="h-3 w-3" />
+                      <span>{project.meetings.length} meetings</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Footer */}
             <div className="flex items-center justify-between pt-3">

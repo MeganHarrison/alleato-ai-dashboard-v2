@@ -9,7 +9,7 @@ export default async function DocumentsPage() {
   const { documents, error } = await getDocuments();
 
   return (
-    <main className="flex flex-1 flex-col gap-6 p-6">
+    <div className="space-y-4 p-2 sm:p-4 md:p-6 w-[95%] sm:w-full mx-auto">
       {/* Header Section */}
       <div className="flex items-start justify-between">
         <div>
@@ -32,6 +32,6 @@ export default async function DocumentsPage() {
       ) : (
         <EditableDocumentsTable documents={documents} />
       )}
-    </main>
+    </div>
   );
 }

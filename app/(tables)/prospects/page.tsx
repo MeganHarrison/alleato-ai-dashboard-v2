@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default function ProspectsPage() {
   return (
-    <div className="flex flex-col gap-8 w-[90%] mx-auto">
+    <div className="space-y-4 p-2 sm:p-4 md:p-6 w-[95%] sm:w-full mx-auto">
       <PageHeader
         title="Prospects"
         description="Manage your sales prospects and leads."

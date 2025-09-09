@@ -6,9 +6,5 @@ export const dynamic = "force-dynamic"
 export default async function CompaniesPage() {
   const companies = await getCompanies()
 
-  return (
-    <main className="flex flex-1 flex-col">
-      <CompaniesDataTable companies={companies} />
-    </main>
-  )
+  return <CompaniesDataTable companies={companies} />
 }

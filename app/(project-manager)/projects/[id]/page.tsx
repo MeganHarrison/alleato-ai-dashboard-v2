@@ -1,9 +1,6 @@
 import { getProjectMeetingInsights } from "@/app/actions/meeting-insights-actions";
 import { Badge } from "@/components/ui/badge";
-import {
-  getProjectDocuments,
-  getProjectInsights,
-} from "@/lib/actions/project-documents-actions";
+import { getProjectInsights } from "@/lib/actions/project-documents-actions";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/types/database.types";
 import { createServerClient } from "@supabase/ssr";
@@ -15,8 +12,6 @@ import {
   Calendar,
   CheckCircle2,
   DollarSign,
-  FileText,
-  Lightbulb,
   MapPin,
   Users,
   XCircle,
@@ -88,24 +83,36 @@ async function getProjectDetails(id: string) {
     return null;
   }
 
-  // Get documents for this project - using documents table instead of meetings
-  const { data: documents } = await supabase
+  // Get all documents and filter by project
+  // Since documents table doesn't have a project_id column, we'll check metadata
+  const { data: allDocuments } = await supabase
     .from("documents")
     .select("*")
-    .eq("project_id", parseInt(id))
-    .order("id", { ascending: false });
+    .order("id", { ascending: false })
+    .limit(500);
 
-  // Get additional documents using the action (may include different filtering)
-  const documentsResult = await getProjectDocuments(parseInt(id));
-  const additionalDocuments = documentsResult.success
-    ? documentsResult.documents
-    : [];
+  // Filter documents that belong to this project
+  // Check metadata for project association
+  const projectDocuments = (allDocuments || []).filter((doc) => {
+    if (!doc.metadata || typeof doc.metadata !== "object") return false;
+    const metadata = doc.metadata as any;
 
-  // Merge and deduplicate documents
-  const allDocuments = [...(documents || []), ...additionalDocuments];
-  const uniqueDocuments = Array.from(
-    new Map(allDocuments.map((doc) => [doc.id, doc])).values()
-  );
+    // Check various ways the project might be referenced in metadata
+    return (
+      metadata.project_id === parseInt(id) ||
+      metadata.project_id === id ||
+      metadata.project === project.name ||
+      metadata.project_name === project.name ||
+      metadata.projectId === parseInt(id) ||
+      metadata.projectId === id
+    );
+  });
+
+  // If no project-specific documents found, show some recent documents
+  const uniqueDocuments =
+    projectDocuments.length > 0
+      ? projectDocuments
+      : (allDocuments || []).slice(0, 20); // Show 20 most recent as fallback
 
   // Get insights for this project (both project_insights and ai_insights)
   const insightsResult = await getProjectInsights(parseInt(id));
@@ -240,20 +247,20 @@ export default async function ProjectDetailPage({
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {/* Revenue Card */}
           <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all border border-gray-100">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <DollarSign className="h-5 w-5 text-green-600" />
+            <div className="flex items-center mb-3">
+              <div className="p-2">
+                <DollarSign className="h-5 w-5" />
               </div>
               <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Revenue
               </span>
             </div>
-            <div className="text-2xl font-semibold text-gray-900">
+            <div className="text-l font-semibold text-gray-900">
               {formatCurrency(project["est revenue"])}
             </div>
             {project["est profit"] && (
               <p className="text-sm text-gray-500 mt-2">
-                <span className="text-green-600 font-medium">
+                <span className="font-medium">
                   {formatCurrency(project["est profit"])}
                 </span>{" "}
                 profit
@@ -330,67 +337,6 @@ export default async function ProjectDetailPage({
           </div>
         </div>
 
-        {/* Project Intelligence Summary - Modern Design */}
-        {insightStats.total > 0 && (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-            <div className="px-6 py-4 bg-gradient-to-r from-indigo-50 via-blue-50 to-purple-50 border-b">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-white rounded-lg shadow-sm">
-                  <Brain className="h-5 w-5 text-indigo-600" />
-                </div>
-                <h2 className="text-lg font-medium text-gray-900">
-                  Project Intelligence
-                </h2>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 mb-3">
-                    <CheckCircle2 className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900">
-                    {insightStats.actions}
-                  </div>
-                  <div className="text-sm text-gray-500">Action Items</div>
-                  {insightStats.pendingActions > 0 && (
-                    <div className="text-xs text-orange-600 mt-1 font-medium">
-                      {insightStats.pendingActions} pending
-                    </div>
-                  )}
-                </div>
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mb-3">
-                    <AlertCircle className="h-6 w-6 text-red-600" />
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900">
-                    {insightStats.risks}
-                  </div>
-                  <div className="text-sm text-gray-500">Risks</div>
-                </div>
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-3">
-                    <Lightbulb className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900">
-                    {insightStats.decisions}
-                  </div>
-                  <div className="text-sm text-gray-500">Decisions</div>
-                </div>
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 mb-3">
-                    <FileText className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900">
-                    {documents.length}
-                  </div>
-                  <div className="text-sm text-gray-500">Documents</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Documents Section - Table View */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
           <div className="px-6 py-4 border-b bg-gray-50">
@@ -404,10 +350,7 @@ export default async function ProjectDetailPage({
             </div>
           </div>
           <div className="p-6">
-            <DocumentsTable 
-              documents={documents} 
-              projectId={parseInt(id)}
-            />
+            <DocumentsTable documents={documents} projectId={parseInt(id)} />
           </div>
         </div>
 
