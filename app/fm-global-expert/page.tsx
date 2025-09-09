@@ -21,10 +21,19 @@ const ReactMarkdown = dynamic(() => import('react-markdown'), {
 
 export default function FMGlobalChat() {
   const [mounted, setMounted] = useState(false);
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error, setInput } =
-    useChat({
-      api: "/api/fm-global",
-    });
+  const chatHelpers = useChat({
+    api: "/api/fm-global",
+  });
+  
+  const { 
+    messages, 
+    input, 
+    handleInputChange, 
+    handleSubmit, 
+    isLoading, 
+    error, 
+    setInput
+  } = chatHelpers;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -42,31 +51,14 @@ export default function FMGlobalChat() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSuggestionClick = (query: string) => {
-    // Set the input value using the setInput function from useChat
-    if (setInput) {
-      setInput(query);
-    } else {
-      // Fallback: manually set the input value
-      const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement;
-      if (inputElement) {
-        inputElement.value = query;
-        // Trigger a change event to update React state
-        const event = new Event('input', { bubbles: true });
-        inputElement.dispatchEvent(event);
-      }
-    }
+  const handleSuggestionClick = async (query: string) => {
+    // sendMessage is available in AI SDK v5 with @ai-sdk/react
+    const sendMessage = (chatHelpers as any).sendMessage;
     
-    // Small delay to ensure state updates
-    setTimeout(() => {
-      // Programmatically click the submit button
-      if (submitButtonRef.current) {
-        submitButtonRef.current.click();
-      } else if (formRef.current) {
-        // Fallback: submit the form directly
-        formRef.current.requestSubmit();
-      }
-    }, 50);
+    if (sendMessage) {
+      // sendMessage expects an object with a 'text' property
+      await sendMessage({ text: query });
+    }
   };
 
   const suggestions = [
