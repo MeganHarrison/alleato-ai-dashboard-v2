@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AddProjectButton } from "@/components/table-buttons/add-project-button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -38,7 +39,6 @@ import {
   LayoutGrid,
   List,
   Phone,
-  Plus,
   Search,
 } from "lucide-react";
 import Link from "next/link";
@@ -544,16 +544,13 @@ export default function ProjectsPage() {
       <div className="mx-auto w-[95%] sm:w-full px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl">Projects Dashboard</h1>
-            </div>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Project
-            </Button>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl">Projects Dashboard</h1>
           </div>
+          <AddProjectButton />
         </div>
+      </div>
 
         {/* Filters and Controls */}
         <div className="rounded-lg mb-6">

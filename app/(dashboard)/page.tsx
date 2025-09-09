@@ -5,6 +5,7 @@ import { DynamicBreadcrumbs } from "@/components/dynamic-breadcrumbs";
 import ErrorBoundary from "@/components/error-boundary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AddProjectButton } from "@/components/table-buttons/add-project-button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -49,7 +50,6 @@ import {
   LayoutGrid,
   List,
   MapPin,
-  Plus,
   Search,
 } from "lucide-react";
 import Link from "next/link";
@@ -626,10 +626,7 @@ export default function DashboardHome() {
                   <div>
                     <h1 className="text-l font-semibold">PROJECTS</h1>
                   </div>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Project
-                  </Button>
+                  <AddProjectButton />
                 </div>
               </div>
 
