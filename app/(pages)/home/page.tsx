@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AddProjectButton } from "@/components/table-buttons/add-project-button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -41,7 +42,6 @@ import {
   LayoutGrid,
   List,
   MapPin,
-  Plus,
   Search,
 } from "lucide-react";
 import Link from "next/link";
@@ -617,16 +617,13 @@ export default function DashboardHome() {
           </div>
         </div>
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl">Projects Dashboard</h1>
-            </div>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Project
-            </Button>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl">Projects Dashboard</h1>
           </div>
+          <AddProjectButton />
         </div>
+      </div>
 
         {/* Filters and Controls */}
         <div className="rounded-lg mb-6">
