@@ -26,6 +26,9 @@ interface Insight {
   title: string;
   description: string;
   severity?: string;
+  assignee?: string;
+  due_date?: string;
+  financial_impact?: string;
   metadata?: any;
   created_at: string;
   document?: {
@@ -40,8 +43,9 @@ interface Insight {
     created_at: string;
   };
   projects?: {
+    id: number;
     name: string;
-    phase: string;
+    phase?: string;
   };
 }
 
@@ -75,6 +79,24 @@ const insightTypeConfig = {
     color: 'text-red-500',
     bgColor: 'bg-red-50',
     label: 'Risk'
+  },
+  fact: {
+    icon: FileText,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-50',
+    label: 'Fact'
+  },
+  stakeholder_feedback: {
+    icon: HelpCircle,
+    color: 'text-yellow-500',
+    bgColor: 'bg-yellow-50',
+    label: 'Feedback'
+  },
+  timeline_change: {
+    icon: TrendingUp,
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50',
+    label: 'Timeline'
   },
   question: {
     icon: HelpCircle,
@@ -248,7 +270,7 @@ export function InsightsView({ insights, documentsWithoutInsights, stats, severi
                 <TabsTrigger value="action_item">Actions</TabsTrigger>
                 <TabsTrigger value="decision">Decisions</TabsTrigger>
                 <TabsTrigger value="risk">Risks</TabsTrigger>
-                <TabsTrigger value="question">Questions</TabsTrigger>
+                <TabsTrigger value="fact">Facts</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -274,47 +296,54 @@ export function InsightsView({ insights, documentsWithoutInsights, stats, severi
                       </div>
                       <div className="flex-1 space-y-2">
                         <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-semibold">{insight.title}</h3>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold">{insight.title}</h3>
+                            </div>
                             <p className="text-sm text-muted-foreground mt-1">
                               {insight.description}
                             </p>
                           </div>
                           {insight.severity && (
-                            <Badge variant={getSeverityColor(insight.severity)}>
+                            <Badge variant={getSeverityColor(insight.severity)} className="ml-2">
                               {insight.severity}
                             </Badge>
                           )}
                         </div>
                         
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          {insight.projects && (
+                            <Badge variant="secondary" className="text-xs">
+                              Project: {insight.projects.name}
+                            </Badge>
+                          )}
                           {(insight.document || insight.documents) && (
                             <span className="flex items-center gap-1">
                               <FileText className="w-3 h-3" />
-                              {insight.document?.title || insight.documents?.title}
+                              {insight.document?.title || insight.documents?.title || 'No document'}
                             </span>
-                          )}
-                          {insight.projects && (
-                            <Badge variant="secondary" className="text-xs">
-                              {insight.projects.name}
-                            </Badge>
                           )}
                           <span>{format(new Date(insight.created_at), 'MMM d, yyyy')}</span>
                         </div>
 
-                        {insight.metadata && (
+                        {(insight.assignee || insight.due_date || insight.metadata) && (
                           <div className="mt-2 space-y-1">
-                            {insight.metadata.assignee && (
+                            {(insight.assignee || insight.metadata?.assignee) && (
                               <p className="text-xs">
-                                <span className="font-medium">Assigned to:</span> {insight.metadata.assignee}
+                                <span className="font-medium">Assigned to:</span> {insight.assignee || insight.metadata.assignee}
                               </p>
                             )}
-                            {insight.metadata.due_date && (
+                            {(insight.due_date || insight.metadata?.due_date) && (
                               <p className="text-xs">
-                                <span className="font-medium">Due:</span> {format(new Date(insight.metadata.due_date), 'MMM d, yyyy')}
+                                <span className="font-medium">Due:</span> {format(new Date(insight.due_date || insight.metadata.due_date), 'MMM d, yyyy')}
                               </p>
                             )}
-                            {insight.metadata.context && (
+                            {insight.financial_impact && (
+                              <p className="text-xs">
+                                <span className="font-medium">Financial Impact:</span> {insight.financial_impact}
+                              </p>
+                            )}
+                            {insight.metadata?.context && (
                               <p className="text-xs italic text-muted-foreground">
                                 "{insight.metadata.context}"
                               </p>

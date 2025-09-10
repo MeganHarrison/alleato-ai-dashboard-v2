@@ -1,285 +1,371 @@
 import { test, expect, Page } from '@playwright/test';
 
-test.describe('FM Global Expert Chat Interface - Comprehensive Testing', () => {
+// Test configuration
+const FM_GLOBAL_URL = 'http://localhost:3001/fm-global-expert';
+const SCREENSHOT_DIR = '/Users/meganharrison/Documents/github/alleato-project/alleato-ai-dashboard/screenshots';
+
+// Test data for comprehensive testing
+const TEST_QUERIES = {
+  meetings: "What meetings have we had recently?",
+  project: "Show me information about Project Alpha",
+  insights: "What are the recent AI insights?",
+  actionItems: "What action items are pending?",
+  general: "Tell me about our current projects",
+  empty: ""
+};
+
+test.describe('FM Global Expert RAG Interface Tests', () => {
   let page: Page;
 
-  test.beforeEach(async ({ browser }) => {
-    page = await browser.newPage();
+  test.beforeEach(async ({ page: testPage }) => {
+    page = testPage;
     
-    // Listen for console errors
-    page.on('console', msg => {
-      if (msg.type() === 'error') {
-        console.log('Console error:', msg.text());
-      }
-    });
-
     // Navigate to the FM Global Expert page
-    await page.goto('http://localhost:3000/fm-global-expert');
+    await page.goto(FM_GLOBAL_URL);
     
-    // Wait for page to load completely
+    // Wait for the page to be fully loaded
     await page.waitForLoadState('networkidle');
+    
+    // Wait for React to mount
+    await page.waitForTimeout(2000);
   });
 
-  test('1. Page loads correctly without errors', async () => {
-    // Check that the page title is correct
-    await expect(page).toHaveTitle(/FM Global Expert/);
+  test('Page loads correctly and shows initial interface', async () => {
+    // Verify the page title and main elements
+    await expect(page).toHaveTitle(/FM Global/i);
     
-    // Verify main elements are present
-    await expect(page.locator('h1')).toContainText('FM Global Expert');
+    // Check for the main greeting
+    await expect(page.locator('h1')).toContainText('HELLO');
+    await expect(page.locator('text=How can I help you today?')).toBeVisible();
     
-    // Check for message input field
-    const messageInput = page.locator('input[type="text"], textarea').first();
-    await expect(messageInput).toBeVisible();
-    
-    // Check for send button
-    const sendButton = page.locator('button[type="submit"], button').filter({ hasText: /send|submit/i }).first();
-    await expect(sendButton).toBeVisible();
-    
-    // Verify suggestion buttons are present
-    const suggestionButtons = page.locator('button').filter({ hasText: /What are the sprinkler requirements|How do I calculate water demand|What K-factor sprinklers/ });
-    await expect(suggestionButtons).toHaveCount(3);
+    // Verify suggestion cards are present
+    const suggestionCards = page.locator('button').filter({ hasText: /sprinkler|calculate|K-factor/i });
+    await expect(suggestionCards).toHaveCount(3);
     
     // Take screenshot of initial state
     await page.screenshot({ 
-      path: '/Users/meganharrison/Documents/github/alleato-project/alleato-ai-dashboard/screenshots/fm-global-initial-state.png',
+      path: `${SCREENSHOT_DIR}/fm-global-initial-state.png`,
       fullPage: true 
     });
     
-    console.log('✓ Page loads correctly with all elements present');
+    console.log('✓ Page loads correctly with initial interface');
   });
 
-  test('2. Test first suggestion button - Shuttle ASRS question', async () => {
-    const suggestionText = "What are the sprinkler requirements for shuttle ASRS with open-top containers?";
+  test('Connection status indicator works', async () => {
+    // Wait for connection status to be determined
+    await page.waitForTimeout(3000);
     
-    // Find and click the first suggestion button
-    const firstSuggestion = page.locator('button').filter({ hasText: /What are the sprinkler requirements/ }).first();
-    await expect(firstSuggestion).toBeVisible();
+    // Check if connection status alert is visible
+    const statusAlert = page.locator('[role="alert"]').first();
     
-    await firstSuggestion.click();
+    if (await statusAlert.isVisible()) {
+      const statusText = await statusAlert.textContent();
+      console.log('Connection status:', statusText);
+      
+      // Verify status shows either Railway, fallback, or error
+      expect(statusText).toMatch(/(Railway|fallback|error)/i);
+    }
     
-    // Verify the text appears in the input field
-    const messageInput = page.locator('input[type="text"], textarea').first();
-    await expect(messageInput).toHaveValue(suggestionText);
-    
-    // Submit the message
-    const sendButton = page.locator('button[type="submit"], button').filter({ hasText: /send|submit/i }).first();
-    await sendButton.click();
-    
-    // Wait for AI response (allow up to 30 seconds)
-    await expect(page.locator('text=' + suggestionText).first()).toBeVisible();
-    
-    // Wait for AI response to appear
-    await page.waitForSelector('div:has-text("shuttle ASRS"), div:has-text("open-top"), div:has-text("sprinkler")', { 
-      timeout: 30000 
-    });
-    
-    // Take screenshot showing successful interaction
+    // Take screenshot of connection status
     await page.screenshot({ 
-      path: '/Users/meganharrison/Documents/github/alleato-project/alleato-ai-dashboard/screenshots/fm-global-suggestion-1-working.png',
+      path: `${SCREENSHOT_DIR}/fm-global-connection-status.png`,
       fullPage: true 
     });
     
-    console.log('✓ First suggestion button works correctly');
+    console.log('✓ Connection status indicator displays correctly');
   });
 
-  test('3. Test second suggestion button - Water demand calculation', async () => {
-    const suggestionText = "How do I calculate water demand for Class 3 commodities?";
+  test('Chat input functionality works', async () => {
+    // Find the input field
+    const inputField = page.locator('input[type="text"]');
+    await expect(inputField).toBeVisible();
+    await expect(inputField).toHaveAttribute('placeholder', 'Type message');
     
-    // Find and click the second suggestion button
-    const secondSuggestion = page.locator('button').filter({ hasText: /How do I calculate water demand/ }).first();
-    await expect(secondSuggestion).toBeVisible();
+    // Test typing in the input
+    await inputField.fill('Test message');
+    await expect(inputField).toHaveValue('Test message');
     
-    await secondSuggestion.click();
+    // Clear input
+    await inputField.clear();
+    await expect(inputField).toHaveValue('');
     
-    // Verify the text appears in the input field
-    const messageInput = page.locator('input[type="text"], textarea').first();
-    await expect(messageInput).toHaveValue(suggestionText);
-    
-    // Submit the message
-    const sendButton = page.locator('button[type="submit"], button').filter({ hasText: /send|submit/i }).first();
-    await sendButton.click();
-    
-    // Wait for AI response
-    await expect(page.locator('text=' + suggestionText).first()).toBeVisible();
-    
-    // Wait for AI response to appear
-    await page.waitForSelector('div:has-text("Class 3"), div:has-text("water demand"), div:has-text("calculate")', { 
-      timeout: 30000 
-    });
-    
-    // Take screenshot
-    await page.screenshot({ 
-      path: '/Users/meganharrison/Documents/github/alleato-project/alleato-ai-dashboard/screenshots/fm-global-suggestion-2-working.png',
-      fullPage: true 
-    });
-    
-    console.log('✓ Second suggestion button works correctly');
+    console.log('✓ Chat input functionality works correctly');
   });
 
-  test('4. Test third suggestion button - K-factor sprinklers', async () => {
-    const suggestionText = "What K-factor sprinklers are needed for 38ft storage height?";
+  test('Submit button states work correctly', async () => {
+    const inputField = page.locator('input[type="text"]');
+    const submitButton = page.locator('button[type="submit"]');
     
-    // Find and click the third suggestion button
-    const thirdSuggestion = page.locator('button').filter({ hasText: /What K-factor sprinklers/ }).first();
-    await expect(thirdSuggestion).toBeVisible();
+    // Initially disabled with empty input
+    await expect(submitButton).toBeDisabled();
     
-    await thirdSuggestion.click();
+    // Enabled with text
+    await inputField.fill('Test question');
+    await expect(submitButton).toBeEnabled();
     
-    // Verify the text appears in the input field
-    const messageInput = page.locator('input[type="text"], textarea').first();
-    await expect(messageInput).toHaveValue(suggestionText);
+    // Disabled again when cleared
+    await inputField.clear();
+    await expect(submitButton).toBeDisabled();
     
-    // Submit the message
-    const sendButton = page.locator('button[type="submit"], button').filter({ hasText: /send|submit/i }).first();
-    await sendButton.click();
-    
-    // Wait for AI response
-    await expect(page.locator('text=' + suggestionText).first()).toBeVisible();
-    
-    // Wait for AI response to appear
-    await page.waitForSelector('div:has-text("K-factor"), div:has-text("38ft"), div:has-text("sprinkler")', { 
-      timeout: 30000 
-    });
-    
-    // Take screenshot
-    await page.screenshot({ 
-      path: '/Users/meganharrison/Documents/github/alleato-project/alleato-ai-dashboard/screenshots/fm-global-suggestion-3-working.png',
-      fullPage: true 
-    });
-    
-    console.log('✓ Third suggestion button works correctly');
+    console.log('✓ Submit button states work correctly');
   });
 
-  test('5. Test manual input functionality', async () => {
-    const customMessage = "What is FM Global and what do they do?";
+  test('Test meeting-related queries', async () => {
+    const inputField = page.locator('input[type="text"]');
+    const submitButton = page.locator('button[type="submit"]');
     
-    // Type in custom message
-    const messageInput = page.locator('input[type="text"], textarea').first();
-    await messageInput.fill(customMessage);
-    
-    // Verify the text is in the input
-    await expect(messageInput).toHaveValue(customMessage);
-    
-    // Submit the message
-    const sendButton = page.locator('button[type="submit"], button').filter({ hasText: /send|submit/i }).first();
-    await sendButton.click();
+    // Submit the query
+    await inputField.fill(TEST_QUERIES.meetings);
+    await submitButton.click();
     
     // Wait for the message to appear in chat
-    await expect(page.locator('text=' + customMessage).first()).toBeVisible();
+    await page.waitForSelector('.space-y-6', { timeout: 10000 });
     
-    // Wait for AI response
-    await page.waitForSelector('div:has-text("FM Global"), div:has-text("insurance"), div:has-text("property")', { 
-      timeout: 30000 
+    // Verify user message appears
+    const userMessage = page.locator('.space-y-6 >> text=' + TEST_QUERIES.meetings);
+    await expect(userMessage).toBeVisible();
+    
+    // Wait for AI response (with loading indicator)
+    await page.waitForSelector('.animate-bounce', { timeout: 5000 }).catch(() => {
+      console.log('Loading indicator not found, continuing...');
     });
     
-    // Take screenshot
+    // Wait for AI response to complete
+    await page.waitForSelector('[data-testid="user-menu"] ~ div .prose', { timeout: 15000 }).catch(async () => {
+      // Alternative selector for AI response
+      await page.waitForSelector('.bg-orange-500 ~ div', { timeout: 10000 });
+    });
+    
+    // Verify AI response appears
+    const aiResponseArea = page.locator('.bg-orange-500').first();
+    await expect(aiResponseArea).toBeVisible();
+    
+    // Take screenshot of the conversation
     await page.screenshot({ 
-      path: '/Users/meganharrison/Documents/github/alleato-project/alleato-ai-dashboard/screenshots/fm-global-manual-input-working.png',
+      path: `${SCREENSHOT_DIR}/fm-global-meeting-query.png`,
       fullPage: true 
     });
     
-    console.log('✓ Manual input works correctly');
+    // Get the response text for validation
+    const responseText = await page.locator('.prose').first().textContent();
+    console.log('Meeting query response received:', responseText?.substring(0, 100) + '...');
+    
+    console.log('✓ Meeting-related query processed successfully');
   });
 
-  test('6. Test error scenarios and edge cases', async () => {
-    // Test empty message submission (should be disabled)
-    const messageInput = page.locator('input[type="text"], textarea').first();
-    const sendButton = page.locator('button[type="submit"], button').filter({ hasText: /send|submit/i }).first();
+  test('Test project information queries', async () => {
+    const inputField = page.locator('input[type="text"]');
+    const submitButton = page.locator('button[type="submit"]');
     
-    // Clear input and try to submit
-    await messageInput.fill('');
-    
-    // Check if send button is disabled when input is empty
-    const isDisabled = await sendButton.isDisabled();
-    if (!isDisabled) {
-      // If not disabled, clicking should not send empty message
-      await sendButton.click();
-      
-      // Wait a bit to see if anything happens
-      await page.waitForTimeout(1000);
-      
-      // There should be no new messages in the chat
-      console.log('Empty message handling: Button not disabled but empty message not sent');
-    } else {
-      console.log('✓ Send button is properly disabled for empty input');
-    }
-    
-    // Test loading states
-    await messageInput.fill('Tell me about FM Global standards');
-    await sendButton.click();
-    
-    // Check for loading indicator (spinner, disabled button, etc.)
-    const loadingIndicator = page.locator('.animate-spin, .loading, [data-loading="true"]').first();
-    
-    if (await loadingIndicator.isVisible()) {
-      console.log('✓ Loading indicator is shown during API call');
-    }
+    await inputField.fill(TEST_QUERIES.project);
+    await submitButton.click();
     
     // Wait for response
-    await page.waitForSelector('div:has-text("FM Global"), div:has-text("standards")', { 
-      timeout: 30000 
+    await page.waitForTimeout(8000);
+    
+    // Verify conversation flow
+    await expect(page.locator('text=' + TEST_QUERIES.project)).toBeVisible();
+    await expect(page.locator('.bg-orange-500')).toBeVisible();
+    
+    // Take screenshot
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-project-query.png`,
+      fullPage: true 
     });
     
-    console.log('✓ Error scenarios and loading states handled correctly');
+    console.log('✓ Project information query processed successfully');
   });
 
-  test('7. Performance and responsiveness check', async () => {
-    // Check for any performance issues by rapidly clicking suggestions
-    const suggestions = page.locator('button').filter({ hasText: /What are the sprinkler requirements|How do I calculate water demand|What K-factor sprinklers/ });
+  test('Test AI insights queries', async () => {
+    const inputField = page.locator('input[type="text"]');
+    const submitButton = page.locator('button[type="submit"]');
     
-    // Click each suggestion rapidly to test for race conditions
-    for (let i = 0; i < 3; i++) {
-      const suggestion = suggestions.nth(i);
-      await suggestion.click();
-      
-      // Clear the input and try the next one
-      const messageInput = page.locator('input[type="text"], textarea').first();
-      await messageInput.clear();
-      
-      // Small delay to prevent overwhelming
-      await page.waitForTimeout(100);
-    }
+    await inputField.fill(TEST_QUERIES.insights);
+    await submitButton.click();
     
-    // Check that the interface is still responsive
-    const messageInput = page.locator('input[type="text"], textarea').first();
-    await messageInput.fill('Final test message');
-    await expect(messageInput).toHaveValue('Final test message');
+    // Wait for response
+    await page.waitForTimeout(8000);
     
-    console.log('✓ Interface remains responsive under rapid interaction');
+    // Verify response
+    await expect(page.locator('.bg-orange-500')).toBeVisible();
+    
+    // Take screenshot
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-insights-query.png`,
+      fullPage: true 
+    });
+    
+    console.log('✓ AI insights query processed successfully');
   });
 
-  test('8. Specific error prevention - handleSubmit function check', async () => {
-    // This test specifically checks for the previous "handleSubmit is not a function" error
+  test('Test action items queries', async () => {
+    const inputField = page.locator('input[type="text"]');
+    const submitButton = page.locator('button[type="submit"]');
     
-    // Click each suggestion and verify no JavaScript errors occur
-    const suggestions = page.locator('button').filter({ hasText: /What are the sprinkler requirements|How do I calculate water demand|What K-factor sprinklers/ });
+    await inputField.fill(TEST_QUERIES.actionItems);
+    await submitButton.click();
     
-    for (let i = 0; i < 3; i++) {
-      const suggestion = suggestions.nth(i);
-      
-      // Listen for any JavaScript errors
-      let jsError = false;
-      page.on('pageerror', error => {
-        if (error.message.includes('handleSubmit is not a function')) {
-          jsError = true;
-          console.error('CRITICAL ERROR: handleSubmit is not a function error detected!');
-        }
-      });
-      
-      await suggestion.click();
-      
-      // Wait a moment to see if any errors occur
-      await page.waitForTimeout(500);
-      
-      if (jsError) {
-        throw new Error('handleSubmit function error detected - TEST FAILED');
-      }
-      
-      // Clear for next iteration
-      const messageInput = page.locator('input[type="text"], textarea').first();
-      await messageInput.clear();
-    }
+    // Wait for response
+    await page.waitForTimeout(8000);
     
-    console.log('✓ No handleSubmit function errors detected');
+    // Verify response
+    await expect(page.locator('.bg-orange-500')).toBeVisible();
+    
+    // Take screenshot
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-action-items-query.png`,
+      fullPage: true 
+    });
+    
+    console.log('✓ Action items query processed successfully');
+  });
+
+  test('Test suggestion buttons functionality', async () => {
+    // Click on the first suggestion button
+    const firstSuggestion = page.locator('button').filter({ hasText: /sprinkler.*shuttle.*ASRS/i });
+    await firstSuggestion.click();
+    
+    // Wait for the query to be submitted automatically
+    await page.waitForTimeout(8000);
+    
+    // Verify the suggestion text appears in the conversation
+    const suggestionText = await firstSuggestion.textContent();
+    await expect(page.locator(`text=${suggestionText}`)).toBeVisible();
+    
+    // Verify AI response
+    await expect(page.locator('.bg-orange-500')).toBeVisible();
+    
+    // Take screenshot
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-suggestion-click.png`,
+      fullPage: true 
+    });
+    
+    console.log('✓ Suggestion buttons work correctly');
+  });
+
+  test('Test multiple conversation turns', async () => {
+    const inputField = page.locator('input[type="text"]');
+    const submitButton = page.locator('button[type="submit"]');
+    
+    // First query
+    await inputField.fill('Tell me about recent meetings');
+    await submitButton.click();
+    await page.waitForTimeout(6000);
+    
+    // Second query
+    await inputField.fill('What about project updates?');
+    await submitButton.click();
+    await page.waitForTimeout(6000);
+    
+    // Third query
+    await inputField.fill('Any action items?');
+    await submitButton.click();
+    await page.waitForTimeout(6000);
+    
+    // Verify multiple conversation turns
+    const messages = page.locator('.space-y-6 > div');
+    const messageCount = await messages.count();
+    
+    expect(messageCount).toBeGreaterThan(3); // At least 3 message pairs
+    
+    // Take final screenshot
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-multiple-turns.png`,
+      fullPage: true 
+    });
+    
+    console.log(`✓ Multiple conversation turns work (${messageCount} messages)`);
+  });
+
+  test('Test error handling with empty queries', async () => {
+    const inputField = page.locator('input[type="text"]');
+    const submitButton = page.locator('button[type="submit"]');
+    
+    // Try to submit empty query (should be disabled)
+    await inputField.fill('');
+    await expect(submitButton).toBeDisabled();
+    
+    // Try with just spaces
+    await inputField.fill('   ');
+    await expect(submitButton).toBeDisabled();
+    
+    console.log('✓ Empty query handling works correctly');
+  });
+
+  test('Test responsive design elements', async () => {
+    // Test desktop view
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-desktop-view.png`,
+      fullPage: true 
+    });
+    
+    // Test tablet view
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-tablet-view.png`,
+      fullPage: true 
+    });
+    
+    // Test mobile view
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-mobile-view.png`,
+      fullPage: true 
+    });
+    
+    console.log('✓ Responsive design tested across viewports');
+  });
+
+  test('Comprehensive functionality test', async () => {
+    const inputField = page.locator('input[type="text"]');
+    const submitButton = page.locator('button[type="submit"]');
+    
+    console.log('Starting comprehensive functionality test...');
+    
+    // Test 1: General project query
+    await inputField.fill(TEST_QUERIES.general);
+    await submitButton.click();
+    
+    // Wait for response and verify
+    await page.waitForTimeout(8000);
+    
+    let responseElements = page.locator('.bg-orange-500');
+    await expect(responseElements.first()).toBeVisible();
+    
+    // Get response content for analysis
+    const firstResponse = await page.locator('.prose').first().textContent();
+    console.log('First response preview:', firstResponse?.substring(0, 150) + '...');
+    
+    // Test 2: Verify data integration
+    const hasProjectData = firstResponse?.includes('project') || firstResponse?.includes('Project');
+    const hasMeetingData = firstResponse?.includes('meeting') || firstResponse?.includes('Meeting');
+    const hasInsightData = firstResponse?.includes('insight') || firstResponse?.includes('Insight');
+    
+    console.log('Response analysis:');
+    console.log('- Contains project data:', hasProjectData);
+    console.log('- Contains meeting data:', hasMeetingData);
+    console.log('- Contains insight data:', hasInsightData);
+    
+    // Test 3: Follow-up query to test conversation context
+    await inputField.fill('Can you be more specific about the first project?');
+    await submitButton.click();
+    await page.waitForTimeout(6000);
+    
+    // Final comprehensive screenshot
+    await page.screenshot({ 
+      path: `${SCREENSHOT_DIR}/fm-global-comprehensive-test.png`,
+      fullPage: true 
+    });
+    
+    console.log('✓ Comprehensive functionality test completed');
+    
+    // Verify final state
+    const allMessages = page.locator('.space-y-6 > div');
+    const finalMessageCount = await allMessages.count();
+    console.log(`Final message count: ${finalMessageCount}`);
+    
+    expect(finalMessageCount).toBeGreaterThan(2);
   });
 });

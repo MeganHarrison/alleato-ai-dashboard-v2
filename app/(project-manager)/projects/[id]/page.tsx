@@ -9,6 +9,7 @@ import { AlertCircle, CheckCircle2, XCircle } from "lucide-react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { DocumentsTable } from "./DocumentsTable";
+import { InsightsSection } from "./InsightsSection";
 
 export const dynamic = "force-dynamic";
 
@@ -191,10 +192,10 @@ export default async function ProjectDetailPage({
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen px-8 lg:px-12 py-6">
       {/* Modern Header Section */}
       <div>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto px-6 sm:px-8 lg:px-12 py-8">
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl pb-4 font-medium text-gray-900">
@@ -249,26 +250,26 @@ export default async function ProjectDetailPage({
                 Project Details
               </h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
                   <span className="text-sm text-gray-600">Start Date:</span>
                   <span className="text-sm font-medium text-gray-900">
                     {formatDate(project["start date"])}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
                   <span className="text-sm text-gray-600">Est Revenue:</span>
                   <span className="text-sm font-medium text-gray-900">
                     {formatCurrency(project["est revenue"])}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
                   <span className="text-sm text-gray-600">Est Profit:</span>
                   <span className="text-sm font-medium text-gray-900">
                     {formatCurrency(project["est profit"])}
                   </span>
                 </div>
                 {project["est completion date"] && (
-                  <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                  <div className="flex items-center gap-4 pt-2 border-t border-gray-200">
                     <span className="text-sm text-gray-600">
                       Est Completion:
                     </span>
@@ -283,165 +284,39 @@ export default async function ProjectDetailPage({
         </div>
       </div>
 
-      {/* Two Column Layout for Summary and Details - Even Width */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mt-6">
-        {/* Summary Column - 50% width */}
-        <div>
-          {/* Activity Feed */}
-          <Card className="lg:col-span-4 bg-white">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-semibold tracking-[0.1em] uppercase">
-                Project Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <h6>Meeting Name: Sep 5, 2025</h6>
-              <div className="pt-4 space-y-4 max-h-80 overflow-y-auto">
-                {[
-                  {
-                    time: "25/06/2025 09:29",
-                    user: "Sarah Chen",
-                    action: "completed project milestone in",
-                    location: "Berlin Office",
-                    target: null,
-                  },
-                  {
-                    time: "25/06/2025 08:12",
-                    user: "Marcus Rivera",
-                    action: "delivered client presentation in",
-                    location: "Cairo Branch",
-                    target: null,
-                  },
-                  {
-                    time: "24/06/2025 22:55",
-                    user: "Elena Volkov",
-                    action: "lost connection during meeting in",
-                    location: "Havana Office",
-                    target: null,
-                  },
-                  {
-                    time: "24/06/2025 21:33",
-                    user: "James Park",
-                    action: "initiated research project in",
-                    location: "Tokyo Hub",
-                    target: null,
-                  },
-                  {
-                    time: "24/06/2025 19:45",
-                    user: "Alex Thompson",
-                    action: "updated security protocols in",
-                    location: "Moscow Center",
-                    target: "Data Systems",
-                  },
-                ].map((log, index) => (
-                  <div
-                    key={index}
-                    className="border-l-2 border-amber-400/50 pl-4 p-3 rounded-r-lg transition-all duration-200"
-                  >
-                    <div className="text-xs mb-1">{log.time}</div>
-                    <div className="text-sm leading-relaxed">
-                      <span className="text-brand font-medium">{log.user}</span>{" "}
-                      {log.action} <span>{log.location}</span>
-                      {log.target && (
-                        <span>
-                          {" "}
-                          with{" "}
-                          <span className="text-amber-400 font-medium">
-                            {log.target}
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Activity Column - 50% width */}
-        <div className="p-2">
-          <div className="mx-auto sm:px-2 lg:px-2 py-2">
-            <div className="flex items-center gap-3">
-              <h2 className="text-lg text-gray-900">Meetings</h2>
-              <Badge variant="secondary" className="rounded-full">
-                {documents.length}
-              </Badge>
-            </div>
-            <div className="p-6">
-              <DocumentsTable documents={documents} projectId={parseInt(id)} />
-            </div>
-          </div>
-        </div>
+      {/* Insights Feed - Moved Above Meetings */}
+      <div className="my-8">
+        <Card className="lg:col-span-4 bg-white">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-sm font-semibold tracking-[0.1em] uppercase">
+              Project Insights
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <InsightsSection 
+              meetingInsights={safeInsights}
+              projectInsights={projectInsights}
+              aiInsights={aiInsights}
+            />
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Modern Insights Section */}
-      {(safeInsights.length > 0 ||
-        projectInsights.length > 0 ||
-        aiInsights.length > 0) && (
-        <div className="space-y-6">
-          {/* AI-Generated Insights */}
-          {aiInsights.length > 0 && (
-            <div>
-              <div className="px-6 py-6">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-md font-medium text-gray-900">
-                    Project Insights
-                  </h3>
-                  <Badge variant="secondary" className="rounded-full text-xs">
-                    {aiInsights.length}
-                  </Badge>
-                </div>
-              </div>
-              <div className="p-6 space-y-4">
-                {aiInsights.slice(0, 5).map((insight) => (
-                  <div
-                    key={insight.id}
-                    className="p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                  >
-                    {/* First Row: Title, Type, and Priority */}
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-sm text-gray-900">
-                        {insight.title}
-                      </h4>
-                      <div className="flex items-center gap-2">
-                        {insight.insight_type && (
-                          <Badge
-                            variant="outline"
-                            className="capitalize text-xs"
-                          >
-                            {insight.insight_type}
-                          </Badge>
-                        )}
-                        {insight.severity && (
-                          <Badge
-                            className={cn(
-                              "text-xs",
-                              insight.severity === "high" &&
-                                "bg-red-100 text-red-700",
-                              insight.severity === "medium" &&
-                                "bg-yellow-100 text-yellow-700",
-                              insight.severity === "low" &&
-                                "bg-green-100 text-green-700"
-                            )}
-                          >
-                            {insight.severity}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Second Row: Summary/Description */}
-                    <p className="text-sm text-gray-600">
-                      {insight.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
+      {/* Meetings Feed - Now Below Insights */}
+      <div className="mb-8">
+        <Card className="lg:col-span-4 bg-white">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-sm font-semibold tracking-[0.1em] uppercase">
+              Project Meetings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-2">
+              <DocumentsTable documents={documents} projectId={parseInt(id)} />
             </div>
-          )}
-        </div>
-      )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

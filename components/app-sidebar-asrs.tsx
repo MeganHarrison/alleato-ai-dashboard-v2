@@ -1,5 +1,5 @@
-import * as React from "react";
 import { GalleryVerticalEnd } from "lucide-react";
+import * as React from "react";
 
 import {
   Sidebar,
@@ -20,7 +20,7 @@ const data = {
   navMain: [
     {
       title: "Table of Contents",
-      url: "/fm-global-8-34",
+      url: "/toc",
       items: [
         {
           title: "1.1 Changes",

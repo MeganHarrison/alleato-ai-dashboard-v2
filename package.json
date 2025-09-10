@@ -111,6 +111,7 @@
     "embla-carousel-react": "8.5.1",
     "framer-motion": "^12.23.12",
     "input-otp": "1.4.1",
+    "langsmith": "^0.3.67",
     "lucide-react": "^0.454.0",
     "marked": "^16.2.1",
     "nanoid": "^5.0.9",

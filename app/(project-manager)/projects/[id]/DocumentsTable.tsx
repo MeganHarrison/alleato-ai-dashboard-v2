@@ -103,7 +103,6 @@ export function DocumentsTable({
       const updateData: any = {
         title: editedDocument.title,
         date: editedDocument.date,
-        summary: editedDocument.summary,
         project: editedDocument.project,
       };
 
@@ -210,25 +209,18 @@ export function DocumentsTable({
         <Table>
           <TableHeader className="bg-gray-50/50">
             <TableRow className="border-b border-gray-200 hover:bg-transparent">
-              <TableHead className="w-[25%] font-semibold text-gray-900 px-6 py-4">
+              <TableHead className="w-[35%] font-semibold text-gray-900 px-6 py-4">
                 Title
               </TableHead>
-              <TableHead className="w-[12%] font-semibold text-gray-900 px-4 py-4">
+              <TableHead className="w-[20%] font-semibold text-gray-900 px-4 py-4">
                 Date
               </TableHead>
               {!projectId && (
-                <TableHead className="w-[18%] font-semibold text-gray-900 px-4 py-4">
+                <TableHead className="w-[25%] font-semibold text-gray-900 px-4 py-4">
                   Project
                 </TableHead>
               )}
-              <TableHead
-                className={`${
-                  projectId ? "w-[45%]" : "w-[30%]"
-                } font-semibold text-gray-900 px-4 py-4`}
-              >
-                Summary
-              </TableHead>
-              <TableHead className="w-[15%] text-center font-semibold text-gray-900 px-6 py-4">
+              <TableHead className="w-[20%] text-center font-semibold text-gray-900 px-6 py-4">
                 Actions
               </TableHead>
             </TableRow>
@@ -237,7 +229,7 @@ export function DocumentsTable({
             {documents.length === 0 ? (
               <TableRow className="hover:bg-transparent">
                 <TableCell
-                  colSpan={projectId ? 4 : 5}
+                  colSpan={projectId ? 3 : 4}
                   className="text-center py-12 text-gray-500"
                 >
                   <div className="flex flex-col items-center gap-2">
@@ -339,27 +331,6 @@ export function DocumentsTable({
                         )}
                       </TableCell>
                     )}
-
-                    <TableCell className="px-4 py-4">
-                      {isEditing ? (
-                        <Textarea
-                          value={currentDocument.summary || ""}
-                          onChange={(e) =>
-                            handleFieldChange("summary", e.target.value)
-                          }
-                          className="w-full min-h-[60px] text-xs"
-                          placeholder="Enter summary..."
-                        />
-                      ) : (
-                        <div className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                          {document.summary || (
-                            <span className="text-gray-400 italic">
-                              No summary
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </TableCell>
 
                     <TableCell className="px-6 py-4">
                       {isEditing ? (

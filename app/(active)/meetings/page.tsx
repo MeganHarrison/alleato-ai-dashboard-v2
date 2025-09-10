@@ -82,7 +82,6 @@ const COLUMNS = [
   { id: "title", label: "Title", defaultVisible: true },
   { id: "date", label: "Date", defaultVisible: true },
   { id: "project", label: "Project", defaultVisible: true },
-  { id: "summary", label: "Summary", defaultVisible: true },
 ];
 
 export default function MeetingsPage() {
@@ -170,7 +169,6 @@ export default function MeetingsPage() {
     return documents.filter(doc => {
       const matchesSearch = 
         doc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doc.project?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesProject = projectFilter === 'all' || 
@@ -185,7 +183,6 @@ export default function MeetingsPage() {
     setEditData({
       title: document.title,
       date: document.date,
-      summary: document.summary,
       project_id: document.project_id,
       project: document.project,
     });
@@ -207,7 +204,6 @@ export default function MeetingsPage() {
             ...editingDocument.metadata,
             title: editData.title,
             date: editData.date,
-            summary: editData.summary,
             project_id: editData.project_id,
             project: editData.project
           }
@@ -284,12 +280,11 @@ export default function MeetingsPage() {
   };
 
   const exportToCSV = () => {
-    const headers = ['Title', 'Date', 'Project', 'Summary'];
+    const headers = ['Title', 'Date', 'Project'];
     const rows = filteredDocuments.map(d => [
       d.title || '',
       d.date ? format(new Date(d.date), 'yyyy-MM-dd') : '',
-      d.project || projects.find(p => p.id === d.project_id)?.name || '',
-      d.summary || ''
+      d.project || projects.find(p => p.id === d.project_id)?.name || ''
     ]);
     
     const csvContent = [headers, ...rows]
@@ -406,14 +401,13 @@ export default function MeetingsPage() {
                 {visibleColumns.has('title') && <TableHead>Title</TableHead>}
                 {visibleColumns.has('date') && <TableHead>Date</TableHead>}
                 {visibleColumns.has('project') && <TableHead>Project</TableHead>}
-                {visibleColumns.has('summary') && <TableHead>Summary</TableHead>}
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredDocuments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={4} className="text-center text-muted-foreground">
                     No meetings found
                   </TableCell>
                 </TableRow>
@@ -444,13 +438,6 @@ export default function MeetingsPage() {
                             {document.project || projects.find(p => p.id === document.project_id)?.name}
                           </Badge>
                         )}
-                      </TableCell>
-                    )}
-                    {visibleColumns.has('summary') && (
-                      <TableCell>
-                        <div className="text-sm text-muted-foreground line-clamp-2">
-                          {document.summary || '—'}
-                        </div>
                       </TableCell>
                     )}
                     <TableCell className="text-right">
@@ -556,15 +543,6 @@ export default function MeetingsPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Summary</label>
-              <Textarea
-                value={editData.summary || ''}
-                onChange={(e) => setEditData({ ...editData, summary: e.target.value })}
-                placeholder="Enter meeting summary..."
-                rows={4}
-              />
             </div>
           </div>
           <DialogFooter>

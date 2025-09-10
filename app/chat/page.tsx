@@ -8,13 +8,13 @@ import {
 import { Message, MessageContent } from '@/components/ai-elements/message';
 import {
   PromptInput,
-  PromptInputActionAddAttachments,
-  PromptInputActionMenu,
-  PromptInputActionMenuContent,
-  PromptInputActionMenuTrigger,
-  PromptInputAttachment,
-  PromptInputAttachments,
-  PromptInputBody,
+  // PromptInputActionAddAttachments,
+  // PromptInputActionMenu,
+  // PromptInputActionMenuContent,
+  // PromptInputActionMenuTrigger,
+  // PromptInputAttachment,
+  // PromptInputAttachments,
+  // PromptInputBody,
   PromptInputButton,
   type PromptInputMessage,
   PromptInputModelSelect,
@@ -172,23 +172,23 @@ const ChatBotDemo = () => {
         </Conversation>
 
         <PromptInput onSubmit={handleSubmit} className="mt-4" globalDrop multiple>
-          <PromptInputBody>
+          {/* <PromptInputBody>
             <PromptInputAttachments>
               {(attachment) => <PromptInputAttachment data={attachment} />}
-            </PromptInputAttachments>
+            </PromptInputAttachments> */}
             <PromptInputTextarea
               onChange={(e) => setInput(e.target.value)}
               value={input}
             />
-          </PromptInputBody>
+          {/* </PromptInputBody> */}
           <PromptInputToolbar>
             <PromptInputTools>
-              <PromptInputActionMenu>
+              {/* <PromptInputActionMenu>
                 <PromptInputActionMenuTrigger />
                 <PromptInputActionMenuContent>
                   <PromptInputActionAddAttachments />
                 </PromptInputActionMenuContent>
-              </PromptInputActionMenu>
+              </PromptInputActionMenu> */}
               <PromptInputButton
                 variant={webSearch ? 'default' : 'ghost'}
                 onClick={() => setWebSearch(!webSearch)}

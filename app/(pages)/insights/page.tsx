@@ -10,10 +10,17 @@ export const metadata: Metadata = {
 export default async function InsightsPage() {
   const supabase = await createClient();
 
-  // Fetch all insights - simplified query without foreign key constraints
+  // Fetch all insights with project information
   const { data: allInsights, error: insightsError } = await supabase
     .from('ai_insights')
-    .select('*')
+    .select(`
+      *,
+      projects!ai_insights_project_id_fkey (
+        id,
+        name,
+        phase
+      )
+    `)
     .order('created_at', { ascending: false })
     .limit(500);  // Increased limit to get more insights
   
@@ -24,6 +31,21 @@ export default async function InsightsPage() {
   console.log('Fetched insights count:', allInsights?.length || 0);
   if (allInsights && allInsights.length > 0) {
     console.log('Sample insight:', allInsights[0]);
+  }
+
+  // Fetch documents for insights that have document_id
+  const documentIds = [...new Set(allInsights?.map(i => i.document_id).filter(Boolean) || [])];
+  let documentsMap = new Map();
+  
+  if (documentIds.length > 0) {
+    const { data: documents } = await supabase
+      .from('documents')
+      .select('id, title, created_at')
+      .in('id', documentIds);
+    
+    documents?.forEach(doc => {
+      documentsMap.set(doc.id, doc);
+    });
   }
 
   // Process insights - parse JSON description if needed
@@ -43,13 +65,21 @@ export default async function InsightsPage() {
       }
     }
     
+    // Get document info if available
+    const documentInfo = insight.document_id ? documentsMap.get(insight.document_id) : null;
+    
     return {
       ...insight,
       description: parsedDescription,
       metadata: metadata,
-      document: {
+      document: documentInfo ? {
+        id: documentInfo.id,
+        title: documentInfo.title,
+        source: 'Document',
+        created_at: documentInfo.created_at
+      } : {
         id: insight.document_id || insight.meeting_id || '',
-        title: insight.meeting_name || insight.title || 'Untitled',
+        title: insight.meeting_name || 'Untitled',
         source: insight.source_meetings || 'Unknown',
         created_at: insight.created_at
       }

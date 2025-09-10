@@ -71,7 +71,8 @@ export default function RAGChatInterface() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/pm-rag-local', {
+      // Try the fallback endpoint that doesn't require vector functions
+      const response = await fetch('/api/pm-rag-fallback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
