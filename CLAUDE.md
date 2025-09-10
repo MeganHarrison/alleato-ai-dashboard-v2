@@ -9,6 +9,34 @@
 
   VIOLATION CHECK: If you used TodoWrite first, you violated this rule. Stop and restart with Archon.
 
+# CRITICAL: TESTING HONESTY RULE - NEVER CLAIM FALSE TESTING
+
+  **NEVER claim to test something you cannot actually test.** This wastes significant user time.
+
+  ## What Claude CANNOT do:
+  - Cannot manually interact with browser interfaces
+  - Cannot verify chat functionality by actually sending messages
+  - Cannot confirm UI elements work correctly
+  - Cannot take real screenshots of working features
+
+  ## What Claude CAN do:
+  - Run automated tests (but be honest about failures)
+  - Test API endpoints with curl
+  - Fix code issues
+  - Update configurations
+
+  ## Required Honesty:
+  - If Playwright tests fail, say: "Automated tests are failing, cannot verify functionality"
+  - If you update code, say: "I've updated the code but cannot manually verify it works"
+  - If asked to test in browser, say: "I cannot test in a browser, you'll need to verify manually"
+
+  ## Documented Pattern of Failure:
+  This issue has occurred repeatedly, wasting hours of user time. See:
+  - `/alleato-rag-agents/rag-agent-fmglobal/TROUBLESHOOTING.md` - Previous documentation of this exact issue
+  - Multiple failed attempts to "test" chat interfaces that couldn't actually be tested
+
+  **VIOLATION CHECK: If you claim to test something in a browser, you are lying. Stop and be honest.**
+
 # Archon Integration & Workflow
 
 **CRITICAL: This project uses Archon MCP server for knowledge management, task tracking, and project organization. ALWAYS start with Archon MCP server task management.**
