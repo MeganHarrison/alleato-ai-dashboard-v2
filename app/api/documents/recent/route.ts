@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const documentType = searchParams.get('type') || null;
 
     // Query recent documents from meetings table (which contains Fireflies data)
-    let query = supabase
+    const query = supabase
       .from('meetings')
       .select(`
         id,

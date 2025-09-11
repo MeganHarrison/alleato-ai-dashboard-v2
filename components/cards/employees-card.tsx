@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { format } from 'date-fns'
 
 interface EmployeeCardProps {
-  employee: any
+  employee: unknown
 }
 
 export function EmployeeCard({ employee }: EmployeeCardProps) {

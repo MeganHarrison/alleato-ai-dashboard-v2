@@ -29,7 +29,7 @@ interface Insight {
   assignee?: string;
   due_date?: string;
   financial_impact?: string;
-  metadata?: any;
+  metadata?: unknown;
   created_at: string;
   document?: {
     id: string;

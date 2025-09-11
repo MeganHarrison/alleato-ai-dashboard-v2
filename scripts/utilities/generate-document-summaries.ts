@@ -24,7 +24,7 @@ interface DocumentWithChunks {
   id: string;
   title: string;
   summary: string | null;
-  metadata: any;
+  metadata: unknown;
   chunks?: Array<{
     content: string;
     chunk_index: number;
@@ -161,10 +161,10 @@ async function generateAllSummaries() {
   
   // Process in batches
   const BATCH_SIZE = 5;
-  let successCount = 0;
-  let errorCount = 0;
+  const successCount = 0;
+  const errorCount = 0;
   
-  for (let i = 0; i < documents.length; i += BATCH_SIZE) {
+  for (const i = 0; i < documents.length; i += BATCH_SIZE) {
     const batch = documents.slice(i, i + BATCH_SIZE);
     const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
     const totalBatches = Math.ceil(documents.length / BATCH_SIZE);

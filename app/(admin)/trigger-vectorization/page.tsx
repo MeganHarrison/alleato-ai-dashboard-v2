@@ -45,7 +45,7 @@ export default function TriggerVectorizationPage() {
       
       if (response.ok) {
         const data = await response.json()
-        setDetails((prev: any) => ({ ...prev, status: data }))
+        setDetails((prev: unknown) => ({ ...(prev as object), status: data }))
       }
     } catch (error) {
       console.error('Status check failed:', error)

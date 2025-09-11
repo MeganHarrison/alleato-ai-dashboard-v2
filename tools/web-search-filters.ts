@@ -43,7 +43,7 @@ async function main() {
       ) {
         console.log(
           JSON.stringify(
-            item.providerData.action.sources.map((s: any) => s.url),
+            item.providerData.action.sources.map((s: unknown) => s.url),
             null,
             2,
           ),

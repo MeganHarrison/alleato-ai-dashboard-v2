@@ -110,7 +110,7 @@ How can I help you today?`
                 {/* Render insights if present in metadata */}
                 {message.role === 'assistant' && message.metadata?.insights && (
                   <div className="mt-4 space-y-2">
-                    {message.metadata.insights.map((insight: any, idx: number) => (
+                    {message.metadata.insights.map((insight: unknown, idx: number) => (
                       <Card key={idx} className="p-3">
                         <div className="flex items-start gap-2">
                           {insight.type === 'risk' && <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5" />}

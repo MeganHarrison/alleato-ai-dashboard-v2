@@ -32,8 +32,8 @@ export default function RAGChatInterface() {
       timestamp: new Date(),
     }
   ]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [input] = useState($2);
+  const [loading] = useState($2);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -99,7 +99,7 @@ export default function RAGChatInterface() {
         role: 'assistant',
         content: data.message || data.response || 'I couldn\'t find relevant information for your query.',
         timestamp: new Date(),
-        sources: data.metadata?.sources?.map((source: any) => ({
+        sources: data.metadata?.sources?.map((source: unknown) => ({
           meeting_id: source.meeting_id || source,
           title: source.title || source,
           date: source.date || new Date().toISOString(),

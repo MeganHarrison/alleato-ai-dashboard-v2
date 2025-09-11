@@ -60,7 +60,7 @@ export const Reasoning = memo(
       defaultProp: 0,
     });
 
-    const [hasAutoClosedRef, setHasAutoClosedRef] = useState(false);
+    const [hasAutoClosedRef] = useState($2);
     const [startTime, setStartTime] = useState<number | null>(null);
 
     // Track duration when streaming starts and ends

@@ -4,7 +4,7 @@ import { DataTable } from "@/components/tables/database-table";
 import { formatDate } from "@/utils/format";
 
 interface ProjectsTableProps {
-  projects: any[];
+  projects: unknown[];
 }
 
 export function ProjectsTable({ projects }: ProjectsTableProps) {

@@ -69,7 +69,7 @@ async function cleanupExistingDuplicates() {
   if (duplicateIds.length > 0) {
     // Delete duplicates in batches
     const batchSize = 100;
-    for (let i = 0; i < duplicateIds.length; i += batchSize) {
+    for (const i = 0; i < duplicateIds.length; i += batchSize) {
       const batch = duplicateIds.slice(i, i + batchSize);
       const { error: deleteError } = await supabase
         .from('ai_insights')

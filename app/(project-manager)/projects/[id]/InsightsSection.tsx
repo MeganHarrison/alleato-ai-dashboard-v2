@@ -29,8 +29,8 @@ interface Insight {
 
 interface InsightsSectionProps {
   meetingInsights: Insight[];
-  projectInsights: any[];
-  aiInsights: any[];
+  projectInsights: unknown[];
+  aiInsights: unknown[];
 }
 
 export function InsightsSection({ 
@@ -38,7 +38,7 @@ export function InsightsSection({
   projectInsights = [], 
   aiInsights = [] 
 }: InsightsSectionProps) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage] = useState($2);
   const itemsPerPage = 20;
 
   // Combine all insights and sort by date

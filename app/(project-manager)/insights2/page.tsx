@@ -42,7 +42,7 @@ interface Meeting {
 export default function AIDashboard(): ReactElement {
   const [activeTab, setActiveTab] = useState<TabType>("today");
   const [insights, setInsights] = useState<Insight[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState($2);
   const [error, setError] = useState<string | null>(null);
 
   // Function to map database insight types to UI types

@@ -9,11 +9,11 @@ import { Search, ChevronLeft, ChevronRight, Database } from "lucide-react"
 interface Column {
   key: string
   label: string
-  format?: (value: any) => string | ReactElement
+  format?: (value: unknown) => string | ReactElement
 }
 
 interface DataTableProps {
-  data: any[]
+  data: unknown[]
   columns?: Column[] | string[]
   pageSize?: number
 }
@@ -112,7 +112,7 @@ export function DataTable({ data = [], columns, pageSize = 10 }: DataTableProps)
                     <p>No results found.</p>
                     {searchTerm && (
                       <p className="text-sm mt-1">
-                        Try adjusting your search or filters to find what you&apos;re looking for.
+                        Try adjusting your search or filters to find what you're looking for.
                       </p>
                     )}
                   </div>

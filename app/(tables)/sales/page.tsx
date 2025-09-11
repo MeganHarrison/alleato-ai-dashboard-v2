@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/page-header";
 export const dynamic = "force-dynamic";
 
 export default async function SalesPage() {
-  const sales: any[] = []; // Temporarily disabled due to missing table: (await getTableData("sales")) || [];
+  const sales: unknown[] = []; // Temporarily disabled due to missing table: (await getTableData("sales")) || [];
 
   // If no data, provide sample data
   const sampleData = sales.length

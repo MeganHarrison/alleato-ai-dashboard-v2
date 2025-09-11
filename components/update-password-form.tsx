@@ -19,9 +19,9 @@ export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [password, setPassword] = useState("");
+  const [password] = useState($2);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState($2);
   const router = useRouter();
 
   const handleForgotPassword = async (e: React.FormEvent) => {

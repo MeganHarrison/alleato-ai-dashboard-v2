@@ -1,761 +1,564 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { DollarSign, AlertTriangle, TrendingUp, XCircle, HelpCircle } from 'lucide-react';
 
-const FMGlobalRequirementsForm = () => {
+interface ASRSFormData {
+  asrs_type?: 'Shuttle' | 'Mini-Load' | 'Horizontal Carousel';
+  container_type?: 'Closed-Top' | 'Open-Top' | 'Mixed';
+  rack_depth_ft?: number;
+  rack_spacing_ft?: number;
+  ceiling_height_ft?: number;
+  aisle_width_ft?: number;
+  commodity_type?: string[];
+  storage_height_ft?: number;
+  system_type?: 'wet' | 'dry' | 'both';
+  building_type?: string;
+  sprinkler_coverage?: 'standard' | 'extended';
+  expected_throughput?: 'low' | 'medium' | 'high';
+}
+
+interface FormQuestion {
+  id: keyof ASRSFormData;
+  type: 'select' | 'number' | 'multiselect' | 'radio';
+  question: string;
+  options?: { value: unknown; label: string; description?: string }[];
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
+  required: boolean;
+  helpText?: string;
+  conditional?: (data: ASRSFormData) => boolean;
+  validation?: (value: unknown) => string | null;
+}
+
+export default function ASRSRequirementsForm() {
+  const [formData, setFormData] = useState<ASRSFormData>({});
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    // Basic Project Info
-    projectName: '',
-    companyName: '',
-    contactEmail: '',
-    
-    // ASRS Classification (Step 1)
-    asrsType: '',
-    systemType: '',
-    
-    // Container Configuration (Step 2) 
-    containerMaterial: '',
-    containerConfiguration: '',
-    containerWallType: '',
-    containerBottomType: 'solid',
-    
-    // Physical Dimensions (Step 3)
-    storageHeightFt: '',
-    ceilingHeightFt: '',
-    aisleWidthFt: '',
-    rackRowDepthFt: '',
-    numberOfLevels: '',
-    tierHeightIn: '',
-    
-    // Commodity Information (Step 4)
-    commodityClass: '',
-    plasticType: '',
-    specialHazards: [] as string[],
-    
-    // Environmental Conditions (Step 5)
-    ambientTemp: 'ambient',
-    buildingType: 'noncombustible',
-    ventilationType: 'natural',
-    
-    // System Requirements (Step 6)
-    preferredSystem: 'wet',
-    availablePressurePsi: '',
-    budgetRange: ''
-  });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [designResult, setDesignResult] = useState<any>(null);
+  
 
-  const [recommendations, setRecommendations] = useState<Array<{
-    type: string;
-    title: string;
-    message: string;
-    impact: string;
-    costImpact: string;
-  }>>([]);
-  const [costAnalysis, setCostAnalysis] = useState<{
-    baseCost: number;
-    complexity: number;
-    estimatedCost: number;
-    confidence: string;
-  } | null>(null);
-  const [optimizationSuggestions, setOptimizationSuggestions] = useState<Array<{
-    type: string;
-    title: string;
-    description: string;
-    savings: string;
-    feasibility: string;
-    implementationEffort: string;
-  }>>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiResults, setApiResults] = useState<Record<string, unknown> | null>(null);
-
-  // API endpoint - replace with your deployed worker URL
-  const API_BASE_URL = 'https://fm-global-asrs-api-production.megan-d14.workers.dev';
-
-  const generateRecommendations = () => {
-    const recs = [];
-    
-    // Container configuration impact
-    if (formData.containerConfiguration === 'open_top' && formData.containerMaterial === 'combustible') {
-      recs.push({
-        type: 'warning',
-        title: 'High-Cost Configuration Detected',
-        message: 'Open-top combustible containers typically require in-rack sprinklers, significantly increasing costs.',
-        impact: 'high',
-        costImpact: '$75,000 - $200,000'
-      });
-    }
-    
-    // Height threshold warnings
-    if (parseInt(formData.storageHeightFt) > 20) {
-      recs.push({
-        type: 'info',
-        title: 'Enhanced Protection Required',
-        message: 'Storage heights >20ft may trigger enhanced protection requirements.',
-        impact: 'medium',
-        costImpact: '$25,000 - $75,000'
-      });
-    }
-    
-    // Aisle width optimization
-    if (parseInt(formData.aisleWidthFt) === 7) {
-      recs.push({
-        type: 'optimization',
-        title: 'Aisle Width Optimization Opportunity',
-        message: 'Consider 6ft or 8ft aisle width - 7ft may not provide optimal protection requirements.',
-        impact: 'medium',
-        costImpact: 'Potential $15,000 savings'
-      });
-    }
-    
-    setRecommendations(recs);
-  };
-
-  const analyzeCostImpact = () => {
-    let baseCost = 50000; // Base ceiling system cost
-    let complexity = 1;
-    
-    // ASRS type impact
-    if (formData.asrsType === 'mini_load') complexity *= 1.3;
-    if (formData.asrsType === 'top_loading') complexity *= 1.1;
-    
-    // Container configuration impact
-    if (formData.containerConfiguration === 'open_top') {
-      baseCost += 100000; // In-rack sprinklers
-      complexity *= 1.5;
-    }
-    
-    // Height impact
-    const height = parseInt(formData.storageHeightFt) || 15;
-    if (height > 30) complexity *= 1.4;
-    else if (height > 20) complexity *= 1.2;
-    
-    // Material impact
-    if (formData.containerMaterial === 'expanded_plastic') complexity *= 1.6;
-    else if (formData.containerMaterial === 'combustible') complexity *= 1.3;
-    
-    const estimatedCost = Math.round(baseCost * complexity);
-    
-    setCostAnalysis({
-      baseCost: baseCost,
-      complexity: complexity,
-      estimatedCost: estimatedCost,
-      confidence: complexity < 1.5 ? 'high' : complexity < 2 ? 'medium' : 'low'
-    });
-  };
-
-  const findOptimizationOpportunities = () => {
-    const suggestions = [];
-    
-    // Container optimization
-    if (formData.containerConfiguration === 'open_top') {
-      suggestions.push({
-        type: 'container_change',
-        title: 'Switch to Closed-Top Containers',
-        description: 'Closed-top containers eliminate in-rack sprinkler requirements',
-        savings: '$75,000 - $150,000',
-        feasibility: 'medium',
-        implementationEffort: 'Product packaging redesign required'
-      });
-    }
-    
-    // System type optimization
-    if (formData.preferredSystem === 'dry' && formData.ambientTemp === 'heated') {
-      suggestions.push({
-        type: 'system_change',
-        title: 'Consider Wet System',
-        description: 'Wet systems typically require fewer sprinklers in heated environments',
-        savings: '$15,000 - $35,000',
-        feasibility: 'high',
-        implementationEffort: 'Low - design change only'
-      });
-    }
-    
-    // Height optimization
-    const height = parseInt(formData.storageHeightFt);
-    if (height > 20 && height < 25) {
-      suggestions.push({
-        type: 'height_reduction',
-        title: 'Reduce Storage Height to 20ft',
-        description: 'Staying under 20ft threshold simplifies protection requirements',
-        savings: '$25,000 - $50,000',
-        feasibility: 'medium',
-        implementationEffort: 'Rack reconfiguration required'
-      });
-    }
-    
-    setOptimizationSuggestions(suggestions);
-  };
-
-  const getApplicableTables = () => {
-    // This would normally query your FM Global tables based on current config
-    const tables = [];
-    
-    if (formData.asrsType === 'mini_load') {
-      if (formData.containerConfiguration === 'closed_top') {
-        tables.push({ number: 4, title: 'Mini-Load ASRS Ceiling Protection', confidence: 95 });
-        tables.push({ number: 15, title: 'Enhanced Protection Requirements', confidence: 78 });
-      } else if (formData.containerConfiguration === 'open_top') {
-        tables.push({ number: 26, title: 'In-Rack Sprinkler Requirements', confidence: 90 });
-        tables.push({ number: 41, title: 'Combined Ceiling + In-Rack Protection', confidence: 85 });
+  const questions: FormQuestion[] = [
+    {
+      id: 'asrs_type',
+      type: 'select',
+      question: 'What type of ASRS system are you implementing?',
+      options: [
+        { 
+          value: 'Shuttle', 
+          label: 'Shuttle ASRS', 
+          description: 'Horizontal loading mechanism with shuttle carriers. Best for high-density storage.' 
+        },
+        { 
+          value: 'Mini-Load', 
+          label: 'Mini-Load ASRS', 
+          description: 'Vertical loading for smaller items. Ideal for parts and components.' 
+        },
+        { 
+          value: 'Horizontal Carousel', 
+          label: 'Horizontal Carousel', 
+          description: 'Rotating carousel system for medium-density applications.' 
+        }
+      ],
+      required: true,
+      helpText: 'This determines the applicable FM Global 8-34 protection requirements and design tables.'
+    },
+    {
+      id: 'container_type',
+      type: 'select',
+      question: 'What type of containers will be stored in the ASRS?',
+      options: [
+        { 
+          value: 'Closed-Top', 
+          label: 'Closed-Top Containers', 
+          description: 'Fully enclosed storage containers - Lower fire protection requirements' 
+        },
+        { 
+          value: 'Open-Top', 
+          label: 'Open-Top Containers', 
+          description: 'Open containers or exposed products - Higher protection requirements' 
+        },
+        { 
+          value: 'Mixed', 
+          label: 'Mixed Container Types', 
+          description: 'Combination of closed and open containers - Most complex protection scheme' 
+        }
+      ],
+      required: true,
+      conditional: (data) => !!data.asrs_type,
+      helpText: 'Container type significantly impacts sprinkler design and protection scheme selection.'
+    },
+    {
+      id: 'rack_depth_ft',
+      type: 'number',
+      question: 'What is the maximum rack depth in feet?',
+      min: 3,
+      max: 25,
+      step: 0.5,
+      unit: 'feet',
+      required: true,
+      conditional: (data) => !!data.container_type,
+      helpText: 'Rack depth determines figure selection and sprinkler arrangement requirements.',
+      validation: (value) => {
+        const numValue = Number(value);
+        if (numValue < 3) return 'Minimum rack depth is 3 feet per FM Global requirements';
+        if (numValue > 25) return 'Rack depths over 25 feet require special engineering review';
+        return null;
       }
+    },
+    {
+      id: 'rack_spacing_ft',
+      type: 'number',
+      question: 'What is the rack spacing (aisle width between racks)?',
+      min: 2.5,
+      max: 8,
+      step: 0.5,
+      unit: 'feet',
+      required: true,
+      conditional: (data) => !!data.rack_depth_ft,
+      helpText: 'Spacing affects sprinkler coverage patterns and hydraulic design requirements.'
+    },
+    {
+      id: 'ceiling_height_ft',
+      type: 'number',
+      question: 'What is the ceiling height?',
+      min: 15,
+      max: 45,
+      step: 1,
+      unit: 'feet',
+      required: true,
+      conditional: (data) => !!data.rack_spacing_ft,
+      helpText: 'Ceiling height determines sprinkler K-factor requirements and design area calculations.'
+    },
+    {
+      id: 'storage_height_ft',
+      type: 'number',
+      question: 'What is the maximum storage height?',
+      min: 8,
+      max: 40,
+      step: 1,
+      unit: 'feet',
+      required: true,
+      conditional: (data) => !!data.ceiling_height_ft,
+      validation: (value) => {
+        const ceilingHeight = formData.ceiling_height_ft || 0;
+        const numValue = Number(value);
+        if (numValue >= ceilingHeight - 4) {
+          return 'Storage height must be at least 4 feet below ceiling per FM Global requirements';
+        }
+        return null;
+      },
+      helpText: 'Storage height affects clearance requirements and in-rack sprinkler needs.'
+    },
+    {
+      id: 'commodity_type',
+      type: 'multiselect',
+      question: 'What types of commodities will be stored?',
+      options: [
+        { value: 'Class I', label: 'Class I Commodities', description: 'Non-combustible products in combustible packaging' },
+        { value: 'Class II', label: 'Class II Commodities', description: 'Class I products in slatted wooden crates' },
+        { value: 'Class III', label: 'Class III Commodities', description: 'Wood, paper, or natural fiber products' },
+        { value: 'Class IV', label: 'Class IV Commodities', description: 'Class I-III with significant plastic content' },
+        { value: 'Cartoned Unexpanded Plastics', label: 'Cartoned Unexpanded Plastics' },
+        { value: 'Cartoned Expanded Plastics', label: 'Cartoned Expanded Plastics' },
+        { value: 'Uncartoned Unexpanded Plastics', label: 'Uncartoned Unexpanded Plastics' },
+        { value: 'Uncartoned Expanded Plastics', label: 'Uncartoned Expanded Plastics' }
+      ],
+      required: true,
+      conditional: (data) => !!data.storage_height_ft,
+      helpText: 'Commodity classification determines protection density requirements.'
+    },
+    {
+      id: 'system_type',
+      type: 'radio',
+      question: 'What type of sprinkler system will be used?',
+      options: [
+        { value: 'wet', label: 'Wet System', description: 'Water-filled pipes (most common, faster response)' },
+        { value: 'dry', label: 'Dry System', description: 'Air-filled pipes (required in freezing conditions)' },
+        { value: 'both', label: 'Both/Uncertain', description: 'Will evaluate both options for optimal design' }
+      ],
+      required: true,
+      conditional: (data) => !!data.commodity_type?.length,
+      helpText: 'System type affects response time and design requirements.'
     }
-    
-    return tables;
-  };
-
-  // Real-time validation and suggestions
-  useEffect(() => {
-    if (currentStep >= 2) {
-      generateRecommendations();
-      analyzeCostImpact();
-      findOptimizationOpportunities();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData, currentStep]);
-
-  const renderStep1 = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Step 1: ASRS System Classification</h3>
-      
-      <div>
-        <Label htmlFor="asrsType">ASRS System Type</Label>
-        <Select value={formData.asrsType} onValueChange={(value) => setFormData({...formData, asrsType: value})}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select ASRS type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="mini_load">Horizontal-Loading Mini-Load (angle irons/guides)</SelectItem>
-            <SelectItem value="shuttle">Horizontal-Loading Shuttle (slats/mesh)</SelectItem>
-            <SelectItem value="top_loading">Top-Loading ASRS (robot access from above)</SelectItem>
-            <SelectItem value="vertically_enclosed">Vertically Enclosed ASRS (lift/carousel)</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="text-sm text-gray-600 mt-1">
-          This determines which FM Global protection tables apply to your system.
-        </p>
-      </div>
-
-      <div>
-        <Label>Preferred Sprinkler System Type</Label>
-        <RadioGroup value={formData.systemType} onValueChange={(value) => setFormData({...formData, systemType: value})}>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="wet" id="wet" />
-            <Label htmlFor="wet">Wet System (pipes filled with water)</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="dry" id="dry" />
-            <Label htmlFor="dry">Dry System (pipes filled with air/nitrogen)</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="both" id="both" />
-            <Label htmlFor="both">Need guidance on best option</Label>
-          </div>
-        </RadioGroup>
-      </div>
-    </div>
-  );
-
-  const renderStep2 = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Step 2: Container Configuration</h3>
-      <Alert>
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Container configuration has the biggest impact on sprinkler requirements and costs.
-        </AlertDescription>
-      </Alert>
-      
-      <div>
-        <Label htmlFor="containerMaterial">Container Material</Label>
-        <Select value={formData.containerMaterial} onValueChange={(value) => setFormData({...formData, containerMaterial: value})}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select material type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="metal">Metal (noncombustible)</SelectItem>
-            <SelectItem value="combustible">Cardboard/Corrugated (combustible)</SelectItem>
-            <SelectItem value="unexpanded_plastic">Unexpanded Plastic</SelectItem>
-            <SelectItem value="expanded_plastic">Expanded Plastic (requires special analysis)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label htmlFor="containerConfiguration">Container Top Configuration</Label>
-        <RadioGroup value={formData.containerConfiguration} onValueChange={(value) => setFormData({...formData, containerConfiguration: value})}>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="closed_top" id="closed" />
-            <Label htmlFor="closed">Closed-Top <Badge variant="outline" className="ml-2 text-green-600">Lower Cost</Badge></Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="open_top" id="open" />
-            <Label htmlFor="open">Open-Top <Badge variant="outline" className="ml-2 text-red-600">Higher Cost</Badge></Label>
-          </div>
-        </RadioGroup>
-        {formData.containerConfiguration === 'open_top' && (
-          <Alert className="mt-2 border-red-200">
-            <XCircle className="h-4 w-4 text-red-500" />
-            <AlertDescription className="text-red-800">
-              Open-top containers typically require in-rack sprinklers, significantly increasing costs.
-            </AlertDescription>
-          </Alert>
-        )}
-      </div>
-
-      <div>
-        <Label htmlFor="containerWallType">Container Wall Type</Label>
-        <RadioGroup value={formData.containerWallType} onValueChange={(value) => setFormData({...formData, containerWallType: value})}>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="solid" id="solid_wall" />
-            <Label htmlFor="solid_wall">Solid Walls</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="non_solid" id="non_solid_wall" />
-            <Label htmlFor="non_solid_wall">Non-Solid Walls (mesh, perforated)</Label>
-          </div>
-        </RadioGroup>
-      </div>
-    </div>
-  );
-
-  const renderStep3 = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Step 3: Physical Dimensions</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="storageHeight">Maximum Storage Height (ft)</Label>
-          <Input
-            id="storageHeight"
-            type="number"
-            value={formData.storageHeightFt}
-            onChange={(e) => setFormData({...formData, storageHeightFt: e.target.value})}
-            placeholder="20"
-          />
-          {parseInt(formData.storageHeightFt) > 20 && (
-            <p className="text-sm text-yellow-600 mt-1">⚠️ Heights {'>'}20ft may require enhanced protection</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="ceilingHeight">Ceiling Height (ft)</Label>
-          <Input
-            id="ceilingHeight"
-            type="number"
-            value={formData.ceilingHeightFt}
-            onChange={(e) => setFormData({...formData, ceilingHeightFt: e.target.value})}
-            placeholder="30"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="aisleWidth">Aisle Width (ft)</Label>
-          <Input
-            id="aisleWidth"
-            type="number"
-            value={formData.aisleWidthFt}
-            onChange={(e) => setFormData({...formData, aisleWidthFt: e.target.value})}
-            placeholder="6"
-          />
-          {formData.aisleWidthFt === '7' && (
-            <p className="text-sm text-blue-600 mt-1">💡 Consider 6ft or 8ft for optimal requirements</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="rackDepth">Rack Row Depth (ft)</Label>
-          <Input
-            id="rackDepth"
-            type="number"
-            value={formData.rackRowDepthFt}
-            onChange={(e) => setFormData({...formData, rackRowDepthFt: e.target.value})}
-            placeholder="4"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="levels">Number of Storage Levels</Label>
-          <Input
-            id="levels"
-            type="number"
-            value={formData.numberOfLevels}
-            onChange={(e) => setFormData({...formData, numberOfLevels: e.target.value})}
-            placeholder="12"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="tierHeight">Tier Height (inches)</Label>
-          <Input
-            id="tierHeight"
-            type="number"
-            value={formData.tierHeightIn}
-            onChange={(e) => setFormData({...formData, tierHeightIn: e.target.value})}
-            placeholder="15"
-          />
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderStep4 = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Step 4: Commodity Information</h3>
-      
-      <div>
-        <Label htmlFor="commodityClass">FM Global Commodity Classification</Label>
-        <Select value={formData.commodityClass} onValueChange={(value) => setFormData({...formData, commodityClass: value})}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select commodity class" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="class_1">Class 1 - Noncombustible products in noncombustible packaging</SelectItem>
-            <SelectItem value="class_2">Class 2 - Noncombustible products in combustible packaging</SelectItem>
-            <SelectItem value="class_3">Class 3 - Combustible products (wood, paper, natural fibers)</SelectItem>
-            <SelectItem value="class_4">Class 4 - Class 1-3 with limited plastic content</SelectItem>
-            <SelectItem value="plastic_cartoned">Plastic - Cartoned unexpanded</SelectItem>
-            <SelectItem value="plastic_exposed">Plastic - Exposed unexpanded</SelectItem>
-            <SelectItem value="plastic_expanded">Plastic - Expanded (requires special analysis)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label>Special Hazards (check all that apply)</Label>
-        <div className="space-y-2 mt-2">
-          {['Lithium-ion batteries', 'Aerosols', 'Ignitable liquids', 'Hazardous chemicals'].map((hazard) => (
-            <div key={hazard} className="flex items-center space-x-2">
-              <Checkbox 
-                id={hazard}
-                checked={formData.specialHazards.includes(hazard)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFormData({...formData, specialHazards: [...formData.specialHazards, hazard]});
-                  } else {
-                    setFormData({...formData, specialHazards: formData.specialHazards.filter(h => h !== hazard)});
-                  }
-                }}
-              />
-              <Label htmlFor={hazard}>{hazard}</Label>
-            </div>
-          ))}
-        </div>
-        {formData.specialHazards.length > 0 && (
-          <Alert className="mt-2">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              Special hazards require additional FM Global standards beyond 8-34.
-            </AlertDescription>
-          </Alert>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderResults = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Analysis Results</h3>
-      
-      {costAnalysis && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <DollarSign className="h-5 w-5 mr-2" />
-              Cost Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <p className="text-sm text-gray-600">Base Cost</p>
-                <p className="text-2xl font-bold">${costAnalysis.baseCost.toLocaleString()}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600">Complexity Factor</p>
-                <p className="text-2xl font-bold text-red-600">{costAnalysis.complexity.toFixed(1)}x</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600">Estimated Total</p>
-                <p className="text-3xl font-bold text-green-600">${costAnalysis.estimatedCost.toLocaleString()}</p>
-              </div>
-            </div>
-            <p className="text-center text-sm text-gray-600 mt-2">
-              Confidence: <Badge variant={costAnalysis.confidence === 'high' ? 'default' : costAnalysis.confidence === 'medium' ? 'secondary' : 'destructive'}>
-                {costAnalysis.confidence}
-              </Badge>
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {optimizationSuggestions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <TrendingUp className="h-5 w-5 mr-2" />
-              Cost Optimization Opportunities
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {optimizationSuggestions.map((suggestion, index) => (
-                <div key={index} className="border rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-semibold">{suggestion.title}</h4>
-                    <Badge variant="outline" className="text-green-600">
-                      {suggestion.savings}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-2">{suggestion.description}</p>
-                  <div className="flex items-center justify-between text-xs">
-                    <span>Feasibility: <Badge variant={suggestion.feasibility === 'high' ? 'default' : 'secondary'}>
-                      {suggestion.feasibility}
-                    </Badge></span>
-                    <span className="text-gray-500">{suggestion.implementationEffort}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Applicable FM Global Tables</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {getApplicableTables().map((table, index) => (
-              <div key={index} className="flex items-center justify-between p-2 border rounded">
-                <span>Table {table.number}: {table.title}</span>
-                <Badge variant="outline">{table.confidence}% match</Badge>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Next Steps</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="contactEmail">Contact Email for Detailed Quote</Label>
-              <Input
-                id="contactEmail"
-                type="email"
-                value={formData.contactEmail}
-                onChange={(e) => setFormData({...formData, contactEmail: e.target.value})}
-                placeholder="engineer@company.com"
-              />
-            </div>
-            <div>
-              <Label htmlFor="companyName">Company Name</Label>
-              <Input
-                id="companyName"
-                value={formData.companyName}
-                onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                placeholder="Your company"
-              />
-            </div>
-            <Button className="w-full" size="lg">
-              Get Professional Analysis & Quote
-            </Button>
-            <p className="text-sm text-center text-gray-600">
-              Our engineers will review your configuration and provide detailed recommendations within 24 hours.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const steps = [
-    { number: 1, title: 'ASRS Type', component: renderStep1 },
-    { number: 2, title: 'Containers', component: renderStep2 },
-    { number: 3, title: 'Dimensions', component: renderStep3 },
-    { number: 4, title: 'Commodities', component: renderStep4 },
-    { number: 5, title: 'Results', component: renderResults }
   ];
 
-  const canProceed = () => {
-    switch(currentStep) {
-      case 1:
-        return formData.asrsType && formData.systemType;
-      case 2:
-        return formData.containerMaterial && formData.containerConfiguration && formData.containerWallType;
-      case 3:
-        return formData.storageHeightFt && formData.ceilingHeightFt && formData.aisleWidthFt;
-      case 4:
-        return formData.commodityClass;
-      default:
-        return true;
+  const currentQuestions = questions.filter(q => 
+    !q.conditional || q.conditional(formData)
+  ).slice(currentStep, currentStep + 1);
+
+  const handleInputChange = (questionId: keyof ASRSFormData, value: unknown) => {
+    setFormData(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
+  };
+
+  const isCurrentStepValid = () => {
+    const currentQuestion = currentQuestions[0];
+    if (!currentQuestion) return false;
+    
+    const value = formData[currentQuestion.id];
+    if (currentQuestion.required && (value === undefined || value === '')) return false;
+    
+    if (currentQuestion.validation) {
+      const error = currentQuestion.validation(value);
+      if (error) return false;
+    }
+    
+    return true;
+  };
+
+  const nextStep = () => {
+    if (currentStep < questions.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
-  // Submit form to deployed worker
-  const handleSubmitToAPI = async () => {
-    setIsSubmitting(true);
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const generateDesign = async () => {
+    setIsGenerating(true);
+    
     try {
-      const response = await fetch(`${API_BASE_URL}/api/submit-requirements`, {
+      const response = await fetch('/api/fm-global/form', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      setApiResults(result);
-      console.log('API Response:', result);
       
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', response.status, errorText);
+        alert(`Error: Server returned ${response.status}. Please try again.`);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        const spec = result.specification;
+        
+        const designData = {
+          applicable_figures: spec.applicableFigures,
+          applicable_tables: spec.applicableTables,
+          sprinkler_count: spec.sprinklerCount,
+          protection_scheme: spec.protectionScheme,
+          in_rack_required: spec.inRackProtection?.required,
+          submission_id: result.submissionId
+        };
+        
+        setDesignResult(designData);
+      } else {
+        alert(`Error: ${result.error || 'Unknown error occurred'}`);
+      }
     } catch (error) {
-      console.error('Submission error:', error);
-      setApiResults({ error: (error as Error).message });
+      console.error('Form submission error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Error submitting form: ${errorMessage}`);
     } finally {
-      setIsSubmitting(false);
+      setIsGenerating(false);
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">FM Global 8-34 ASRS Requirements Assessment</h1>
-        <p className="text-gray-600">Get instant sprinkler requirements and cost optimization suggestions</p>
-      </div>
+  const renderQuestion = (question: FormQuestion) => {
+    const value = formData[question.id];
+    const error = question.validation ? question.validation(value) : null;
 
-      {/* Progress Bar */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          {steps.slice(0, -1).map((step) => (
-            <div key={step.number} className={`flex items-center ${step.number < steps.length ? 'flex-1' : ''}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                currentStep >= step.number 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-200 text-gray-600'
-              }`}>
-                {step.number}
-              </div>
-              <span className={`ml-2 text-sm ${currentStep >= step.number ? 'text-blue-600' : 'text-gray-500'}`}>
-                {step.title}
-              </span>
-              {step.number < steps.length - 1 && (
-                <div className={`flex-1 h-1 mx-4 rounded ${currentStep > step.number ? 'bg-blue-600' : 'bg-gray-200'}`} />
-              )}
-            </div>
-          ))}
+    return (
+      <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">{question.question}</h3>
+          {question.helpText && (
+            <p className="text-gray-600 text-sm bg-blue-50 p-3 rounded-lg border border-blue-200">
+              💡 {question.helpText}
+            </p>
+          )}
         </div>
-        <Progress value={(currentStep / steps.length) * 100} className="mt-2" />
-      </div>
 
-      {/* Current Step Content */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          {steps[currentStep - 1].component()}
-        </CardContent>
-      </Card>
-
-      {/* Recommendations Panel */}
-      {recommendations.length > 0 && currentStep < 5 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <HelpCircle className="h-5 w-5 mr-2" />
-              Real-time Recommendations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recommendations.map((rec, index) => (
-                <Alert key={index} className={rec.type === 'warning' ? 'border-red-200' : rec.type === 'optimization' ? 'border-green-200' : 'border-blue-200'}>
-                  {rec.type === 'warning' && <AlertTriangle className="h-4 w-4" />}
-                  {rec.type === 'optimization' && <TrendingUp className="h-4 w-4" />}
-                  {rec.type === 'info' && <HelpCircle className="h-4 w-4" />}
-                  <AlertDescription>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-medium">{rec.title}</p>
-                        <p className="text-sm mt-1">{rec.message}</p>
-                      </div>
-                      <Badge variant="outline" className={
-                        rec.impact === 'high' ? 'text-red-600' :
-                        rec.impact === 'medium' ? 'text-yellow-600' : 'text-green-600'
-                      }>
-                        {rec.costImpact}
-                      </Badge>
+        <div className="space-y-4">
+          {question.type === 'select' && question.options && (
+            <div className="grid gap-3">
+              {question.options.map((option) => (
+                <label
+                  key={option.value}
+                  className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    value === option.value
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name={question.id}
+                    value={option.value}
+                    checked={value === option.value}
+                    onChange={(e) => handleInputChange(question.id, e.target.value)}
+                    className="sr-only"
+                  />
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-semibold text-gray-900">{option.label}</div>
+                      {option.description && (
+                        <div className="text-sm text-gray-600 mt-1">{option.description}</div>
+                      )}
                     </div>
-                  </AlertDescription>
-                </Alert>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      value === option.value ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                    }`}>
+                      {value === option.value && <div className="w-2 h-2 bg-white rounded-full" />}
+                    </div>
+                  </div>
+                </label>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between">
-        <Button 
-          variant="outline" 
-          onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-          disabled={currentStep === 1}
+          {question.type === 'number' && (
+            <div>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="number"
+                  min={question.min}
+                  max={question.max}
+                  step={question.step}
+                  value={value || ''}
+                  onChange={(e) => handleInputChange(question.id, parseFloat(e.target.value))}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                  placeholder={`Enter ${question.question.toLowerCase()}`}
+                />
+                {question.unit && (
+                  <span className="text-gray-500 font-medium">{question.unit}</span>
+                )}
+              </div>
+              {question.min !== undefined && question.max !== undefined && (
+                <div className="mt-2 text-sm text-gray-500">
+                  Range: {question.min} - {question.max} {question.unit}
+                </div>
+              )}
+            </div>
+          )}
+
+          {question.type === 'multiselect' && question.options && (
+            <div className="grid gap-2">
+              {question.options.map((option) => {
+                const isSelected = Array.isArray(value) && value.includes(option.value);
+                return (
+                  <label
+                    key={option.value}
+                    className={`block p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={(e) => {
+                        const currentArray = Array.isArray(value) ? value : [];
+                        if (e.target.checked) {
+                          handleInputChange(question.id, [...currentArray, option.value]);
+                        } else {
+                          handleInputChange(question.id, currentArray.filter(v => v !== option.value));
+                        }
+                      }}
+                      className="sr-only"
+                    />
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="font-medium text-gray-900">{option.label}</div>
+                        {option.description && (
+                          <div className="text-sm text-gray-600 mt-1">{option.description}</div>
+                        )}
+                      </div>
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                        isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                      }`}>
+                        {isSelected && <span className="text-white text-xs">✓</span>}
+                      </div>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+
+          {question.type === 'radio' && question.options && (
+            <div className="space-y-3">
+              {question.options.map((option) => (
+                <label
+                  key={option.value}
+                  className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    value === option.value
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name={question.id}
+                    value={option.value}
+                    checked={value === option.value}
+                    onChange={(e) => handleInputChange(question.id, e.target.value)}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <div className="ml-3">
+                    <div className="font-medium text-gray-900">{option.label}</div>
+                    {option.description && (
+                      <div className="text-sm text-gray-600">{option.description}</div>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {error && (
+            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+              ⚠️ {error}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const progress = ((currentStep + 1) / questions.length) * 100;
+
+  if (designResult) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold text-green-900 mb-2">✅ Design Complete!</h2>
+          <p className="text-green-700">Your ASRS sprinkler system design has been generated based on FM Global 8-34 requirements.</p>
+          {designResult.submission_id && (
+            <p className="text-sm text-green-600 mt-2">Submission ID: {designResult.submission_id}</p>
+          )}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold mb-4">Your Configuration</h3>
+            <div className="space-y-2 text-sm">
+              <div><span className="font-medium">ASRS Type:</span> {formData.asrs_type}</div>
+              <div><span className="font-medium">Container Type:</span> {formData.container_type}</div>
+              <div><span className="font-medium">Rack Depth:</span> {formData.rack_depth_ft} ft</div>
+              <div><span className="font-medium">Rack Spacing:</span> {formData.rack_spacing_ft} ft</div>
+              <div><span className="font-medium">Ceiling Height:</span> {formData.ceiling_height_ft} ft</div>
+              <div><span className="font-medium">Storage Height:</span> {formData.storage_height_ft} ft</div>
+              <div><span className="font-medium">Commodity:</span> {formData.commodity_type?.join(', ')}</div>
+              <div><span className="font-medium">System Type:</span> {formData.system_type}</div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold mb-4">FM Global 8-34 Requirements</h3>
+            <div className="space-y-3">
+              <div><span className="font-medium">Applicable Figures:</span> {designResult.applicable_figures.join(', ') || 'Standard configurations'}</div>
+              <div><span className="font-medium">Applicable Tables:</span> {designResult.applicable_tables.join(', ') || 'See FM Global 8-34'}</div>
+              <div><span className="font-medium">Sprinkler Count:</span> {designResult.sprinkler_count} sprinklers</div>
+              <div><span className="font-medium">Protection Scheme:</span> {designResult.protection_scheme}</div>
+              {designResult.in_rack_required && (
+                <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                  <span className="font-medium">⚠️ In-Rack Protection Required</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-center space-x-4">
+          <button
+            onClick={() => window.print()}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Download Report
+          </button>
+          <button
+            onClick={() => {
+              setDesignResult(null);
+              setCurrentStep(0);
+              setFormData({});
+            }}
+            className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            New Design
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">ASRS Sprinkler System Requirements</h1>
+        <p className="text-gray-600 mb-4">
+          Answer these questions to determine your FM Global 8-34 compliance requirements and get an instant design estimate.
+        </p>
+        
+        <div className="bg-gray-200 rounded-full h-3 mb-4">
+          <div 
+            className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="text-sm text-gray-600">
+          Step {currentStep + 1} of {questions.length}
+        </div>
+      </div>
+
+      {currentQuestions.map(question => (
+        <div key={question.id}>
+          {renderQuestion(question)}
+        </div>
+      ))}
+
+      <div className="flex justify-between mt-8">
+        <button
+          onClick={prevStep}
+          disabled={currentStep === 0}
+          className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Previous
-        </Button>
-        
-        {currentStep < 5 && (
-          <Button 
-            onClick={() => setCurrentStep(currentStep + 1)}
-            disabled={!canProceed()}
+          ← Previous
+        </button>
+
+        {currentStep < questions.length - 1 ? (
+          <button
+            onClick={nextStep}
+            disabled={!isCurrentStepValid()}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Next Step
-          </Button>
-        )}
-        
-        {currentStep === 5 && (
-          <Button 
-            variant="default" 
-            size="lg"
-            onClick={handleSubmitToAPI}
-            disabled={isSubmitting}
+            Next →
+          </button>
+        ) : (
+          <button
+            onClick={generateDesign}
+            disabled={!isCurrentStepValid() || isGenerating}
+            className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit to API & Generate Report'}
-          </Button>
+            {isGenerating ? 'Generating Design...' : 'Generate Design & Quote'}
+          </button>
         )}
       </div>
 
-      {/* API Results Display */}
-      {apiResults && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>API Response</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
-              {JSON.stringify(apiResults, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
+      {isGenerating && (
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div>
+              <div className="font-medium text-blue-900">Analyzing FM Global 8-34 Requirements</div>
+              <div className="text-sm text-blue-700">Searching applicable figures and tables...</div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
-};
-
-export default FMGlobalRequirementsForm;
+}

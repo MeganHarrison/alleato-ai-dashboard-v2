@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let results = {
+    const results = {
       documentsProcessed: 0,
       insightsGenerated: 0,
       errors: [] as string[],
@@ -117,7 +117,7 @@ async function processSingleDocument(documentId: string) {
     results.documentsProcessed = 1;
     results.insightsGenerated = stored;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     results.errors.push(`Error processing document: ${error.message}`);
   }
 
@@ -198,12 +198,12 @@ async function processProjectDocuments(projectId: string) {
         results.documentsProcessed++;
         results.insightsGenerated += stored;
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         results.errors.push(`Error with ${doc.title}: ${error.message}`);
       }
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     results.errors.push(`Fatal error: ${error.message}`);
   }
 
@@ -289,13 +289,13 @@ async function processBatchDocuments() {
           results.documentsProcessed++;
           results.insightsGenerated += stored;
 
-        } catch (error: any) {
+        } catch (error: unknown) {
           results.errors.push(`Error with ${doc.title}: ${error.message}`);
         }
       }
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     results.errors.push(`Fatal error: ${error.message}`);
   }
 
@@ -384,7 +384,7 @@ Guidelines:
       max_tokens: 2000,
     });
 
-    let insightsJson = response.choices[0].message.content || '[]';
+    const insightsJson = response.choices[0].message.content || '[]';
     
     // Clean up the response
     insightsJson = insightsJson.trim();
@@ -398,7 +398,7 @@ Guidelines:
     const insights = JSON.parse(insightsJson);
 
     // Validate insights
-    return insights.filter((insight: any) => 
+    return insights.filter((insight: unknown) => 
       insight.type && 
       insight.title && 
       insight.description && 
@@ -412,12 +412,12 @@ Guidelines:
 }
 
 async function storeInsights(
-  insights: any[],
+  insights: unknown[],
   projectId: string,
   documentId: string,
   existingKeys: Set<string>
 ): Promise<number> {
-  let storedCount = 0;
+  const storedCount = 0;
 
   for (const insight of insights) {
     try {
@@ -445,7 +445,7 @@ async function storeInsights(
         : 'medium';
 
       // Parse due date
-      let dueDate = null;
+      const dueDate = null;
       if (insight.due_date) {
         try {
           dueDate = new Date(insight.due_date).toISOString();

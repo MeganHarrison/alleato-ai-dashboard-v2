@@ -73,12 +73,12 @@ const TestimonialCard = ({ quote, name, company, avatar, type }: TestimonialCard
   const avatarBorderRadius = isLargeCard ? "rounded-[41px]" : "rounded-[30.75px]"
   const padding = isLargeCard ? "p-6" : "p-[30px]"
 
-  let cardClasses = `flex flex-col justify-between items-start overflow-hidden rounded-[10px] shadow-[0px_2px_4px_rgba(0,0,0,0.08)] relative ${padding}`
-  let quoteClasses = ""
-  let nameClasses = ""
-  let companyClasses = ""
-  let backgroundElements = null
-  let cardHeight = ""
+  const cardClasses = `flex flex-col justify-between items-start overflow-hidden rounded-[10px] shadow-[0px_2px_4px_rgba(0,0,0,0.08)] relative ${padding}`
+  const quoteClasses = ""
+  const nameClasses = ""
+  const companyClasses = ""
+  const backgroundElements = null
+  const cardHeight = ""
   const cardWidth = "w-full md:w-[384px]"
 
   if (type === "large-teal") {

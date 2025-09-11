@@ -1,0 +1,34 @@
+name: E2E
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+        run: |
+          if npm run | grep -q 'test:e2e'; then npm run test:e2e; else echo "No test:e2e script"; fi

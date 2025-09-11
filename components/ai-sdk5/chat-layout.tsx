@@ -1,5 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
@@ -115,8 +113,7 @@ function ChatSidebar({ chats, currentChatId }: ChatSidebarProps) {
 }
 
 export function ChatLayout({ children, chats, currentChatId }: ChatLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const [sidebarOpen] = useState($2);
   return (
     <div className="flex h-screen">
       {/* Desktop Sidebar */}

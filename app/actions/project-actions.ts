@@ -120,7 +120,7 @@ export async function deleteProject(id: string) {
   revalidatePath("/projects-db")
 }
 
-export async function updateProjectField(id: string, field: string, value: any) {
+export async function updateProjectField(id: string, field: string, value: unknown) {
   const supabase = await createClient()
 
   const updateData: Partial<Project> = {

@@ -35,7 +35,7 @@ export default async function InsightsPage() {
 
   // Fetch documents for insights that have document_id
   const documentIds = [...new Set(allInsights?.map(i => i.document_id).filter(Boolean) || [])];
-  let documentsMap = new Map();
+  const documentsMap = new Map();
   
   if (documentIds.length > 0) {
     const { data: documents } = await supabase
@@ -51,8 +51,8 @@ export default async function InsightsPage() {
   // Process insights - parse JSON description if needed
   const insights = allInsights?.map(insight => {
     // Parse description if it's a JSON string
-    let parsedDescription = insight.description;
-    let metadata = {};
+    const parsedDescription = insight.description;
+    const metadata = {};
     
     if (typeof insight.description === 'string' && insight.description.startsWith('{')) {
       try {

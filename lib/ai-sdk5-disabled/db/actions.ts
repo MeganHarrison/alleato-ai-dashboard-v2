@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use server";
 
 import { UIMessage, UIMessagePart, generateId } from "ai";
@@ -130,8 +129,8 @@ export async function loadChat(chatId: string): Promise<MyUIMessage[]> {
     // Transform the data into UI messages
     return messagesData.map((message) => {
       const messageParts = (message.parts || [])
-        .sort((a: any, b: any) => a.order - b.order)
-        .map((part: any) => mapDBPartToUIMessagePart(part))
+        .sort((a: unknown, b: unknown) => a.order - b.order)
+        .map((part: unknown) => mapDBPartToUIMessagePart(part))
         .filter((part): part is UIMessagePart => part !== null);
 
       return {

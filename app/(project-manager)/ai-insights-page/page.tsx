@@ -12,22 +12,22 @@ import {
 } from 'lucide-react';
 
 interface InsightWithDetails {
-  id: any;
-  project_id: any;
-  insight_type: any;
-  title: any;
-  description: any;
-  severity?: any;
-  assignee?: any;
-  due_date?: any;
-  financial_impact?: any;
-  created_at: any;
-  meeting_date?: any;
-  meeting_name?: any;
-  document_id?: any;
+  id: unknown;
+  project_id: unknown;
+  insight_type: unknown;
+  title: unknown;
+  description: unknown;
+  severity?: unknown;
+  assignee?: unknown;
+  due_date?: unknown;
+  financial_impact?: unknown;
+  created_at: unknown;
+  meeting_date?: unknown;
+  meeting_name?: unknown;
+  document_id?: unknown;
   projects?: {
-    id: any;
-    name: any;
+    id: unknown;
+    name: unknown;
   }[];
 }
 

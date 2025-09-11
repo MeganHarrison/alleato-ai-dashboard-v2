@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    let content = ""
-    let fileName = ""
+    const content = ""
+    const fileName = ""
     
     if (file) {
       // Read file content

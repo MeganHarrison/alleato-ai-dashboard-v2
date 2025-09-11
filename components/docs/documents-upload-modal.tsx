@@ -7,12 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 
 export function DocumentsUploadModal({ onUpload }: { onUpload?: () => void }) {
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
+  const [open] = useState($2);
+  const [title] = useState($2);
+  const [category] = useState($2);
   const [error, setError] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-
+  const [isUploading] = useState($2);
   // Dropzone + Supabase hook
   const props = useSupabaseUpload({
     bucketName: "documents",

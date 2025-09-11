@@ -1,5 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { useChat } from "@ai-sdk/react";
@@ -39,8 +37,7 @@ export function EnhancedChatV5({
   suggestedQuestions = [],
   minimalWelcome = false
 }: EnhancedChatProps) {
-  const [input, setInput] = useState("");
-  
+  const [input] = useState($2);
   // Use the useChat hook properly according to AI SDK v5
   const { messages, handleSubmit, handleInputChange, isLoading, error, reload, stop } = useChat({
     id,
@@ -98,7 +95,7 @@ export function EnhancedChatV5({
 
     // Handle parts-based messages (AI SDK v5)
     if (message.parts && message.parts.length > 0) {
-      return message.parts.map((part: any, i: number) => {
+      return message.parts.map((part: unknown, i: number) => {
         switch (part.type) {
           case 'text':
             return <div key={`${message.id}-part-${i}`}>{part.text}</div>;

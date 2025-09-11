@@ -186,7 +186,7 @@ ${context}`,
       prompt: `User Question: ${message}
 
 Previous conversation for context:
-${conversationHistory.slice(-5).map((m: any) => `${m.role}: ${m.content}`).join('\n')}
+${conversationHistory.slice(-5).map((m: unknown) => `${m.role}: ${m.content}`).join('\n')}
 
 Please provide a helpful response based on the available data.`,
       temperature: 0.7,

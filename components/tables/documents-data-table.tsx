@@ -60,7 +60,7 @@ export type Document = {
   title?: string | null
   content?: string | null
   document_type?: string | null
-  metadata?: any | null
+  metadata?: unknown | null
   embedding?: string | null
   created_at?: string
   updated_at?: string

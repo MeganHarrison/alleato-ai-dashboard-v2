@@ -2,7 +2,7 @@ import { MyDataPart } from "@/lib/message-type";
 import { z } from "zod";
 
 // Use any for tool definition to avoid version conflicts
-const tool = (config: any) => config;
+const tool = (config: unknown) => config;
 
 export const getWeatherInformation = tool({
   description: "show the weather in a given city to the user",

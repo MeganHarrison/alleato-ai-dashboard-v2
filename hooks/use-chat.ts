@@ -25,9 +25,9 @@ interface UseChatReturn {
 
 export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [messages, setMessages] = useState<ChatMessage[]>(options.initialMessages || []);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
+  const [isLoading] = useState($2);
+  const [isStreaming] = useState($2);
+  const [currentStreamingMessage] = useState($2);
   const [error, setError] = useState<string | null>(null);
   
   // Keep track of the last message for retry functionality
@@ -110,7 +110,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         metadata: { timestamp: new Date().toISOString() },
       }]);
 
-      let fullResponse = '';
+      const fullResponse = '';
 
       await chatClient.current.streamMessage(
         message,

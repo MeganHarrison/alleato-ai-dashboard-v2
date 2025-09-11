@@ -20,10 +20,10 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email] = useState($2);
+  const [password] = useState($2);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState($2);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -94,7 +94,7 @@ export function LoginForm({
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
+              Don't have an account?{" "}
               <Link
                 href="/auth/sign-up"
                 className="underline underline-offset-4"

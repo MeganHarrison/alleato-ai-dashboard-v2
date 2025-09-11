@@ -40,8 +40,8 @@ export default function RAGChatPage(): ReactElement {
       timestamp: new Date(),
     },
   ]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [input] = useState($2);
+  const [loading] = useState($2);
   const [healthStatus, setHealthStatus] = useState<HealthStatus>({ status: 'checking' });
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

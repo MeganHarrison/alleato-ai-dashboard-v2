@@ -4,14 +4,14 @@ import { EmbeddingService } from './embeddings';
 export interface Document {
   id?: number;
   content: string;
-  metadata?: any;
+  metadata?: unknown;
   embedding?: number[];
 }
 
 export interface SearchResult {
   id: number;
   content: string;
-  metadata: any;
+  metadata: unknown;
   similarity: number;
 }
 
@@ -29,7 +29,7 @@ export class VectorStore {
   async storeDocument(document: Document): Promise<{ success: boolean; id?: number; error?: string }> {
     try {
       // Generate embedding if not provided
-      let embedding = document.embedding;
+      const embedding = document.embedding;
       if (!embedding) {
         embedding = await this.embeddingService.generateEmbedding(document.content);
       }
@@ -68,7 +68,7 @@ export class VectorStore {
         ? await this.embeddingService.generateEmbeddings(textsToEmbed)
         : [];
 
-      let embeddingIndex = 0;
+      const embeddingIndex = 0;
       const documentsWithEmbeddings = documents.map(doc => {
         const embedding = doc.embedding || embeddings[embeddingIndex++];
         return {
@@ -134,7 +134,7 @@ export class VectorStore {
       matchThreshold?: number;
       matchCount?: number;
     } = {}
-  ): Promise<{ success: boolean; results?: any[]; error?: string }> {
+  ): Promise<{ success: boolean; results?: unknown[]; error?: string }> {
     try {
       const { matchThreshold = 0.7, matchCount = 10 } = options;
 

@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 /**
  * Try to connect to Railway API
  */
-async function tryRailwayAPI(message: string, conversationHistory: any[]) {
+async function tryRailwayAPI(message: string, conversationHistory: unknown[]) {
   const RAILWAY_RAG_API = process.env.RAILWAY_PM_RAG;
   
   if (!RAILWAY_RAG_API) {
@@ -115,7 +115,7 @@ async function tryRailwayAPI(message: string, conversationHistory: any[]) {
 /**
  * Enhanced local processing with better project management context
  */
-async function enhancedLocalProcessing(message: string, conversationHistory: any[]) {
+async function enhancedLocalProcessing(message: string, conversationHistory: unknown[]) {
   try {
     // Import required modules
     const { generateText } = await import('ai');
@@ -195,7 +195,7 @@ Focus on delivering maximum value by connecting current queries to broader proje
 **User Question:** ${message}
 
 **Previous Conversation Context:**
-${conversationHistory.slice(-3).map((msg: any) => `${msg.role}: ${msg.content}`).join('\n')}
+${conversationHistory.slice(-3).map((msg: unknown) => `${msg.role}: ${msg.content}`).join('\n')}
 
 Please provide a comprehensive, strategic response that leverages all available data sources and connects the user's question to broader project management insights and recommendations.`,
       temperature: 0.7,
@@ -203,9 +203,9 @@ Please provide a comprehensive, strategic response that leverages all available 
 
     // Extract sources for metadata
     const sources = [
-      ...meetings.slice(0, 3).map((m: any) => ({ type: 'meeting', title: m.title, date: m.date })),
-      ...documents.slice(0, 2).map((d: any) => ({ type: 'document', title: d.title, date: d.date })),
-      ...insights.slice(0, 2).map((i: any) => ({ type: 'insight', title: i.title, severity: i.severity }))
+      ...meetings.slice(0, 3).map((m: unknown) => ({ type: 'meeting', title: m.title, date: m.date })),
+      ...documents.slice(0, 2).map((d: unknown) => ({ type: 'document', title: d.title, date: d.date })),
+      ...insights.slice(0, 2).map((i: unknown) => ({ type: 'insight', title: i.title, severity: i.severity }))
     ];
 
     return NextResponse.json({
@@ -261,7 +261,7 @@ Please try your question again, or let me know how I can assist with your projec
 /**
  * Enhanced search functions
  */
-async function searchMeetings(supabase: any, query: string, limit = 8) {
+async function searchMeetings(supabase: unknown, query: string, limit = 8) {
   try {
     const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 2);
     
@@ -280,7 +280,7 @@ async function searchMeetings(supabase: any, query: string, limit = 8) {
   }
 }
 
-async function searchDocuments(supabase: any, query: string, limit = 6) {
+async function searchDocuments(supabase: unknown, query: string, limit = 6) {
   try {
     const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 2);
     
@@ -299,7 +299,7 @@ async function searchDocuments(supabase: any, query: string, limit = 6) {
   }
 }
 
-async function getRecentInsights(supabase: any, limit = 10) {
+async function getRecentInsights(supabase: unknown, limit = 10) {
   try {
     const { data: insights, error } = await supabase
       .from('ai_insights')
@@ -315,7 +315,7 @@ async function getRecentInsights(supabase: any, limit = 10) {
   }
 }
 
-async function getActiveProjects(supabase: any, limit = 8) {
+async function getActiveProjects(supabase: unknown, limit = 8) {
   try {
     const { data: projects, error } = await supabase
       .from('projects')
@@ -332,7 +332,7 @@ async function getActiveProjects(supabase: any, limit = 8) {
   }
 }
 
-async function getActionItems(supabase: any, limit = 12) {
+async function getActionItems(supabase: unknown, limit = 12) {
   try {
     const { data: tasks, error } = await supabase
       .from('tasks')
@@ -352,18 +352,18 @@ async function getActionItems(supabase: any, limit = 12) {
 /**
  * Build enhanced context for AI processing
  */
-function buildEnhancedContext({ message, meetings, documents, insights, projects, tasks, conversationHistory }: any) {
+function buildEnhancedContext({ message, meetings, documents, insights, projects, tasks, conversationHistory }: unknown) {
   return `
 **COMPREHENSIVE PROJECT MANAGEMENT CONTEXT**
 
 **ACTIVE PROJECTS (${projects.length} total):**
 ${projects.length > 0 
-  ? projects.map((p: any) => `• ${p.name} [${p.phase || p.status}] - ${p.client || 'Internal'}: ${p.description || 'No description'}`).join('\n')
+  ? projects.map((p: unknown) => `• ${p.name} [${p.phase || p.status}] - ${p.client || 'Internal'}: ${p.description || 'No description'}`).join('\n')
   : 'No active projects found.'}
 
 **RECENT MEETINGS (${meetings.length} analyzed):**
 ${meetings.length > 0
-  ? meetings.map((m: any) => {
+  ? meetings.map((m: unknown) => {
       const date = m.date ? new Date(m.date).toLocaleDateString() : 'No date';
       const participants = m.participants?.length ? ` (${m.participants.length} participants)` : '';
       return `• "${m.title}" - ${date}${participants}\n  ${m.summary || 'No summary available'}`;
@@ -372,7 +372,7 @@ ${meetings.length > 0
 
 **PROJECT DOCUMENTS (${documents.length} reviewed):**
 ${documents.length > 0
-  ? documents.map((d: any) => {
+  ? documents.map((d: unknown) => {
       const date = d.date ? new Date(d.date).toLocaleDateString() : 'No date';
       return `• "${d.title}" (${date}): ${d.content ? d.content.substring(0, 150) + '...' : 'No content preview'}`;
     }).join('\n')
@@ -380,7 +380,7 @@ ${documents.length > 0
 
 **AI INSIGHTS & ANALYSIS (${insights.length} recent):**
 ${insights.length > 0
-  ? insights.slice(0, 6).map((i: any) => {
+  ? insights.slice(0, 6).map((i: unknown) => {
       const severity = i.severity ? ` [${i.severity.toUpperCase()}]` : '';
       const type = i.insight_type || 'general';
       return `• [${type}]${severity}: ${i.title} - ${i.description}`;
@@ -389,7 +389,7 @@ ${insights.length > 0
 
 **ACTION ITEMS & TASKS (${tasks.length} pending):**
 ${tasks.length > 0
-  ? tasks.slice(0, 8).map((t: any) => {
+  ? tasks.slice(0, 8).map((t: unknown) => {
       const priority = t.priority ? ` [${t.priority}]` : '';
       const assignee = t.assignee ? ` → ${t.assignee}` : '';
       return `• ${t.title}${priority}${assignee}: ${t.description || 'No details'}`;

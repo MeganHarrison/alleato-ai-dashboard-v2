@@ -36,7 +36,7 @@ export function StorageManager({ projectRef }: { projectRef: string }) {
 
       {buckets && buckets.length > 0 ? (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {buckets.map((bucket: any) => (
+          {buckets.map((bucket: unknown) => (
             <Tooltip key={bucket.id}>
               <TooltipTrigger asChild>
                 <Button

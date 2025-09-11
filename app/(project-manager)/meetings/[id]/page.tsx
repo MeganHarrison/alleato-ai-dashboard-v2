@@ -31,15 +31,15 @@ interface MeetingDocument {
   title: string | null;
   content: string | null;
   summary: string | null;
-  metadata: any;
+  metadata: unknown;
   meeting_date: string | null;
   duration_minutes: number | null;
   participants: string[] | null;
   keywords: string[] | null;
   action_items: string[] | null;
   topics_discussed: string[] | null;
-  sentiment_scores: any;
-  speaker_analytics: any;
+  sentiment_scores: unknown;
+  speaker_analytics: unknown;
   fireflies_link: string | null;
   audio_url: string | null;
   video_url: string | null;
@@ -67,11 +67,11 @@ export default function MeetingPage() {
   const router = useRouter();
   const [meeting, setMeeting] = useState<MeetingDocument | null>(null);
   const [actualTranscript, setActualTranscript] = useState<string | null>(null);
-  const [transcriptLoading, setTranscriptLoading] = useState(false);
+  const [transcriptLoading] = useState($2);
   const [insights, setInsights] = useState<AIInsight[]>([]);
-  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [insightsLoading] = useState($2);
   const [relatedMeetings, setRelatedMeetings] = useState<MeetingDocument[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState($2);
   const [error, setError] = useState<string | null>(null);
   const [supabase] = useState(() => createClient());
 
@@ -88,7 +88,7 @@ export default function MeetingPage() {
       setTranscriptLoading(true);
       
       // Check if metadata contains storage_bucket_path
-      let metadata = meeting.metadata;
+      const metadata = meeting.metadata;
       if (typeof metadata === 'string') {
         metadata = JSON.parse(metadata);
       }

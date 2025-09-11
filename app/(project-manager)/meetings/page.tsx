@@ -20,16 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { 
   Loader2,
   Search,
-  Edit,
-  Save,
-  X,
-  Calendar,
-  FileText,
   Download,
   Trash2,
   MoreHorizontal,
@@ -39,7 +33,6 @@ import {
   Pencil
 } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -63,7 +56,7 @@ interface Document {
   content: string | null;
   document_type: string | null;
   embedding: string | null;
-  metadata: any;
+  metadata: unknown;
   title?: string | null;
   date?: string | null;
   summary?: string | null;
@@ -162,12 +155,6 @@ export default function MeetingsPage() {
     }
   };
 
-  // Get unique projects for filter
-  const projectOptions = useMemo(() => {
-    const projectSet = new Set(documents.map(d => d.project_id).filter(Boolean));
-    const projectsWithDocs = projects.filter(p => projectSet.has(p.id));
-    return ["all", ...projectsWithDocs.map(p => String(p.id))];
-  }, [documents, projects]);
 
   // Filter documents
   const filteredDocuments = useMemo(() => {

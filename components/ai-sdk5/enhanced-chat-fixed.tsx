@@ -1,6 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { useChat } from "@ai-sdk/react";
@@ -45,8 +42,7 @@ export function EnhancedChatFixed({
   suggestedQuestions = [],
   minimalWelcome = false
 }: EnhancedChatProps) {
-  const [input, setInput] = useState(initialPrompt || "");
-  
+  const [input] = useState($2);
   // Use useChat hook with simpler configuration first
   const chatResult = useChat({
     id,
@@ -78,7 +74,7 @@ export function EnhancedChatFixed({
 
   // Determine which submit function to use
   const submitFunction = handleSubmit || submit || sendMessage;
-  const inputChangeFunction = handleInputChange || ((e: any) => setInput(e.target.value));
+  const inputChangeFunction = handleInputChange || ((e: unknown) => setInput(e.target.value));
 
   useEffect(() => {
     console.log('Available functions:', {
@@ -170,7 +166,7 @@ export function EnhancedChatFixed({
               )
             ) : (
               <div className="space-y-6">
-                {messages.map((message: any) => (
+                {messages.map((message: unknown) => (
                   <Message key={message.id} from={message.role}>
                     <MessageContent>
                       {renderMessageContent(message)}

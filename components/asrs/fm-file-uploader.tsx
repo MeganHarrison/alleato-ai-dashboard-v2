@@ -21,11 +21,10 @@ interface UploadResult {
 
 export function FMFileUploader() {
   const [files, setFiles] = useState<File[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [uploading] = useState($2);
   const [results, setResults] = useState<UploadResult[]>([]);
-  const [progress, setProgress] = useState(0);
-  const [dragActive, setDragActive] = useState(false);
-
+  const [progress] = useState($2);
+  const [dragActive] = useState($2);
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -66,7 +65,7 @@ export function FMFileUploader() {
     const uploadResults: UploadResult[] = [];
     const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || 'https://fm-global-vectorizer.workers.dev';
 
-    for (let i = 0; i < files.length; i++) {
+    for (const i = 0; i < files.length; i++) {
       const file = files[i];
       const formData = new FormData();
       formData.append('file', file);
@@ -91,7 +90,7 @@ export function FMFileUploader() {
             message: `${file.name}: ${result.error || 'Upload failed'}`,
           });
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         uploadResults.push({
           success: false,
           message: `${file.name}: ${error.message}`,

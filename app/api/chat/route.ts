@@ -7,7 +7,7 @@ if (!RAILWAY_API_URL) {
   console.error('❌ RAILWAY_PM_RAG environment variable not set');
 }
 
-async function queryRailwayRAG(message: string, conversationHistory: any[] = []) {
+async function queryRailwayRAG(message: string, conversationHistory: unknown[] = []) {
   if (!RAILWAY_API_URL) {
     throw new Error('Railway API URL not configured');
   }
@@ -66,15 +66,26 @@ export async function POST(req: NextRequest) {
       const railwayResponse = await queryRailwayRAG(lastMessage.content, messages);
       
       // Extract the response from Railway API
-      let responseText = '';
+      const responseText = '';
       if (railwayResponse) {
-        responseText = railwayResponse.response || railwayResponse.answer || railwayResponse.message || 'No response generated';
+        // Handle AgentRunResult format
+        const rawResponse = railwayResponse.response || railwayResponse.answer || railwayResponse.message || '';
+        
+        // Parse AgentRunResult if present
+        if (typeof rawResponse === 'string' && rawResponse.includes('AgentRunResult(output=')) {
+          const match = rawResponse.match(/AgentRunResult\(output='(.*)'\)$/);
+          if (match) {
+            rawResponse = match[1];
+          }
+        }
+        
+        responseText = rawResponse || 'No response generated';
         
         // Add sources if available
         const sources = railwayResponse.sources || railwayResponse.documents || [];
         if (sources.length > 0) {
           responseText += '\n\n**Sources:**\n';
-          responseText += sources.map((source: any, index: number) => 
+          responseText += sources.map((source: unknown, index: number) => 
             `${index + 1}. ${source.title || source.document_name || 'Document'} ${source.relevance_score ? `(${Math.round(source.relevance_score * 100)}% relevant)` : ''}`
           ).join('\n');
         }

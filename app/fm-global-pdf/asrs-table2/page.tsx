@@ -134,18 +134,11 @@ const table1Data = {
 };
 
 const Table1Display = () => {
-  const [selectedDataPoint, setSelectedDataPoint] = useState(0);
-  const [showEquations, setShowEquations] = useState(false);
-  const [showFootnotes, setShowFootnotes] = useState(false);
-  const [calculatorInputs, setCalculatorInputs] = useState({
-    sprinklersInDesign: '',
-    ceilingSlope: '',
-    onLineSpacing: '',
-    ceilingConstruction: 'unobstructed',
-    sprinklerType: 'extended_coverage'
-  });
-
-  const getSprinklersPerBranch = (condition: any, sprinklersInDesign: number, savg = 12, lavg = 12) => {
+  const [selectedDataPoint] = useState($2);
+  const [showEquations] = useState($2);
+  const [showFootnotes] = useState($2);
+  const [calculatorInputs] = useState($2);
+  const getSprinklersPerBranch = (condition: unknown, sprinklersInDesign: number, savg = 12, lavg = 12) => {
     if (typeof condition.sprinklers_per_branch === 'number') {
       return condition.sprinklers_per_branch;
     }
@@ -163,7 +156,7 @@ const Table1Display = () => {
     return condition.sprinklers_per_branch;
   };
 
-  const EquationDisplay = ({ equation }: { equation: any }) => (
+  const EquationDisplay = ({ equation }: { equation: unknown }) => (
     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
       <div className="flex items-start gap-3">
         <div className="bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded">
@@ -183,7 +176,7 @@ const Table1Display = () => {
     </div>
   );
 
-  const DataPointTable = ({ dataPoint, index }: { dataPoint: any; index: number }) => (
+  const DataPointTable = ({ dataPoint, index }: { dataPoint: unknown; index: number }) => (
     <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
       <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -210,7 +203,7 @@ const Table1Display = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {dataPoint.conditions.map((condition: any, condIndex: number) => (
+            {dataPoint.conditions.map((condition: unknown, condIndex: number) => (
               <tr key={condIndex} className="hover:bg-gray-50">
                 <td className="px-4 py-3">{condition.sprinkler_type || dataPoint.sprinkler_type}</td>
                 <td className="px-4 py-3">{condition.max_ceiling_slope}</td>
@@ -235,10 +228,10 @@ const Table1Display = () => {
 
   const Calculator = () => {
     const [result, setResult] = useState<{
-      sprinklersPerBranch: any;
-      dataPoint: any;
-      condition: any;
-      equation?: any;
+      sprinklersPerBranch: unknown;
+      dataPoint: unknown;
+      condition: unknown;
+      equation?: unknown;
     } | null>(null);
 
     const calculate = () => {

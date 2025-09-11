@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface CompanyCardProps {
-  company: any
+  company: unknown
 }
 
 export function CompanyCard({ company }: CompanyCardProps) {

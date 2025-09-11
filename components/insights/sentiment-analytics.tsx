@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { 
   Smile,
@@ -52,7 +51,7 @@ export function SentimentAnalytics() {
           neutral: 25,
           negative: 10,
           trend: "up",
-          recentMeetings: meetings.slice(0, 5).map((meeting: any) => ({
+          recentMeetings: meetings.slice(0, 5).map((meeting: unknown) => ({
             title: meeting.title || 'Meeting',
             date: new Date(meeting.created_at),
             sentiment: Math.floor(Math.random() * 40) + 60, // Mock sentiment 60-100

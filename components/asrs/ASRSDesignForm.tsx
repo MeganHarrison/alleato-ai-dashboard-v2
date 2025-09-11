@@ -95,10 +95,9 @@ interface Results {
 }
 
 const ASRSDesignForm: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isCalculating, setIsCalculating] = useState(false);
-  const [hasResults, setHasResults] = useState(false);
-
+  const [currentStep] = useState($2);
+  const [isCalculating] = useState($2);
+  const [hasResults] = useState($2);
   const steps: Step[] = [
     { title: "Project Info", description: "Basic project details" },
     { title: "ASRS Config", description: "System configuration" },
@@ -219,7 +218,7 @@ const ASRSDesignForm: React.FC = () => {
     { value: "high_value_items", name: "High-Value Items" },
   ];
 
-  const updateFormData = useCallback((field: keyof FormData, value: any) => {
+  const updateFormData = useCallback((field: keyof FormData, value: unknown) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
@@ -322,7 +321,7 @@ const ASRSDesignForm: React.FC = () => {
 
   const trackLead = useCallback(
     async (results: Results) => {
-      let score = 0;
+      const score = 0;
       if (formData.storage_height_ft && formData.storage_height_ft > 15)
         score += 25;
       if (formData.container_type.includes("combustible")) score += 30;

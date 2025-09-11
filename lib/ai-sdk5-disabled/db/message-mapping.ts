@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { UIMessagePart } from "ai";
 import { NewPart, Part } from "./schema";
 import { MyMessagePart } from "../types/message-types";

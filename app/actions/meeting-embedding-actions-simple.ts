@@ -42,7 +42,7 @@ export async function queryMeetingChunksSimple(
     }
 
     // Format the results to match expected structure
-    const formattedData = data?.map((chunk: any) => ({
+    const formattedData = data?.map((chunk: unknown) => ({
       content: chunk.content,
       meeting_title: chunk.meetings.title,
       meeting_date: chunk.meetings.date,

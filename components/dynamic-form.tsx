@@ -46,7 +46,7 @@ const unwrapZodType = (fieldSchema: ZodTypeAny): ZodTypeAny => {
       `unwrapZodType received an invalid Zod schema object. Check the console for the problematic schema/key.`
     )
   }
-  let currentSchema = fieldSchema
+  const currentSchema = fieldSchema
 
   // Support both old (typeName) and new (type) Zod formats
   const getTypeName = (def: Record<string, any>) => def.typeName || def.type

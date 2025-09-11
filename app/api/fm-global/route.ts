@@ -10,15 +10,13 @@ import OpenAI from 'openai';
 const openaiClient = isTracingEnabled ? wrapOpenAI(new OpenAI()) : new OpenAI();
 
 // FM Global ASRS Expert Railway endpoint
-const FM_GLOBAL_API_URL = process.env.RAILWAY_ASRS_RAG ? 
-                           `https://${process.env.RAILWAY_ASRS_RAG}` :
+const FM_GLOBAL_API_URL = process.env.RAILWAY_ASRS_RAG ||
                            process.env.FM_GLOBAL_RAILWAY_API_URL || 
-                           process.env.FM_GLOBAL_API_URL ||
-                           'https://fm-global-asrs-expert-production-afb0.up.railway.app';
+                           process.env.FM_GLOBAL_API_URL;
 
 // Trace the Railway API call
 const callRailwayEndpoint = traceable(
-  async function railwayFMGlobalCall(apiUrl: string, requestBody: any) {
+  async function railwayFMGlobalCall(apiUrl: string, requestBody: unknown) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
     
@@ -63,7 +61,7 @@ const callRailwayEndpoint = traceable(
 
 // Trace the OpenAI fallback
 const callOpenAIFallback = traceable(
-  async function openAIFMGlobalFallback(messages: any[]) {
+  async function openAIFMGlobalFallback(messages: unknown[]) {
     const systemMessage = {
       role: 'system',
       content: `You are an expert assistant specialized in FM Global standards for sprinkler systems, particularly FM Global 8-34 for ASRS (Automated Storage and Retrieval Systems). 
@@ -119,7 +117,7 @@ const callOpenAIFallback = traceable(
 
 // Main traced handler
 const handleFMGlobalRequest = traceable(
-  async function fmGlobalHandler(body: any) {
+  async function fmGlobalHandler(body: unknown) {
     const { messages, sessionId, userId } = body;
     const runId = crypto.randomUUID();
     
@@ -139,7 +137,7 @@ const handleFMGlobalRequest = traceable(
       let requestBody;
       if (messages && Array.isArray(messages)) {
         const lastUserMessage = messages
-          .filter((msg: any) => msg.role === 'user')
+          .filter((msg: unknown) => msg.role === 'user')
           .pop();
         
         requestBody = {
@@ -209,7 +207,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Non-traced handler for when tracing is disabled
-async function handleNonTracedRequest(body: any) {
+async function handleNonTracedRequest(body: unknown) {
   const { messages } = body;
   
   // Check if we should use Railway endpoint or fallback to OpenAI
@@ -220,7 +218,7 @@ async function handleNonTracedRequest(body: any) {
       let requestBody;
       if (messages && Array.isArray(messages)) {
         const lastUserMessage = messages
-          .filter((msg: any) => msg.role === 'user')
+          .filter((msg: unknown) => msg.role === 'user')
           .pop();
         
         requestBody = {
@@ -254,7 +252,8 @@ async function handleNonTracedRequest(body: any) {
           return NextResponse.json({
             ...data,
             _source: 'railway',
-            _endpoint: FM_GLOBAL_API_URL
+            _endpoint: FM_GLOBAL_API_URL,
+            _verified_railway_response: true
           });
         }
       }

@@ -42,7 +42,7 @@ interface FMTable {
   description: string | null;
   commodity_types: string | null;
   protection_scheme: string | null;
-  data: any;
+  data: unknown;
 }
 
 /**

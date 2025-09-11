@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use server";
 
 import { createClient } from '@supabase/supabase-js';
@@ -52,7 +51,7 @@ export const upsertMessage = async ({
   // Insert new parts
   if (message.parts && message.parts.length > 0) {
     const partsToInsert = message.parts.map((part: UIMessagePart, index: number) => {
-      const base: any = {
+      const base: unknown = {
         id: generateId(),
         messageId: id,
         type: part.type,
@@ -67,21 +66,21 @@ export const upsertMessage = async ({
           base.reasoning_text = (part as any).text;
           break;
         case 'file': {
-          const p: any = part;
+          const p: unknown = part;
           base.file_mediaType = p.mediaType;
           base.file_filename = p.filename ?? null;
           base.file_url = p.url;
           break;
         }
         case 'source_url': {
-          const p: any = part;
+          const p: unknown = part;
           base.source_url_sourceId = p.sourceId;
           base.source_url_url = p.url;
           base.source_url_title = p.title ?? null;
           break;
         }
         case 'source_document': {
-          const p: any = part;
+          const p: unknown = part;
           base.source_document_sourceId = p.sourceId;
           base.source_document_mediaType = p.mediaType;
           base.source_document_title = p.title;
@@ -89,7 +88,7 @@ export const upsertMessage = async ({
           break;
         }
         case 'tool-getWeatherInformation': {
-          const p: any = part;
+          const p: unknown = part;
           base.tool_toolCallId = p.toolCallId;
           base.tool_state = p.state;
           base.tool_errorText = p.errorText ?? null;
@@ -98,7 +97,7 @@ export const upsertMessage = async ({
           break;
         }
         case 'tool-getLocation': {
-          const p: any = part;
+          const p: unknown = part;
           base.tool_toolCallId = p.toolCallId;
           base.tool_state = p.state;
           base.tool_errorText = p.errorText ?? null;
@@ -107,7 +106,7 @@ export const upsertMessage = async ({
           break;
         }
         case 'data-weather': {
-          const p: any = part;
+          const p: unknown = part;
           const d = p.data || {};
           base.data_weather_id = generateId();
           base.data_weather_location = d.location ?? null;
@@ -142,7 +141,7 @@ export const loadChat = async (chatId: string): Promise<MyUIMessage[]> => {
   if (!messagesData || messagesData.length === 0) return [];
 
   // 2) fetch parts for these messages
-  const messageIds = messagesData.map((m: any) => m.id);
+  const messageIds = messagesData.map((m: unknown) => m.id);
   const { data: partsData, error: partsErr } = await supabase
     .from('parts')
     .select('*')
@@ -151,15 +150,15 @@ export const loadChat = async (chatId: string): Promise<MyUIMessage[]> => {
   if (partsErr) throw partsErr;
 
   const byMessage = new Map<string, any[]>();
-  (partsData || []).forEach((p: any) => {
+  (partsData || []).forEach((p: unknown) => {
     const arr = byMessage.get(p.messageId) || [];
     arr.push(p);
     byMessage.set(p.messageId, arr);
   });
 
-  return messagesData.map((m: any) => {
+  return messagesData.map((m: unknown) => {
     const p = byMessage.get(m.id) || [];
-    const uiParts: UIMessagePart[] = p.map((part: any) => {
+    const uiParts: UIMessagePart[] = p.map((part: unknown) => {
       switch (part.type) {
         case 'text':
           return { type: 'text', text: part.text_text ?? '' } as any;

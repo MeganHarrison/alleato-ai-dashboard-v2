@@ -218,8 +218,7 @@ export function Weather({
     end: new Date(weatherAtLocation.daily.sunset[0]),
   });
 
-  const [isMobile, setIsMobile] = useState(false);
-
+  const [isMobile] = useState($2);
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);

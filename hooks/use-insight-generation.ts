@@ -16,7 +16,7 @@ interface UseInsightGenerationOptions {
 }
 
 export function useInsightGeneration(options: UseInsightGenerationOptions = {}) {
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating] = useState($2);
   const [progress, setProgress] = useState<string>('');
 
   const generateInsights = async (documentId: string) => {

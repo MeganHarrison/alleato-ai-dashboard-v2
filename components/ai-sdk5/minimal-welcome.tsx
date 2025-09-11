@@ -1,5 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 interface MinimalWelcomeProps {

@@ -160,7 +160,7 @@ async function executeMigration() {
       try {
         await client.query(step.sql);
         console.log(`   ✅ Success\n`);
-      } catch (error: any) {
+      } catch (error: unknown) {
         if (error.code === '42710') { // duplicate_object
           console.log(`   ⏭️  Skipped (already exists)\n`);
         } else if (error.code === '42701') { // duplicate_column
@@ -343,7 +343,7 @@ const createDocumentInsight = async (
 
 // Querying insights with proper joins
 const getInsightsWithContext = async (projectId?: number) => {
-  let query = supabase
+  const query = supabase
     .from('ai_insights')
     .select(\`
       *,

@@ -56,11 +56,11 @@ async function generateAllInsights() {
     }
     
     const generator = new InsightGenerator();
-    let successCount = 0;
-    let errorCount = 0;
+    const successCount = 0;
+    const errorCount = 0;
     
     // Process in batches
-    for (let i = 0; i < documentsToProcess.length; i += BATCH_SIZE) {
+    for (const i = 0; i < documentsToProcess.length; i += BATCH_SIZE) {
       const batch = documentsToProcess.slice(i, i + BATCH_SIZE);
       const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
       const totalBatches = Math.ceil(documentsToProcess.length / BATCH_SIZE);

@@ -14,7 +14,7 @@ export const SYSTEM_SCHEMAS = [
  * Generates the SQL query to list tables in the database.
  */
 export function listTablesSql(schemas: string[] = []) {
-  let sql = stripIndent`
+  const sql = stripIndent`
     with
       tables as (${tablesSql}),
       columns as (${columnsSql})

@@ -1,5 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
 import { marked } from 'marked';
 import { memo, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';

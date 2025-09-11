@@ -22,7 +22,7 @@ const openai = new OpenAI({ apiKey: openaiApiKey });
 function chunkText(text: string, maxChunkSize = 1000): string[] {
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
   const chunks: string[] = [];
-  let currentChunk = '';
+  const currentChunk = '';
 
   for (const sentence of sentences) {
     if ((currentChunk + sentence).length > maxChunkSize && currentChunk) {
@@ -109,7 +109,7 @@ async function processMeetings() {
     console.log(`  📝 Created ${chunks.length} chunks`);
 
     // Generate embeddings for each chunk
-    for (let i = 0; i < chunks.length; i++) {
+    for (const i = 0; i < chunks.length; i++) {
       try {
         console.log(`  🔄 Generating embedding for chunk ${i + 1}/${chunks.length}`);
         const embedding = await generateEmbedding(chunks[i]);
@@ -186,7 +186,7 @@ async function testVectorSearch() {
       }
     } else if (data && data.length > 0) {
       console.log(`\n✅ Vector search successful! Found ${data.length} results:`);
-      data.forEach((result: any, index: number) => {
+      data.forEach((result: unknown, index: number) => {
         console.log(`\n${index + 1}. Similarity: ${(result.similarity * 100).toFixed(1)}%`);
         console.log(`   Content: ${result.content.substring(0, 100)}...`);
       });

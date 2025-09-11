@@ -19,9 +19,9 @@ interface DocumentToUpdate {
   id: string;
   title: string;
   summary: string | null;
-  metadata: any;
-  action_items: any;
-  bullet_points: any;
+  metadata: unknown;
+  action_items: unknown;
+  bullet_points: unknown;
 }
 
 async function updateDocumentSummaries() {
@@ -48,19 +48,19 @@ async function updateDocumentSummaries() {
 
     console.log(`✅ Found ${documents.length} documents to check\n`);
 
-    let updatedCount = 0;
-    let skippedCount = 0;
-    let errorCount = 0;
+    const updatedCount = 0;
+    const skippedCount = 0;
+    const errorCount = 0;
 
     for (const doc of documents as DocumentToUpdate[]) {
       try {
         // Check if metadata contains summary data
         const metadata = doc.metadata;
-        let hasUpdates = false;
-        const updates: any = {};
+        const hasUpdates = false;
+        const updates: unknown = {};
 
         // Check for overview in different possible locations
-        let overview = null;
+        const overview = null;
         
         // Check if metadata has a summary object with overview
         if (metadata?.summary?.overview) {
@@ -85,7 +85,7 @@ async function updateDocumentSummaries() {
         }
 
         // Check for action_items
-        let actionItems = null;
+        const actionItems = null;
         if (metadata?.summary?.action_items) {
           actionItems = metadata.summary.action_items;
         } else if (metadata?.full_summary?.action_items) {
@@ -104,7 +104,7 @@ async function updateDocumentSummaries() {
         }
 
         // Check for bullet_points (from bullet_gist)
-        let bulletPoints = null;
+        const bulletPoints = null;
         if (metadata?.summary?.bullet_gist) {
           bulletPoints = metadata.summary.bullet_gist;
         } else if (metadata?.full_summary?.bullet_gist) {

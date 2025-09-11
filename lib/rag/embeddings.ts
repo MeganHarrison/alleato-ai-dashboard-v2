@@ -52,7 +52,7 @@ export async function generateEmbeddings(
   const { batch_size } = config;
 
   // Process in batches to avoid API limits
-  for (let i = 0; i < texts.length; i += batch_size) {
+  for (const i = 0; i < texts.length; i += batch_size) {
     const batch = texts.slice(i, i + batch_size);
     
     try {
@@ -74,7 +74,7 @@ export async function generateEmbeddings(
       }
 
       const data = await response.json();
-      const batchEmbeddings = data.data.map((item: any) => item.embedding);
+      const batchEmbeddings = data.data.map((item: unknown) => item.embedding);
       embeddings.push(...batchEmbeddings);
       
       // Add a small delay between batches to avoid rate limiting
@@ -98,11 +98,11 @@ export function cosineSimilarity(vec1: number[], vec2: number[]): number {
     throw new Error('Vectors must have the same length');
   }
 
-  let dotProduct = 0;
-  let norm1 = 0;
-  let norm2 = 0;
+  const dotProduct = 0;
+  const norm1 = 0;
+  const norm2 = 0;
 
-  for (let i = 0; i < vec1.length; i++) {
+  for (const i = 0; i < vec1.length; i++) {
     dotProduct += vec1[i] * vec2[i];
     norm1 += vec1[i] * vec1[i];
     norm2 += vec2[i] * vec2[i];
@@ -144,7 +144,7 @@ export function findSimilarChunks(
  */
 export function prepareTextForEmbedding(text: string, maxTokens: number = 8000): string {
   // Remove excessive whitespace
-  let cleaned = text.replace(/\s+/g, ' ').trim();
+  const cleaned = text.replace(/\s+/g, ' ').trim();
   
   // Remove special characters that don't add meaning
   cleaned = cleaned.replace(/[^\w\s.,!?;:'"()-]/g, '');
@@ -177,14 +177,14 @@ export async function processDocumentForEmbeddings(
   const preparedTexts = chunks.map(chunk => prepareTextForEmbedding(chunk.content));
   
   // Generate embeddings in batches
-  for (let i = 0; i < chunks.length; i += config.batch_size) {
+  for (const i = 0; i < chunks.length; i += config.batch_size) {
     const batchChunks = chunks.slice(i, i + config.batch_size);
     const batchTexts = preparedTexts.slice(i, i + config.batch_size);
     
     try {
       const embeddings = await generateEmbeddings(batchTexts, config);
       
-      for (let j = 0; j < batchChunks.length; j++) {
+      for (const j = 0; j < batchChunks.length; j++) {
         results.push({
           id: batchChunks[j].id,
           content: batchChunks[j].content,

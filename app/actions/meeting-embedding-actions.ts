@@ -29,7 +29,7 @@ export async function queryMeetingChunks(
     }
 
     // Format the results for use in chat context
-    const formattedData = data?.map((chunk: any) => ({
+    const formattedData = data?.map((chunk: unknown) => ({
       content: chunk.chunk_text,
       meeting_title: chunk.meeting_title,
       meeting_date: chunk.meeting_date,

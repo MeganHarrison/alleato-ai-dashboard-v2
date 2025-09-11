@@ -13,7 +13,7 @@ export interface ChatMessage {
   message: string;
   timestamp: Date;
   type?: 'text' | 'search' | 'document' | 'system';
-  metadata?: any;
+  metadata?: unknown;
 }
 
 interface ChatMessageProps {
@@ -49,7 +49,7 @@ export function ChatMessage({ message, isOwnMessage = false, showAvatar = true }
         <div className="space-y-2">
           <p className="font-medium">🔍 Shared search results for: "{message.metadata.query}"</p>
           <div className="pl-4 border-l-2 border-blue-500 space-y-1">
-            {message.metadata.results.slice(0, 3).map((result: any, idx: number) => (
+            {message.metadata.results.slice(0, 3).map((result: unknown, idx: number) => (
               <div key={idx} className="text-sm">
                 <span className="font-medium">[{(result.similarity * 100).toFixed(0)}%]</span>{' '}
                 <span className="text-muted-foreground">

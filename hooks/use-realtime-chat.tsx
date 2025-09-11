@@ -16,9 +16,8 @@ export function useRealtimeChat({
   initialMessages = []
 }: UseRealtimeChatOptions) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  
+  const [isConnected] = useState($2);
+  const [isLoading] = useState($2);
   const supabase = createClient();
 
   // Load existing messages
@@ -94,7 +93,7 @@ export function useRealtimeChat({
   const sendMessage = useCallback(async (
     message: string,
     type: 'text' | 'search' | 'document' | 'system' = 'text',
-    metadata?: any
+    metadata?: unknown
   ) => {
     try {
       const { data, error } = await supabase
@@ -120,7 +119,7 @@ export function useRealtimeChat({
   // Share search results
   const shareSearchResults = useCallback(async (
     query: string,
-    results: any[]
+    results: unknown[]
   ) => {
     const metadata = {
       type: 'search',

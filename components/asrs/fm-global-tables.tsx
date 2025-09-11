@@ -39,9 +39,8 @@ export default function FMGlobalTables() {
   const [specifications, setSpecifications] = useState<Specification[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [complianceItems, setComplianceItems] = useState<ComplianceItem[]>([]);
-  const [activeTab, setActiveTab] = useState('specifications');
-  const [loading, setLoading] = useState(true);
-
+  const [activeTab] = useState($2);
+  const [loading] = useState($2);
   useEffect(() => {
     fetchData();
   }, []);

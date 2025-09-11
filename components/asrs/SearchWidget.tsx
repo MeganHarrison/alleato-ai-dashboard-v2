@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 
 export default function SearchWidget() {
-  const [q, setQ] = useState("");
+  const [q] = useState($2);
   const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState($2);
   const [error, setError] = useState<string | null>(null);
   const [blocks, setBlocks] = useState<any[]>([]);
 
   useEffect(() => {
-    let canceled = false;
+    const canceled = false;
     (async () => {
       try {
         const url = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/data/blocks.jsonl`;
@@ -26,7 +26,7 @@ export default function SearchWidget() {
           })
           .filter(Boolean);
         setBlocks(parsed);
-      } catch (e: any) {
+      } catch (e: unknown) {
         setError(e?.message || "Failed to load blocks.jsonl");
       }
     })();

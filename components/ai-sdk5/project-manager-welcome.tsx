@@ -1,10 +1,7 @@
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { FileText, TrendingUp, Target, Users, Calendar, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";

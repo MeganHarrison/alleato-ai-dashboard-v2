@@ -9,7 +9,7 @@ if (!RAILWAY_API_URL) {
   console.error('❌ RAILWAY_PM_RAG environment variable not set');
 }
 
-async function queryRailwayRAG(message: string, conversationHistory: any[] = []) {
+async function queryRailwayRAG(message: string, conversationHistory: unknown[] = []) {
   if (!RAILWAY_API_URL) {
     throw new Error('Railway API URL not configured');
   }
@@ -74,8 +74,8 @@ export async function POST(req: NextRequest) {
 
     // Query Railway RAG API
     let railwayResponse;
-    let ragContext = '';
-    let sources: any[] = [];
+    const ragContext = '';
+    let sources: unknown[] = [];
 
     try {
       railwayResponse = await queryRailwayRAG(lastMessage.content, messages);
@@ -149,7 +149,7 @@ Remember: You have access to real-time data through the Railway RAG system. Use 
     const result = await streamText({
       model: openai('gpt-4-turbo'),
       system: systemPrompt,
-      messages: messages.map((msg: any) => ({
+      messages: messages.map((msg: unknown) => ({
         role: msg.role,
         content: msg.content,
       })),

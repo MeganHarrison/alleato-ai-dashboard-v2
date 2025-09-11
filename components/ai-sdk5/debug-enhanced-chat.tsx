@@ -1,6 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { useChat } from "@ai-sdk/react";

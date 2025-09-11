@@ -1,5 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { useChat } from "@ai-sdk/react";
@@ -44,8 +42,8 @@ export function EnhancedChat({
   suggestedQuestions = [],
   minimalWelcome = false
 }: EnhancedChatProps) {
-  const [input, setInput] = useState(initialPrompt || "");
-  const [hasSubmittedInitial, setHasSubmittedInitial] = useState(false);
+  const [input] = useState($2);
+  const [hasSubmittedInitial] = useState($2);
   const lastSavedMessagesRef = useRef<string>("");
 
   /**

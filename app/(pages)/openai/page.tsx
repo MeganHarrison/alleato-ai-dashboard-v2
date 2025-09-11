@@ -23,7 +23,6 @@ export default function OpenAIChat() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -105,8 +104,95 @@ export default function OpenAIChat() {
                   ) : (
                     <User className="w-5 h-5 mt-0.5 flex-shrink-0" />
                   )}
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {message.content}
+                  <div className="text-sm leading-relaxed">
+                    {message.content.split('\n').map((line, index) => {
+                      // Handle numbered lists
+                      if (line.match(/^\d+\.\s\*\*.*\*\*/)) {
+                        return (
+                          <div key={index} className="mb-4">
+                            <h4 className="font-semibold text-blue-700 mb-2">{line.replace(/^\d+\.\s/, '').replace(/\*\*/g, '')}</h4>
+                          </div>
+                        );
+                      }
+                      // Handle sub-bullets with dashes
+                      else if (line.match(/^\s*-\s\*\*.*\*\*/)) {
+                        return (
+                          <div key={index} className="ml-4 mb-1 flex items-start gap-2">
+                            <span className="text-blue-500 mt-1">•</span>
+                            <span className="font-medium">{line.replace(/^\s*-\s/, '').replace(/\*\*/g, '')}</span>
+                          </div>
+                        );
+                      }
+                      // Handle regular sub-bullets
+                      else if (line.match(/^\s*-\s/)) {
+                        return (
+                          <div key={index} className="ml-4 mb-1 flex items-start gap-2">
+                            <span className="text-gray-400 mt-1">•</span>
+                            <span>{line.replace(/^\s*-\s/, '')}</span>
+                          </div>
+                        );
+                      }
+                      // Handle markdown links
+                      else if (line.includes('[') && line.includes('](')) {
+                        const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+                        const parts = line.split(linkRegex);
+                        return (
+                          <div key={index} className="mb-2">
+                            {parts.map((part, partIndex) => {
+                              if (partIndex % 3 === 1) {
+                                // This is the link text
+                                return (
+                                  <a 
+                                    key={partIndex} 
+                                    href={parts[partIndex + 1]} 
+                                    className="text-blue-600 hover:text-blue-800 underline"
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                  >
+                                    {part}
+                                  </a>
+                                );
+                              } else if (partIndex % 3 === 2) {
+                                // This is the URL, skip it
+                                return null;
+                              } else {
+                                // This is regular text
+                                return <span key={partIndex}>{part}</span>;
+                              }
+                            })}
+                          </div>
+                        );
+                      }
+                      // Handle bold text
+                      else if (line.includes('**')) {
+                        const parts = line.split(/(\*\*[^*]+\*\*)/);
+                        return (
+                          <div key={index} className="mb-2">
+                            {parts.map((part, partIndex) => 
+                              part.startsWith('**') && part.endsWith('**') ? (
+                                <strong key={partIndex} className="font-semibold text-gray-900">
+                                  {part.replace(/\*\*/g, '')}
+                                </strong>
+                              ) : (
+                                <span key={partIndex}>{part}</span>
+                              )
+                            )}
+                          </div>
+                        );
+                      }
+                      // Handle empty lines
+                      else if (line.trim() === '') {
+                        return <div key={index} className="mb-3" />;
+                      }
+                      // Regular paragraphs
+                      else {
+                        return (
+                          <p key={index} className="mb-2 text-gray-700">
+                            {line}
+                          </p>
+                        );
+                      }
+                    })}
                   </div>
                 </div>
               </Card>

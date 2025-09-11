@@ -8,7 +8,7 @@ interface Document {
   id: number
   content: string | null
   document_type: string | null
-  metadata: any | null
+  metadata: unknown | null
   project_id?: number | null
   created_at?: string | null
   updated_at?: string | null

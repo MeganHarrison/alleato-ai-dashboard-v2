@@ -18,7 +18,7 @@ type FunctionCallMessageProps = {
 };
 
 export function FunctionCallMessage({ message }: FunctionCallMessageProps) {
-  let output = message?.output;
+  const output = message?.output;
   try {
     if (message.output) {
       output = JSON.stringify(JSON.parse(message.output), null, 2);

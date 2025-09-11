@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
@@ -27,20 +26,15 @@ import { createDocument } from "@/app/actions/documents-full-actions";
 import { toast } from "sonner";
 
 export function AddDocumentButton() {
-  const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    content: "",
-    document_type: "text",
-    metadata: "",
-  });
-
+  const [open] = useState($2);
+  const [isLoading] = useState($2);
+  const [formData] = useState($2);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      let metadata = null;
+      const metadata = null;
       if (formData.metadata) {
         try {
           metadata = JSON.parse(formData.metadata);

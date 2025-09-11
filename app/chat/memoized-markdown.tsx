@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 
 function parseMarkdownIntoBlocks(markdown: string): string[] {
   const tokens = marked.lexer(markdown);
-  return tokens.map((token: any) => token.raw);
+  return tokens.map((token: unknown) => token.raw);
 }
 
 const MemoizedMarkdownBlock = memo(

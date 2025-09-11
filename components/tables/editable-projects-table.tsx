@@ -13,14 +13,14 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 
 interface EditableProjectsTableProps {
-  projects: any[]
+  projects: unknown[]
 }
 
 export function EditableProjectsTable({ projects }: EditableProjectsTableProps) {
   const [editingCell, setEditingCell] = useState<{ rowId: string; field: string } | null>(null)
   const [tempValue, setTempValue] = useState<string>("")
 
-  const handleCellClick = (rowId: string, field: string, value: any) => {
+  const handleCellClick = (rowId: string, field: string, value: unknown) => {
     if (field === "created_at") return // Don't allow editing created_at
     setEditingCell({ rowId, field })
     setTempValue(value || "")
@@ -67,7 +67,7 @@ export function EditableProjectsTable({ projects }: EditableProjectsTableProps) 
       .join(" ")
   }
 
-  const renderEditableCell = (project: any, field: string, value: any) => {
+  const renderEditableCell = (project: unknown, field: string, value: unknown) => {
     const isEditing = editingCell?.rowId === project.id && editingCell?.field === field
 
     if (field === "status") {

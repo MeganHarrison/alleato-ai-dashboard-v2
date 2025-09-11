@@ -1,0 +1,32 @@
+name: Auto-label Autonomous (Trusted Authors)
+on:
+  pull_request_target:
+    types: [opened, reopened, ready_for_review, synchronize]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Check if author is allowed
+        id: auth
+        run: |
+          ALLOWED="${{ vars.CLAUDE_ALLOWED_LOGINS }}"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          if [ -z "$ALLOWED" ]; then
+            echo "CLAUDE_ALLOWED_LOGINS is empty"; echo "ok=false" >> $GITHUB_OUTPUT; exit 0
+          fi
+          if echo ",$ALLOWED," | grep -qi ",$AUTHOR," ; then
+            echo "ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "ok=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add 'autonomous' label
+        if: steps.auth.outputs.ok == 'true'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: autonomous

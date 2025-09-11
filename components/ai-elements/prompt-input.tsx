@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -153,7 +152,7 @@ export const PromptInputSubmit = ({
   children,
   ...props
 }: PromptInputSubmitProps) => {
-  let Icon = <SendIcon className="size-4" />;
+  const Icon = <SendIcon className="size-4" />;
 
   if (status === 'submitted') {
     Icon = <Loader2Icon className="size-4 animate-spin" />;

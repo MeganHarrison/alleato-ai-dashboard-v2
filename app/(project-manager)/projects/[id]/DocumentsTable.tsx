@@ -52,7 +52,7 @@ interface Document {
   content: string | null;
   document_type: string | null;
   embedding: string | null;
-  metadata: any;
+  metadata: unknown;
   created_at?: string | null;
   updated_at?: string | null;
 }
@@ -78,7 +78,7 @@ export function DocumentsTable({
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editedDocument, setEditedDocument] = useState<Partial<Document>>({});
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteDialogOpen] = useState($2);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
     null
   );
@@ -102,7 +102,7 @@ export function DocumentsTable({
         throw new Error("Database connection not available");
       }
 
-      const updateData: any = {
+      const updateData: unknown = {
         title: editedDocument.title,
         date: editedDocument.date,
         project: editedDocument.project,
@@ -140,7 +140,7 @@ export function DocumentsTable({
     }
   };
 
-  const handleFieldChange = (field: keyof Document, value: any) => {
+  const handleFieldChange = (field: keyof Document, value: unknown) => {
     setEditedDocument((prev) => ({ ...prev, [field]: value }));
   };
 

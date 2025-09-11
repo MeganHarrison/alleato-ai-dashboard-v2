@@ -31,7 +31,7 @@ function ProviderSettingsView({
   projectRef: string
   schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>>
   title: string
-  initialValues: any
+  initialValues: unknown
   onSuccess: () => void
 }) {
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useUpdateAuthConfig()

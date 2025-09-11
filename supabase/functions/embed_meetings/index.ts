@@ -28,7 +28,7 @@ const supabase = createClient(
 function splitIntoChunks(text: string, maxTokens = 500): string[] {
   const sentences = text.split(/(?<=[.!?])\s+/);
   const chunks: string[] = [];
-  let current = "";
+  const current = "";
 
   for (const s of sentences) {
     // rough token estimate: 1 token ≈ 4 characters
@@ -91,7 +91,7 @@ export const handler = async (req: Request): Promise<Response> => {
       const embeddingModel = new OpenAI("text-embedding-3-large");
 
       // 2c️⃣ Loop through chunks, embed, and store
-      for (let i = 0; i < chunks.length; i++) {
+      for (const i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
         const { data: vectors, error: embedErr } = await embeddingModel.run(
           chunk,

@@ -1,6 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { useChat } from "@ai-sdk/react";
@@ -21,7 +18,7 @@ interface ChatProps {
 }
 
 export function Chat({ id, initialMessages = [] }: ChatProps) {
-  const [input, setInput] = useState("");
+  const [input] = useState($2);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

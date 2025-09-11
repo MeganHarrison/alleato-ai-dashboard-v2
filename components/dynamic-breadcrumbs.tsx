@@ -83,7 +83,7 @@ export function DynamicBreadcrumbs() {
         {segments.map((segment, index) => {
           const href = "/" + segments.slice(0, index + 1).join("/")
           const isLast = index === segments.length - 1
-          let displayText = formatSegment(segment)
+          const displayText = formatSegment(segment)
 
           // Use meeting title if this is a meeting UUID and we have the title
           if (isUUID(segment) && segments[index - 1] === 'meetings' && meetingTitle) {

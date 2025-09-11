@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface ClientCardProps {
-  client: any
+  client: unknown
 }
 
 export function ClientCard({ client }: ClientCardProps) {

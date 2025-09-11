@@ -60,7 +60,7 @@ export function InsightsTimeline() {
         
         const data = await response.json()
         
-        const timelineInsights: TimelineInsight[] = data.map((insight: any) => ({
+        const timelineInsights: TimelineInsight[] = data.map((insight: unknown) => ({
           id: insight.id.toString(),
           title: insight.title,
           description: insight.description,

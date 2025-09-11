@@ -35,7 +35,7 @@ export function chunkText(
   }
   
   const chunks: string[] = [];
-  let currentChunk = '';
+  const currentChunk = '';
   
   for (const section of sections) {
     // If section is empty, skip

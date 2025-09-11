@@ -1,0 +1,13 @@
+# Example CODEOWNERS. Replace with your GitHub usernames or teams.
+# Syntax: file_or_dir @owner1 @owner2
+* @megankharrison
+
+# Frontend
+/app/ @megankharrison
+/components/ @megankharrison
+
+# Cloudflare Workers
+/workers/ @megankharrison
+
+# Tests
+/tests/ @megankharrison

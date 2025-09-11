@@ -209,7 +209,7 @@ export function AIElementsChat({
                   {message.role === "assistant" ? (
                     <Response>
                       {/* Handle different content types */}
-                      {message.toolInvocations?.map((tool: any) => (
+                      {message.toolInvocations?.map((tool: unknown) => (
                         <Tool
                           key={tool.toolCallId}
                           name={tool.toolName}

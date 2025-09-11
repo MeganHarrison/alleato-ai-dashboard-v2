@@ -68,7 +68,7 @@ export default function TVNoise({
       const data = imageData.data;
 
       // Generate random noise
-      for (let i = 0; i < data.length; i += 4) {
+      for (const i = 0; i < data.length; i += 4) {
         const noise = Math.random();
 
         if (noise < intensity) {

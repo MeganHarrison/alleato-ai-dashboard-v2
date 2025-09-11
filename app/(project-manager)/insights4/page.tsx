@@ -7,7 +7,6 @@ import MeetingUpload from "@/components/meetings/meeting-upload";
 import MeetingInsightsGenerator from "@/components/meetings/meeting-insights-generator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getMeetingStatistics } from "@/app/actions/meeting-insights-actions";
-import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Meeting Intelligence | Alleato AI",

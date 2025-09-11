@@ -37,7 +37,7 @@ interface UploadedFile {
 
 export default function RagSystemUploadPage() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading] = useState($2);
   const [tags, setTags] = useState<string>("");
   const [category, setCategory] = useState<string>("");
 
@@ -148,7 +148,7 @@ export default function RagSystemUploadPage() {
 
   const pollVectorizationStatus = async (jobId: string, fileIndex: number) => {
     const maxAttempts = 60; // 60 seconds timeout
-    let attempts = 0;
+    const attempts = 0;
 
     const interval = setInterval(async () => {
       try {
@@ -208,7 +208,7 @@ export default function RagSystemUploadPage() {
     setIsUploading(true);
     const pendingFiles = files.filter((f) => f.status === "pending");
 
-    for (let i = 0; i < files.length; i++) {
+    for (const i = 0; i < files.length; i++) {
       if (files[i].status === "pending") {
         await uploadFile(files[i], i);
       }

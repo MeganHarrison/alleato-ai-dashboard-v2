@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface DocumentCardProps {
-  document: any
+  document: unknown
 }
 
 export function DocumentCard({ document }: DocumentCardProps) {

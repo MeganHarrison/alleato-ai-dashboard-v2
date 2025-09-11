@@ -87,8 +87,8 @@ async function queryDocuments() {
     // Group by project
     const projectGroups: Record<string, any> = {};
     projectDocs.forEach(doc => {
-      let projectId = 'unknown';
-      let projectName = 'unknown';
+      const projectId = 'unknown';
+      const projectName = 'unknown';
       
       if (doc.metadata) {
         const metadata = typeof doc.metadata === 'string' 
@@ -121,7 +121,7 @@ async function queryDocuments() {
       console.log(`\n- Project ID: ${group.projectId}, Name: ${group.projectName}`);
       console.log(`  Document count: ${group.count}`);
       if (group.count <= 3) {
-        group.documents.forEach((doc: any) => {
+        group.documents.forEach((doc: unknown) => {
           console.log(`    • ${doc.title} (${doc.id})`);
         });
       }

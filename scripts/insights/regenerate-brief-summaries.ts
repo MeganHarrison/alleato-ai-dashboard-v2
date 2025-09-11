@@ -96,11 +96,11 @@ async function regenerateSummaries() {
     return;
   }
   
-  let successCount = 0;
-  let errorCount = 0;
+  const successCount = 0;
+  const errorCount = 0;
   
   // Process documents
-  for (let i = 0; i < documents.length; i++) {
+  for (const i = 0; i < documents.length; i++) {
     const doc = documents[i];
     
     try {

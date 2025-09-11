@@ -26,19 +26,10 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import {
   Briefcase,
   Building,
@@ -75,7 +66,7 @@ interface Project {
   updated_at?: string;
   due_date?: string;
   team?: string;
-  documents?: any[];
+  documents?: unknown[];
 }
 
 interface Service {
@@ -163,7 +154,7 @@ export default function DashboardHome() {
 
         const supabase = createClient();
 
-        let query = supabase.from("projects").select(`
+        const query = supabase.from("projects").select(`
             *,
             clients (
               id,
@@ -218,7 +209,7 @@ export default function DashboardHome() {
 
   // Filter and sort projects
   const filteredProjects = useMemo(() => {
-    let filtered = projects.filter((project) => {
+    const filtered = projects.filter((project) => {
       // Phase filter
       if (selectedPhase !== "all" && project.phase !== selectedPhase) {
         return false;
@@ -247,8 +238,8 @@ export default function DashboardHome() {
     // Apply sorting
     if (sortColumn) {
       filtered.sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
+        let aValue: unknown;
+        let bValue: unknown;
 
         switch (sortColumn) {
           case "name":
@@ -312,25 +303,6 @@ export default function DashboardHome() {
     setVisibleColumns(newVisible);
   };
 
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortDirection("asc");
-    }
-  };
-
-  const getSortIcon = (column: string) => {
-    if (sortColumn !== column) {
-      return <ChevronsUpDown className="ml-2 h-4 w-4" />;
-    }
-    return sortDirection === "asc" ? (
-      <ChevronUp className="ml-2 h-4 w-4" />
-    ) : (
-      <ChevronDown className="ml-2 h-4 w-4" />
-    );
-  };
 
   const CardView = () => (
     <div className={cn(

@@ -33,12 +33,12 @@ export function validateEnvVars(): EnvVars {
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('❌ Environment Variable Validation Failed:');
-      error.issues.forEach((err: any) => {
+      error.issues.forEach((err: unknown) => {
         console.error(`  - ${err.path.join('.')}: ${err.message}`);
       });
       
       // Provide specific guidance for missing Railway URLs
-      const missingRailwayVars = error.issues.filter((err: any) => 
+      const missingRailwayVars = error.issues.filter((err: unknown) => 
         err.path[0]?.toString().includes('RAILWAY')
       );
       

@@ -148,7 +148,7 @@ async function verifyDocumentInsights() {
       } else {
         console.log('⏭️ Skipped test (no test data available)');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error.code === '23514') { // check_violation
         console.log('✅ Check constraint is working correctly - prevented invalid insertion');
       } else {

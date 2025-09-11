@@ -20,9 +20,9 @@ export function looksLikeRevisionHistory(line: string) {
     );
 }
 
-export function cleanBlocks(raw: any[]) {
+export function cleanBlocks(raw: unknown[]) {
     // 1) remove boilerplate + revision lines
-    let blocks = (raw || []).filter((b) => {
+    const blocks = (raw || []).filter((b) => {
         const t = typeof b?.text === "string" ? b.text : "";
         if (!t) return false;
         if (isBoilerplate(t)) return false;
@@ -31,7 +31,7 @@ export function cleanBlocks(raw: any[]) {
     });
 
     // 2) keep only the first heading within the section
-    let seenHeading = false;
+    const seenHeading = false;
     blocks = blocks.filter((b) => {
         if (b.block_type === "heading") {
             if (seenHeading) return false;

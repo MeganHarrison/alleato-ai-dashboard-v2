@@ -48,7 +48,7 @@ const DEFAULT_CONFIG: ProcessingConfig = {
 
 export class EnhancedRAGPipeline {
   private config: ProcessingConfig;
-  private supabase: any;
+  private supabase: unknown;
 
   constructor(config: Partial<ProcessingConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -111,9 +111,9 @@ export class EnhancedRAGPipeline {
     
     // Semantic chunking - split by paragraphs first
     const paragraphs = content.split(/\n\n+/);
-    let currentChunk = '';
-    let currentStart = 0;
-    let currentEnd = 0;
+    const currentChunk = '';
+    const currentStart = 0;
+    const currentEnd = 0;
     
     for (const paragraph of paragraphs) {
       const trimmedParagraph = paragraph.trim();
@@ -176,7 +176,7 @@ export class EnhancedRAGPipeline {
     const chunks: Array<{ text: string; start: number; end: number }> = [];
     const { maxChunkSize, overlapSize } = this.config.chunking;
     
-    let start = 0;
+    const start = 0;
     while (start < content.length) {
       const end = Math.min(start + maxChunkSize, content.length);
       const text = content.substring(start, end);
@@ -214,7 +214,7 @@ export class EnhancedRAGPipeline {
     const embeddings: number[][] = [];
     
     // Process in batches
-    for (let i = 0; i < texts.length; i += batchSize) {
+    for (const i = 0; i < texts.length; i += batchSize) {
       const batch = texts.slice(i, i + batchSize);
       
       try {
@@ -243,7 +243,7 @@ export class EnhancedRAGPipeline {
   ): Promise<any[]> {
     const enrichedChunks = [];
     
-    for (let i = 0; i < chunks.length; i++) {
+    for (const i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       const embedding = embeddings[i];
       
@@ -376,7 +376,7 @@ export class EnhancedRAGPipeline {
   // Store chunks in database
   private async storeChunks(
     documentId: string,
-    chunks: any[]
+    chunks: unknown[]
   ): Promise<void> {
     const { error } = await this.supabase
       .from('document_chunks')
@@ -454,7 +454,7 @@ export class EnhancedRAGPipeline {
   // Re-rank search results using GPT-5
   private async rerankResults(
     query: string,
-    results: any[]
+    results: unknown[]
   ): Promise<any[]> {
     if (results.length === 0) return [];
     
@@ -499,7 +499,7 @@ ${results.map((r, i) => `[${i}] ${r.content.substring(0, 200)}`).join('\n\n')}`,
     metadata: Record<string, any> = {}
   ): Promise<{
     success: boolean;
-    insights?: any;
+    insights?: unknown;
     error?: string;
   }> {
     try {
@@ -574,7 +574,7 @@ Return JSON with:
   // Store meeting insights
   private async storeMeetingInsights(
     meetingId: string,
-    insights: any
+    insights: unknown
   ): Promise<void> {
     const { error } = await this.supabase
       .from('meeting_insights')

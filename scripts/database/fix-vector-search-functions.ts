@@ -30,7 +30,7 @@ async function runMigration(migrationPath: string) {
     for (const statement of statements) {
       try {
         await supabase.rpc('query', { query: statement + ';' }).single();
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Try direct SQL execution
         const { error: execError } = await supabase.from('_sql').select('*').limit(0);
         if (execError) {

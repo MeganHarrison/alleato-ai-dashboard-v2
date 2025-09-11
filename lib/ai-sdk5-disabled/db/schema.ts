@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { pgTable, text, integer, timestamp, jsonb, uuid } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
@@ -84,4 +83,4 @@ export type NewPart = typeof aiSdk5Parts.$inferInsert;
 
 // Import reference to projects table (assuming it exists)
 // Note: This should be imported from your main schema file
-declare const projects: any;
+declare const projects: unknown;

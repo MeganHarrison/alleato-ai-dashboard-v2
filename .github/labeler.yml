@@ -1,0 +1,9 @@
+frontend:
+  - 'app/**'
+  - 'components/**'
+workers:
+  - 'workers/**'
+tests:
+  - 'tests/**'
+docs:
+  - '**/*.md'

@@ -8,8 +8,8 @@ import { chats, messages, parts } from "@/lib/db/schema-pg";
 // } from "@/utils/message-mapping";
 
 // Temporary placeholders for disabled functions
-const mapDBPartToUIMessagePart = (part: any) => part;
-const mapUIMessagePartsToDBParts = (parts: any[], id: string) => [];
+const mapDBPartToUIMessagePart = (part: unknown) => part;
+const mapUIMessagePartsToDBParts = (parts: unknown[], id: string) => [];
 import { and, eq, gt } from "drizzle-orm";
 import { MyUIMessage } from "../message-type";
 

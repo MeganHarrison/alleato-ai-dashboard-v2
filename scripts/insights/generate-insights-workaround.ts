@@ -75,7 +75,7 @@ async function generateInsightsWorkaround() {
         }
         
         // 4. Get content for analysis
-        let content = '';
+        const content = '';
         
         // Try to get chunks first
         const { data: chunks } = await supabase
@@ -126,8 +126,8 @@ async function generateInsightsWorkaround() {
         }
         
         // 8. Insert into ai_insights table with duplicate prevention
-        let insertedCount = 0;
-        let duplicateCount = 0;
+        const insertedCount = 0;
+        const duplicateCount = 0;
         
         // Insert action items
         for (const item of insights.actionItems) {

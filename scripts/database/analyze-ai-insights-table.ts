@@ -23,8 +23,8 @@ async function analyzeAiInsightsTable() {
   console.log('📋 Column Information:');
   console.log('=' .repeat(80));
   
-  let columns = null;
-  let columnsError = null;
+  const columns = null;
+  const columnsError = null;
   
   try {
     const result = await supabase.rpc('get_table_columns', {
@@ -162,7 +162,7 @@ async function analyzeAiInsightsTable() {
 
   // 9. Check for duplicate prevention
   console.log('\n🔄 Duplicate Prevention Status:');
-  let duplicateCheck = null;
+  const duplicateCheck = null;
   
   try {
     const result = await supabase

@@ -45,8 +45,8 @@ async function applyMigration() {
     .map(s => s.trim())
     .filter(s => s && !s.startsWith('--'));
 
-  let successCount = 0;
-  let errorCount = 0;
+  const successCount = 0;
+  const errorCount = 0;
 
   // Execute each statement separately
   for (const statement of statements) {
@@ -78,7 +78,7 @@ async function applyMigration() {
         console.log(`✅ Statement executed successfully`);
         successCount++;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`❌ Error executing statement: ${error.message}`);
       errorCount++;
       
@@ -142,7 +142,7 @@ async function applyMigration() {
         console.log(`   🧹 Test record cleaned up`);
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`   ❌ Test failed: ${error.message}`);
   }
   

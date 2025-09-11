@@ -6,7 +6,7 @@ export async function integrateSupabaseMCP() {
     const tools = await (mcpClient as any).getTools();
     
     // Filter for Supabase-specific tools
-    const supabaseTools = (tools || []).filter((tool: any) => 
+    const supabaseTools = (tools || []).filter((tool: unknown) => 
       tool.name.includes('supabase') || 
       ['listTables', 'queryTable', 'executeSql'].includes(tool.name)
     );

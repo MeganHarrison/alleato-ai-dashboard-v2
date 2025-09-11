@@ -24,7 +24,7 @@ export default async function MeetingInsightsPage() {
 
   // Group insights by project
   const safeInsights = Array.isArray(insights) ? insights : [];
-  const insightsByProject = safeInsights.reduce((acc: any, insight: any) => {
+  const insightsByProject = safeInsights.reduce((acc: unknown, insight: unknown) => {
     const projectName = insight.project?.name || "No Project"
     if (!acc[projectName]) {
       acc[projectName] = {
@@ -55,7 +55,7 @@ export default async function MeetingInsightsPage() {
             </CardContent>
           </Card>
         ) : (
-          Object.entries(insightsByProject).map(([projectName, projectData]: any) => (
+          Object.entries(insightsByProject).map(([projectName, projectData]: unknown) => (
             <div key={projectName} className="space-y-4">
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-semibold">{projectName}</h2>
@@ -70,7 +70,7 @@ export default async function MeetingInsightsPage() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {projectData.insights.map((insight: any) => {
+                {projectData.insights.map((insight: unknown) => {
                   const typeConfig = insightTypeConfig[insight.type as keyof typeof insightTypeConfig] || insightTypeConfig.update
                   const priorityBadge = insight.priority ? priorityConfig[insight.priority as keyof typeof priorityConfig] : null
                   const Icon = typeConfig.icon

@@ -38,7 +38,7 @@ interface Block {
   ordinal: number;
   source_text: string;
   html: string;
-  meta: any;
+  meta: unknown;
   page_reference: number;
   inline_figures: number[];
   inline_tables: string[];
@@ -100,8 +100,8 @@ class FMDocsClient {
   }
   
   async getSectionNavigation(slug: string): Promise<{
-    previous_section: any;
-    next_section: any;
+    previous_section: unknown;
+    next_section: unknown;
   }> {
     const { data, error } = await this.supabase.rpc('get_section_navigation', { current_slug: slug });
     if (error) throw error;
@@ -255,8 +255,7 @@ interface SearchProps {
 }
 
 const SearchBar: React.FC<SearchProps> = ({ onSearch, onClear, isSearching }) => {
-  const [query, setQuery] = useState('');
-  
+  const [query] = useState($2);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
@@ -388,8 +387,8 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ breadcrumbs, sectionNumber }) =
 // Section Content Component
 interface SectionContentProps {
   content: SectionContent;
-  relatedFigures: any[];
-  relatedTables: any[];
+  relatedFigures: unknown[];
+  relatedTables: unknown[];
 }
 
 const SectionContentView: React.FC<SectionContentProps> = ({ 
@@ -530,8 +529,8 @@ const SectionContentView: React.FC<SectionContentProps> = ({
 
 // Navigation Footer Component
 interface NavigationFooterProps {
-  previousSection: any;
-  nextSection: any;
+  previousSection: unknown;
+  nextSection: unknown;
   onSectionClick: (slug: string) => void;
 }
 
@@ -596,14 +595,14 @@ export const FMDocsApp: React.FC<FMDocsAppProps> = ({
   const [currentContent, setCurrentContent] = useState<SectionContent | null>(null);
   const [relatedFigures, setRelatedFigures] = useState<any[]>([]);
   const [relatedTables, setRelatedTables] = useState<any[]>([]);
-  const [navigation, setNavigation] = useState<{ previous_section: any; next_section: any }>({
+  const [navigation, setNavigation] = useState<{ previous_section: unknown; next_section: unknown }>({
     previous_section: null,
     next_section: null
   });
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isSearching] = useState($2);
+  const [showSearch] = useState($2);
+  const [loading] = useState($2);
   const [error, setError] = useState<string | null>(null);
   
   // Load table of contents on mount

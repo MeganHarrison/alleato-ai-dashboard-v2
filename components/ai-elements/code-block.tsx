@@ -115,7 +115,7 @@ export const CodeBlockCopyButton = ({
   className,
   ...props
 }: CodeBlockCopyButtonProps) => {
-  const [isCopied, setIsCopied] = useState(false);
+  const [isCopied] = useState($2);
   const { code } = useContext(CodeBlockContext);
 
   const copyToClipboard = async () => {

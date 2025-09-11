@@ -113,7 +113,7 @@ class FirefliesClient {
 }
 
 function formatTranscriptToMarkdown(transcript: FirefliesTranscript): string {
-  let md = `# ${transcript.title}\n\n`
+  const md = `# ${transcript.title}\n\n`
   md += `**Date:** ${new Date(transcript.date).toLocaleDateString()}\n`
   md += `**Duration:** ${Math.round(transcript.duration / 60)} minutes\n`
   md += `**Participants:** ${transcript.participants?.join(", ") || "N/A"}\n\n`
@@ -142,7 +142,7 @@ function formatTranscriptToMarkdown(transcript: FirefliesTranscript): string {
   
   if (transcript.sentences?.length) {
     md += `## Transcript\n\n`
-    let currentSpeaker = ""
+    const currentSpeaker = ""
     
     for (const sentence of transcript.sentences) {
       if (sentence.speaker_name !== currentSpeaker) {
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
     // Get list of transcripts
     const transcripts = await client.getTranscripts(limit)
     
-    let processedCount = 0
+    const processedCount = 0
     const errors: string[] = []
     
     for (const transcript of transcripts) {

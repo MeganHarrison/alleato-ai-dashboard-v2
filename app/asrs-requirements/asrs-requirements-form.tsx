@@ -43,7 +43,7 @@ interface FormData {
 }
 
 const ASRSRequirementsForm: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep] = useState($2);
   const [formData, setFormData] = useState<FormData>({
     buildingType: '',
     ceilingHeight: 0,
@@ -87,7 +87,7 @@ const ASRSRequirementsForm: React.FC = () => {
   // Cost optimization logic
   useEffect(() => {
     const newRecommendations: string[] = [];
-    let savings = 0;
+    const savings = 0;
 
     // Open-top to closed-top analysis
     if (formData.containerConfiguration === 'open-top' && 
@@ -122,14 +122,14 @@ const ASRSRequirementsForm: React.FC = () => {
     setPotentialSavings(savings);
   }, [formData]);
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const updateNestedFormData = (parent: string, field: string, value: any) => {
+  const updateNestedFormData = (parent: string, field: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       [parent]: {

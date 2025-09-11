@@ -1,5 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { Chat } from "@/lib/ai-sdk5/db/schema";

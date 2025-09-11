@@ -3,7 +3,7 @@
  */
 
 // Dynamic import to handle browser-only loading
-let pdfjs: any = null;
+let pdfjs: unknown = null;
 
 /**
  * Initialize PDF.js library
@@ -48,16 +48,16 @@ export async function extractTextFromPDF(file: File): Promise<{ content: string;
     const pdf = await loadingTask.promise;
     const pageCount = pdf.numPages;
     
-    let fullText = '';
+    const fullText = '';
     
     // Extract text from each page
-    for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
+    for (const pageNum = 1; pageNum <= pageCount; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
       
       // Combine text items into a single string
       const pageText = textContent.items
-        .map((item: any) => item.str)
+        .map((item: unknown) => item.str)
         .join(' ');
       
       fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;

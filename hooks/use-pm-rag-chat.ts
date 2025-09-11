@@ -28,13 +28,12 @@ export interface UseChatReturn {
 
 export function usePMRAGChat(options: UseChatOptions = {}): UseChatReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
+  const [isLoading] = useState($2);
+  const [isStreaming] = useState($2);
   const [error, setError] = useState<string | null>(null);
-  const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
+  const [currentStreamingMessage] = useState($2);
   const [sources, setSources] = useState<string[]>([]);
-  const [confidence, setConfidence] = useState(0);
-  
+  const [confidence] = useState($2);
   const lastMessageRef = useRef<string>('');
   const lastOptionsRef = useRef<ChatOptions>({});
 
@@ -126,7 +125,7 @@ export function usePMRAGChat(options: UseChatOptions = {}): UseChatReturn {
       setMessages(prev => [...prev, userMessage]);
 
       // Create placeholder for assistant message
-      let assistantContent = '';
+      const assistantContent = '';
 
       await chatClient.streamMessage(
         message,

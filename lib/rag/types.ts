@@ -148,7 +148,7 @@ export interface UploadResponse {
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
 }
 

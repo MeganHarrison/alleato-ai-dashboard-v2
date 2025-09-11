@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -18,7 +17,7 @@ import { format, formatDistanceToNow } from "date-fns"
 interface ProcessingStatus {
   type: "idle" | "loading" | "success" | "error"
   message?: string
-  details?: any
+  details?: unknown
 }
 
 interface DocumentStatus {
@@ -121,11 +120,11 @@ export default function RAGVectorizationAdmin(): ReactElement {
       }
       
       // Show errors if any
-      let details = { ...data }
+      const details = { ...data }
       if (data.errors && data.errors.length > 0) {
-        details.failedTranscripts = data.errors.map((e: any) => ({
-          id: e.transcript_id,
-          error: e.error
+        details.failedTranscripts = data.errors.map((e: unknown) => ({
+          id: (e as {transcript_id: string}).transcript_id,
+          error: (e as {error: string}).error
         }))
       }
       
@@ -247,7 +246,7 @@ export default function RAGVectorizationAdmin(): ReactElement {
       }
       
       const documentsData = await documentsResponse.json()
-      const documentIds = documentsData.documents?.map((doc: any) => doc.id) || []
+      const documentIds = documentsData.documents?.map((doc: unknown) => (doc as {id: string}).id) || []
       
       if (documentIds.length === 0) {
         throw new Error("No recent documents found to generate insights from")

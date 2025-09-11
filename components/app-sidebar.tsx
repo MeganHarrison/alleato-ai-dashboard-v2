@@ -30,16 +30,20 @@ import * as React from "react";
 const data = {
   navMain: [
     {
-      title: "FM Global",
+      title: "Menu",
       url: "#",
       items: [
         {
-          title: "FM Global Expert",
-          url: "/fm-global-expert",
+          title: "Dashboard",
+          url: "/",
         },
         {
-          title: "FM Global PDF",
-          url: "/fm-global-pdf",
+          title: "Meetings",
+          url: "/meetings",
+        },
+        {
+          title: "FM Global Dashboard",
+          url: "/fm-global-dashboard",
         },
         {
           title: "Tables & Figures",
@@ -50,46 +54,34 @@ const data = {
           url: "/fm-global-form",
         },
         {
-          title: "ASRS Design",
-          url: "/asrs-design",
-        },
-        {
           title: "ASRS Form",
           url: "/asrs-form",
         },
         {
-          title: "Main Chat",
-          url: "/asrs-main-chat",
+          title: "ASRS Form 2",
+          url: "/asrs-form-2",
         },
         {
-          title: "FM Global Resources",
-          url: "/fm-resources",
+          title: "ASRS Form 3",
+          url: "/asrs-form-3",
         },
         {
-          title: "ASRS 3",
-          url: "/asrs3",
+          title: "Alleato Intel",
+          url: "/insights8",
         },
       ],
     },
     {
-      title: "Project Management",
+      title: "FM Global",
       url: "#",
       items: [
         {
           title: "Project Insights",
-          url: "/pm-rag",
+          url: "/insights",
         },
         {
           title: "Projects Dashboard",
           url: "/projects-dashboard",
-        },
-        {
-          title: "Meetings",
-          url: "/meetings",
-        },
-        {
-          title: "Alleato Intel",
-          url: "/rag-system",
         },
       ],
     },

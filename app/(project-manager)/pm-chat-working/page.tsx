@@ -21,7 +21,7 @@ export default function PMChatWorking() {
         content: 'Hello! I\'m your PM Assistant with access to meeting transcripts and project data. I can help you:\n\n• Search meeting transcripts\n• Track project health and risks\n• Identify action items and decisions\n• Provide strategic recommendations\n\nWhat would you like to know?',
       },
     ],
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Chat error:', error);
     },
   } as any);
@@ -39,8 +39,7 @@ export default function PMChatWorking() {
   } = chatHelpers as any;
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [showExamples, setShowExamples] = useState(true);
-
+  const [showExamples] = useState($2);
   const exampleQueries = [
     'What were the key decisions from our last project meeting?',
     'Show me all action items from this week',
@@ -163,7 +162,7 @@ export default function PMChatWorking() {
           {/* Chat messages */}
           <ScrollArea className="flex-1 px-6 py-4" ref={scrollAreaRef}>
             <div className="space-y-4">
-              {messages.map((message: any) => {
+              {messages.map((message: unknown) => {
                 const content = message.content || '';
                 const tools = parseToolInvocations(content);
                 const cleanContent = content.replace(/\[Tool: .*?\]/g, '').trim();
@@ -206,7 +205,7 @@ export default function PMChatWorking() {
                         <div className="mt-3 pt-3 border-t border-border/50">
                           <div className="text-xs font-medium mb-2">Tools Used:</div>
                           <div className="space-y-1">
-                            {message.toolInvocations.map((tool: any, index: number) => (
+                            {message.toolInvocations.map((tool: unknown, index: number) => (
                               <div
                                 key={index}
                                 className="text-xs bg-background/50 rounded p-1.5"

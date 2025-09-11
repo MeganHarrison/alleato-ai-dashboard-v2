@@ -18,8 +18,7 @@ export default function Notifications({
 }: NotificationsProps) {
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
-  const [showAll, setShowAll] = useState(false);
-
+  const [showAll] = useState($2);
   const unreadCount = notifications.filter((n) => !n.read).length;
   const displayedNotifications = showAll
     ? notifications

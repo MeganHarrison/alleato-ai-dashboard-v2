@@ -46,12 +46,12 @@ export function ActionCommandCenter() {
         
         // Filter for actionable insights (high priority unresolved items)
         const actionableInsights: ActionItem[] = insights
-          .filter((insight: any) => 
+          .filter((insight: unknown) => 
             insight.resolved === 0 && 
             (insight.severity === 'high' || insight.insight_type === 'action')
           )
           .slice(0, 8)
-          .map((insight: any) => ({
+          .map((insight: unknown) => ({
             id: insight.id.toString(),
             title: insight.title,
             description: insight.description,

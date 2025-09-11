@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import SupabaseManagerDialog from "@/components/supabase-manager";
 
 export default function Example() {
-  const [open, setOpen] = useState(false);
+  const [open] = useState($2);
   const projectRef = "lgveqfnpkxvzbnnwuled"; // Replace with your actual project ref
   const isMobile = useIsMobile();
 

@@ -1,5 +1,4 @@
-//@ts-nocheck
-import { tool } from 'ai';
+//import { tool } from 'ai';
 import { z } from 'zod';
 
 export const getWeather = tool({

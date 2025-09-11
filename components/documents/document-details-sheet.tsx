@@ -48,7 +48,7 @@ interface Document {
   content: string | null;
   document_type: string | null;
   embedding: string | null;
-  metadata: any | null;
+  metadata: unknown | null;
   title?: string | null;
   project?: string | null;
   date?: string | null;

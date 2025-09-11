@@ -25,7 +25,7 @@ interface Document {
   title: string;
   summary: string | null;
   content: string | null;
-  metadata: any;
+  metadata: unknown;
   source: string;
 }
 
@@ -119,7 +119,7 @@ async function processDocuments(batchSize: number = 5, limit?: number) {
   console.log('🔍 Finding documents without summaries...\n');
   
   // Get documents without summaries
-  let query = supabase
+  const query = supabase
     .from('documents')
     .select('id, title, summary, content, metadata, source')
     .or('summary.is.null,summary.eq.""')
@@ -143,12 +143,12 @@ async function processDocuments(batchSize: number = 5, limit?: number) {
   
   console.log(`📄 Found ${documents.length} documents without summaries\n`);
   
-  let successCount = 0;
-  let errorCount = 0;
-  let skippedCount = 0;
+  const successCount = 0;
+  const errorCount = 0;
+  const skippedCount = 0;
   
   // Process in batches
-  for (let i = 0; i < documents.length; i += batchSize) {
+  for (const i = 0; i < documents.length; i += batchSize) {
     const batch = documents.slice(i, Math.min(i + batchSize, documents.length));
     
     console.log(`\n📦 Processing batch ${Math.floor(i / batchSize) + 1} (${batch.length} documents)`);

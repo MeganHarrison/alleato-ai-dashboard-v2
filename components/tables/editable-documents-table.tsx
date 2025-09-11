@@ -49,7 +49,7 @@ interface Document {
   content: string | null;
   document_type: string | null;
   embedding: string | null;
-  metadata: any | null;
+  metadata: unknown | null;
 }
 
 interface EditableDocumentsTableProps {
@@ -122,19 +122,11 @@ const formatDate = (dateStr: string): string => {
 export function EditableDocumentsTable({ documents }: EditableDocumentsTableProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editedDocument, setEditedDocument] = useState<Document | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState($2);
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
+  const [isGeneratingInsights] = useState($2);
   const [generatingDocIds, setGeneratingDocIds] = useState<Set<number>>(new Set());
-  const [visibleColumns, setVisibleColumns] = useState({
-    name: true,
-    date: true,
-    summary: true,
-    project: true,
-    insights: true,
-    actions: true,
-  });
-
+  const [visibleColumns] = useState($2);
   // Check if any documents are missing AI insights
   const documentsWithoutInsights = useMemo(() => {
     return documents.filter(doc => !hasAIInsights(doc));

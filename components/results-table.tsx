@@ -11,8 +11,8 @@ import {
 import { cn } from '@/lib/utils'
 
 interface ResultsTableProps {
-  data: any[]
-  onRowClick?: (row: any) => void
+  data: unknown[]
+  onRowClick?: (row: unknown) => void
 }
 
 export function ResultsTable({ data, onRowClick }: ResultsTableProps) {

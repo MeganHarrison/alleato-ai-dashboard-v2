@@ -50,7 +50,7 @@ export function ProjectHealthMatrix() {
         // Group insights by project
         const projectMap = new Map()
         
-        insights.forEach((insight: any) => {
+        insights.forEach((insight: unknown) => {
           if (insight.projects && insight.projects.length > 0) {
             const project = insight.projects[0]
             const projectId = project.id.toString()
@@ -83,8 +83,8 @@ export function ProjectHealthMatrix() {
 
         // Convert map to array and calculate health scores
         const projectsArray: ProjectHealth[] = Array.from(projectMap.values()).map(project => {
-          const highRisks = project.insights.filter((i: any) => i.severity === 'high').length
-          const mediumRisks = project.insights.filter((i: any) => i.severity === 'medium').length
+          const highRisks = project.insights.filter((i: unknown) => i.severity === 'high').length
+          const mediumRisks = project.insights.filter((i: unknown) => i.severity === 'medium').length
           
           // Simple health score calculation
           const healthScore = Math.max(20, 100 - (highRisks * 20) - (mediumRisks * 10))

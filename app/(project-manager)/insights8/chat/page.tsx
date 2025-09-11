@@ -27,8 +27,8 @@ interface Message {
 
 export default function RagChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [input] = useState($2);
+  const [isLoading] = useState($2);
   const [sessionId] = useState(`session_${Date.now()}`);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -105,8 +105,8 @@ export default function RagChatPage() {
 
       if (!reader) throw new Error('No response stream');
 
-      let sources: any[] = [];
-      let currentContent = '';
+      let sources: unknown[] = [];
+      const currentContent = '';
 
       while (true) {
         const { done, value } = await reader.read();

@@ -11,11 +11,10 @@ import {
 import { useState } from "react";
 
 const FMGlobalNavigator = () => {
-  const [currentStep, setCurrentStep] = useState("start");
+  const [currentStep] = useState($2);
   const [path, setPath] = useState<string[]>([]);
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [isAnimating, setIsAnimating] = useState(false);
-
+  const [isAnimating] = useState($2);
   // Decision tree structure based on FM Global 8-34 Figure 1
   const decisionTree = {
     start: {
@@ -252,7 +251,7 @@ const FMGlobalNavigator = () => {
     },
   };
 
-  const handleAnswer = (answer: any) => {
+  const handleAnswer = (answer: unknown) => {
     setIsAnimating(true);
     const newAnswers = { ...answers, [currentStep]: answer };
     setAnswers(newAnswers);
@@ -291,7 +290,7 @@ const FMGlobalNavigator = () => {
   const current = (decisionTree as any)[currentStep];
   const isResult = current?.type === "result";
 
-  const getIcon = (iconName: any) => {
+  const getIcon = (iconName: unknown) => {
     switch (iconName) {
       case "shield":
         return <CheckCircle className="w-8 h-8" />;
@@ -306,7 +305,7 @@ const FMGlobalNavigator = () => {
     }
   };
 
-  const getColorClasses = (color: any) => {
+  const getColorClasses = (color: unknown) => {
     switch (color) {
       case "green":
         return "bg-green-50 border-green-200 text-green-800";
@@ -398,7 +397,7 @@ const FMGlobalNavigator = () => {
                 <div>
                   <h4 className="font-medium mb-2">Key Requirements:</h4>
                   <ul className="text-sm space-y-1">
-                    {current.details.keyRequirements.map((req: any, idx: number) => (
+                    {current.details.keyRequirements.map((req: unknown, idx: number) => (
                       <li key={idx} className="flex items-start">
                         <span className="w-2 h-2 bg-current rounded-full mt-2 mr-2 flex-shrink-0"></span>
                         {req}
@@ -441,7 +440,7 @@ const FMGlobalNavigator = () => {
             )}
 
             <div className="space-y-4">
-              {current?.options?.map((option: any, idx: number) => (
+              {current?.options?.map((option: unknown, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => handleAnswer(option)}

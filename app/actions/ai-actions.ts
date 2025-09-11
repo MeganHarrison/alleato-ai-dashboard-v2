@@ -89,7 +89,7 @@ export async function getProductsData() {
 
   try {
     // Temporarily disabled due to missing products table
-    const data: any[] = [];
+    const data: unknown[] = [];
     const error = null;
     // const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false })
 
@@ -107,7 +107,7 @@ export async function getProductById(id: number) {
 
   try {
     // Temporarily disabled due to missing products table
-    const data: any = null;
+    const data: unknown = null;
     const error = null;
     // const { data, error } = await supabase.from("products").select("*").eq("id", id).single()
 

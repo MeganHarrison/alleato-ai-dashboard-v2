@@ -16,10 +16,10 @@ const tabs = [
 
 export default function Frame() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [hoverStyle, setHoverStyle] = useState({});
-  const [activeStyle, setActiveStyle] = useState({ left: "0px", width: "0px" });
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [activeIndex] = useState($2);
+  const [hoverStyle] = useState($2);
+  const [activeStyle] = useState($2);
+  const [isDarkMode] = useState($2);
   const tabRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {

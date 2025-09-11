@@ -64,22 +64,21 @@ interface WorkerStats {
 interface ActionResult {
   success: boolean;
   message: string;
-  details?: any;
+  details?: unknown;
   timestamp: string;
 }
 
 export default function RAGDashboard() {
   const supabase = createClientComponentClient();
   const [stats, setStats] = useState<WorkerStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState($2);
   const [processing, setProcessing] = useState<Record<string, boolean>>({});
   const [results, setResults] = useState<ActionResult[]>([]);
   const [selectedMeetings, setSelectedMeetings] = useState<string[]>([]);
   const [workerHealth, setWorkerHealth] = useState<
     "healthy" | "degraded" | "offline"
   >("offline");
-  const [autoRefresh, setAutoRefresh] = useState(false);
-
+  const [autoRefresh] = useState($2);
   // Worker URL - update this based on environment
   const WORKER_URL =
     process.env.NEXT_PUBLIC_WORKER_URL || "http://localhost:57097";
@@ -200,9 +199,9 @@ export default function RAGDashboard() {
     };
 
     try {
-      let endpoint = "";
-      let method = "POST";
-      let body: any = {};
+      const endpoint = "";
+      const method = "POST";
+      let body: unknown = {};
 
       switch (action) {
         case "vectorize-all":
@@ -237,7 +236,7 @@ export default function RAGDashboard() {
             .select("id")
             .is("project_id", null);
 
-          let assigned = 0;
+          const assigned = 0;
           for (const meeting of unassignedMeetings || []) {
             const response = await fetch(
               `${WORKER_URL}/project/assign/${meeting.id}`,
@@ -272,7 +271,7 @@ export default function RAGDashboard() {
             .select("id")
             .gt("created_at", sevenDaysAgo);
 
-          let processed = 0;
+          const processed = 0;
           for (const meeting of recentMeetings || []) {
             // Assign project
             const assignResponse = await fetch(

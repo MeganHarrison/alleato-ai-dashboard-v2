@@ -1,5 +1,3 @@
-// @ts-nocheck
-// @ts-nocheck
 "use client";
 
 import { MyUIMessage } from "@/lib/ai-sdk5/types/message-types";

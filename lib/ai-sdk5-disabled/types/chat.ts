@@ -1,4 +1,3 @@
-// @ts-nocheck
 export interface Chat {
   id: string;
   title?: string | null;

@@ -32,21 +32,20 @@ import { FileTextExtractor } from '@/lib/text-extraction/file-processor';
 interface SearchResult {
   id: number;
   content: string;
-  metadata: any;
+  metadata: unknown;
   similarity: number;
 }
 
 export default function CollaborativeSearchPage() {
-  const [roomName, setRoomName] = useState('vector-search-room');
-  const [username, setUsername] = useState('');
-  const [hasJoined, setHasJoined] = useState(false);
-  const [query, setQuery] = useState('');
+  const [roomName] = useState($2);
+  const [username] = useState($2);
+  const [hasJoined] = useState($2);
+  const [query] = useState($2);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [status, setStatus] = useState('');
-
+  const [isSearching] = useState($2);
+  const [status] = useState($2);
   // Ref to access chat functions
-  const chatRef = useRef<{ shareSearchResults: any; shareDocument: any }>(null);
+  const chatRef = useRef<{ shareSearchResults: unknown; shareDocument: unknown }>(null);
 
   // Use realtime chat hook directly for sharing
   const { shareSearchResults, shareDocument } = useRealtimeChat({
@@ -71,7 +70,7 @@ export default function CollaborativeSearchPage() {
   });
 
   // Handle file upload and processing
-  async function handleFilesUploaded(uploadedFiles: any[]) {
+  async function handleFilesUploaded(uploadedFiles: unknown[]) {
     if (!uploadedFiles || uploadedFiles.length === 0) return;
 
     setStatus('Processing uploaded files...');

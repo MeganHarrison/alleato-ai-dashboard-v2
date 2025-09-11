@@ -46,9 +46,9 @@ interface TeamDataTableProps {
 }
 
 export default function TeamDataTable({ employees }: TeamDataTableProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState($2);
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage] = useState($2);
   const itemsPerPage = 10;
 
   // Get unique departments for filter
@@ -59,7 +59,7 @@ export default function TeamDataTable({ employees }: TeamDataTableProps) {
 
   // Filter and search employees
   const filteredEmployees = useMemo(() => {
-    let filtered = [...employees];
+    const filtered = [...employees];
 
     // Apply department filter
     if (departmentFilter !== "all") {

@@ -17,8 +17,7 @@ export default function FMGlobalChatInterface() {
   
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [inputFocused, setInputFocused] = useState(false);
-
+  const [inputFocused] = useState($2);
   // Example queries for quick access
   const exampleQueries = [
     { icon: '📊', text: 'Key ASRS specifications' },
@@ -111,7 +110,7 @@ export default function FMGlobalChatInterface() {
                       <div className="prose prose-sm dark:prose-invert max-w-none">
                         <ReactMarkdown
                           components={{
-                            code({ inline, className, children, ...props }: any) {
+                            code({ inline, className, children, ...props }: unknown) {
                               const match = /language-(\w+)/.exec(className || '');
                               return !inline && match ? (
                                 <div className="my-3 overflow-hidden rounded-lg">

@@ -28,7 +28,7 @@ import { format } from "date-fns";
 
 export default function RagStatsPage() {
   const [stats, setStats] = useState<SystemStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState($2);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

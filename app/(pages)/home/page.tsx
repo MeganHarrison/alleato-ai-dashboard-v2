@@ -65,7 +65,7 @@ interface Project {
   updated_at?: string;
   due_date?: string;
   team?: string;
-  documents?: any[];
+  documents?: unknown[];
 }
 
 const COLUMNS = [
@@ -101,12 +101,12 @@ function formatCurrency(amount: number | null | undefined) {
 
 export default function DashboardHome() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState($2);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState($2);
   const [selectedPhase, setSelectedPhase] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showOnlyActive, setShowOnlyActive] = useState(true);
+  const [showOnlyActive] = useState($2);
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
     new Set(COLUMNS.filter((col) => col.defaultVisible).map((col) => col.id))
   );
@@ -121,7 +121,7 @@ export default function DashboardHome() {
 
         const supabase = createClient();
 
-        let query = supabase.from("projects").select(`
+        const query = supabase.from("projects").select(`
             *,
             clients (
               id,
@@ -176,7 +176,7 @@ export default function DashboardHome() {
 
   // Filter and sort projects
   const filteredProjects = useMemo(() => {
-    let filtered = projects.filter((project) => {
+    const filtered = projects.filter((project) => {
       // Phase filter
       if (selectedPhase !== "all" && project.phase !== selectedPhase) {
         return false;
@@ -205,8 +205,8 @@ export default function DashboardHome() {
     // Apply sorting
     if (sortColumn) {
       filtered.sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
+        let aValue: unknown;
+        let bValue: unknown;
 
         switch (sortColumn) {
           case "name":
