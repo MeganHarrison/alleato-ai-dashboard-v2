@@ -182,7 +182,10 @@ export default function DashboardHome() {
           setProjects(data);
         }
       } catch (err: unknown) {
-        console.error("Failed to fetch projects:", err);
+        // Log error silently in development to avoid React error boundary
+        if (process.env.NODE_ENV === 'development') {
+          console.warn("Projects fetch failed:", err);
+        }
         setError(
           err instanceof Error ? err.message : "Failed to load projects"
         );
