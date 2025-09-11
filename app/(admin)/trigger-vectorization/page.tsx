@@ -9,7 +9,7 @@ import { Loader2, Play, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react
 export default function TriggerVectorizationPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
-  const [details, setDetails] = useState<any>(null)
+  const [details, setDetails] = useState<Record<string, unknown> | null>(null)
 
   const triggerVectorization = async () => {
     setStatus('loading')

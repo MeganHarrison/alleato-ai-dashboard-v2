@@ -51,8 +51,8 @@ export default async function InsightsPage() {
   // Process insights - parse JSON description if needed
   const insights = allInsights?.map(insight => {
     // Parse description if it's a JSON string
-    const parsedDescription = insight.description;
-    const metadata = {};
+    let parsedDescription = insight.description;
+    let metadata: any = {};
     
     if (typeof insight.description === 'string' && insight.description.startsWith('{')) {
       try {

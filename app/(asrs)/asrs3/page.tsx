@@ -28,8 +28,8 @@ import {
 } from "lucide-react";
 
 export default function FMGlobalPage() {
-  const [activeTab] = useState(false);
-  const [isFormOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('tables');
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   return (
     <div className="h-[calc(100vh-120px)]">
       {/* Header with Form Button */}

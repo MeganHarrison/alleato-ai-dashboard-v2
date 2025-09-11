@@ -11,7 +11,6 @@ import {
   ExternalLink,
   ChevronRight,
   FileText,
-  Clock,
   Star
 } from 'lucide-react';
 
@@ -268,7 +267,7 @@ export default async function SitemapPage() {
       {/* Footer */}
       <div className="mt-12 pt-8 border-t text-center text-sm text-gray-500">
         <p>
-          This sitemap is automatically generated from the application's file structure.
+          This sitemap is automatically generated from the application&apos;s file structure.
         </p>
         <p className="mt-2">
           Pages marked with <Star className="h-3 w-3 inline text-yellow-500" /> are high-priority pages.

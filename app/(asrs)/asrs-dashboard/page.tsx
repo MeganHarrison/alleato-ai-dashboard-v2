@@ -11,7 +11,6 @@ import {
   Database, 
   BookOpen,
   Bot,
-  Wrench,
   ExternalLink,
   Zap,
   Search,
