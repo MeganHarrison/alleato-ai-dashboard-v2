@@ -152,6 +152,21 @@ export default function DashboardHome() {
         setLoading(true);
         setError(null);
 
+        // Check if required environment variables are set
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+          throw new Error(
+            "Missing Supabase configuration. Please check your .env.local file and ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set with valid values."
+          );
+        }
+
+        // Check for placeholder values
+        if (process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") || 
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes("placeholder")) {
+          throw new Error(
+            "Supabase configuration uses placeholder values. Please update your .env.local file with actual Supabase project credentials."
+          );
+        }
+
         const supabase = createClient();
 
         const query = supabase.from("projects").select(`
@@ -404,18 +419,41 @@ export default function DashboardHome() {
         <AppSidebar />
         <SidebarInset>
           <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
+            <div className="text-center max-w-2xl mx-auto px-4">
               <div className="text-red-500 text-6xl mb-4">⚠️</div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 Failed to Load Projects
               </h1>
               <p className="text-gray-600 mb-4">{error}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-brand-600 text-white rounded hover:bg-brand-700"
-              >
-                Retry
-              </button>
+              
+              {(error.includes("Missing Supabase configuration") || error.includes("placeholder")) && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 text-left">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">Setup Instructions:</h3>
+                  <ol className="text-sm text-blue-800 space-y-2">
+                    <li>1. Copy <code className="bg-blue-100 px-1 rounded">.env.example</code> to <code className="bg-blue-100 px-1 rounded">.env.local</code></li>
+                    <li>2. Update the Supabase URL and keys with your actual project credentials</li>
+                    <li>3. Get your Supabase credentials from your <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer" className="underline">Supabase dashboard</a></li>
+                    <li>4. Restart the development server after updating the environment variables</li>
+                  </ol>
+                </div>
+              )}
+              
+              <div className="flex gap-2 justify-center mt-6">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-brand-600 text-white rounded hover:bg-brand-700"
+                >
+                  Retry
+                </button>
+                <a
+                  href="https://github.com/MeganHarrison/alleato-ai-dashboard-v2#environment-variables"
+                  target="_blank"
+                  rel="noopener noreferrer" 
+                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                >
+                  View Setup Guide
+                </a>
+              </div>
             </div>
           </div>
         </SidebarInset>
