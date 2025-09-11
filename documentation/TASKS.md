@@ -1,16 +1,35 @@
 
 # TASKS
 
-1. Test project manager chat
-2. Test fm-global chat
-3. Add fm-global pdf pages
-4. Ability to access meeting transcript when clicked
-5. File Management System for Company Rag
-6. Company Knowledge Base
+## /
+[ ] projects table needs to be editable
 
-5. Assign tasks to employees
-6. Train Maria
+## /meetings
+[ ] Click the meeting and view the transcript
 
+## /insights2
+[ ] Insights not shown
+
+## /insights3
+[ ] no insights
+
+## /insights5
+[ ] git rid of all the crazy colors on connect to real data  
+
+## /insights8
+[ ] Document upload failed
+
+
+
+[ ] Test project manager chat
+[ ] Test fm-global chat
+[ ] Add fm-global pdf pages
+[ ] File Management System for Company Rag
+[ ] Company Knowledge Base
+[ ] Assign tasks to employees
+[ ] Train Maria
+
+## Future Additions
 - Lead generation section
 - Copy writing section
 
