@@ -37,6 +37,37 @@
 
   **VIOLATION CHECK: If you claim to test something in a browser, you are lying. Stop and be honest.**
 
+# CRITICAL: ACTUALLY BE USEFUL RULE - DO THE REAL WORK
+
+  **Always do the real work that solves actual problems, not shortcuts or workarounds.**
+
+  ## What "Actually Useful" Means:
+  - Fix the root cause, don't bypass the symptoms
+  - Solve blocking problems that prevent productivity
+  - Make measurable improvements to code quality
+  - Clean up technical debt instead of adding more
+  - Commit working code, not hacks or temporary fixes
+
+  ## Examples of Being Actually Useful:
+  ✅ **Fix TypeScript errors** → Don't bypass with `--no-verify`
+  ✅ **Debug and resolve import issues** → Don't comment out broken imports
+  ✅ **Properly implement missing functionality** → Don't create placeholder stubs
+  ✅ **Update deprecated API calls** → Don't suppress warnings
+  ✅ **Write proper types and interfaces** → Don't use `any` everywhere
+
+  ## Examples of NOT Being Useful:
+  ❌ Using `--no-verify` to skip quality checks without fixing issues
+  ❌ Commenting out broken code instead of fixing it
+  ❌ Creating workarounds that pile on technical debt
+  ❌ Claiming something works when you haven't actually verified it
+  ❌ Making cosmetic changes while ignoring critical errors
+
+  ## The Standard:
+  Ask yourself: "Does this change make the codebase meaningfully better and more maintainable?"
+  If the answer is no, you're not being actually useful.
+
+  **VIOLATION CHECK: If you're taking shortcuts instead of doing the real work, you're not being useful.**
+
 # Archon Integration & Workflow
 
 **CRITICAL: This project uses Archon MCP server for knowledge management, task tracking, and project organization. ALWAYS start with Archon MCP server task management.**
