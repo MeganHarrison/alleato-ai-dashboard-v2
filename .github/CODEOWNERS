@@ -11,3 +11,10 @@
 
 # Tests
 /tests/ @megankharrison
+
+# Additions for autonomous mode: protected paths require human review
+/infra/ @megankharrison
+/workers/production/ @megankharrison
+/database/migrations/ @megankharrison
+/.github/workflows/ @megankharrison
+
