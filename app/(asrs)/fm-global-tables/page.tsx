@@ -61,7 +61,7 @@ export default function FMGlobalTablesPage() {
   const [loadingTables, setLoadingTables] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<string>("tables");
+  const [activeTab, setActiveTab] = useState<string>("figures");
   const supabase = createClientComponentClient();
 
   // Function to get color class based on ASRS type
@@ -183,7 +183,10 @@ export default function FMGlobalTablesPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <TabsList className="grid grid-cols-2 h-12 bg-muted/30 border border-brand/20 max-w-lg">
-            <TabsTrigger value="figures" className="flex items-center gap-2 data-[state=active]:bg-brand data-[state=active]:text-white">
+            <TabsTrigger 
+              value="figures" 
+              className="flex items-center gap-2 text-slate-700 data-[state=active]:bg-brand data-[state=active]:text-white data-[state=inactive]:text-slate-700 hover:text-slate-900"
+            >
               <FileText className="w-4 h-4" />
               <span className="font-medium">
                 Figures <span className="ml-1 px-2 py-0.5 text-xs bg-brand/20 rounded-full">
@@ -191,7 +194,10 @@ export default function FMGlobalTablesPage() {
                 </span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="tables" className="flex items-center gap-2 data-[state=active]:bg-brand data-[state=active]:text-white">
+            <TabsTrigger 
+              value="tables" 
+              className="flex items-center gap-2 text-slate-700 data-[state=active]:bg-brand data-[state=active]:text-white data-[state=inactive]:text-slate-700 hover:text-slate-900"
+            >
               <TableIcon className="w-4 h-4" />
               <span className="font-medium">
                 Tables <span className="ml-1 px-2 py-0.5 text-xs bg-brand/20 rounded-full">
@@ -251,16 +257,16 @@ export default function FMGlobalTablesPage() {
           ) : (
             <Card className="overflow-hidden">
               <div className="overflow-x-auto">
-                <Table className="min-w-[900px]">
+                <Table className="min-w-[1100px]">
                   <TableHeader>
                     <TableRow className="border-brand/20 bg-gradient-to-r from-brand/5 to-brand/10">
                       <TableHead className="w-20 text-brand font-semibold whitespace-nowrap h-12">Figure #</TableHead>
-                      <TableHead className="min-w-[150px] text-brand font-semibold h-12">Title</TableHead>
+                      <TableHead className="min-w-[300px] text-brand font-semibold h-12">Title</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">ASRS Type</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">Container</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">Max Depth</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">Max Spacing</TableHead>
-                      <TableHead className="min-w-[150px] text-brand font-semibold h-12">Commodities</TableHead>
+                      <TableHead className="min-w-[200px] text-brand font-semibold h-12">Commodities</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">Section</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -323,15 +329,15 @@ export default function FMGlobalTablesPage() {
           ) : (
             <Card className="overflow-hidden">
               <div className="overflow-x-auto">
-                <Table className="min-w-[1000px]">
+                <Table className="min-w-[1200px]">
                   <TableHeader>
                     <TableRow className="border-brand/20 bg-gradient-to-r from-brand/5 to-brand/10">
                       <TableHead className="w-20 text-brand font-semibold whitespace-nowrap h-12">Table #</TableHead>
-                      <TableHead className="min-w-[150px] text-brand font-semibold h-12">Title</TableHead>
+                      <TableHead className="min-w-[300px] text-brand font-semibold h-12">Title</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">ASRS Type</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">System Type</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">Protection</TableHead>
-                      <TableHead className="min-w-[150px] text-brand font-semibold h-12">Commodities</TableHead>
+                      <TableHead className="min-w-[200px] text-brand font-semibold h-12">Commodities</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">Ceiling Height</TableHead>
                       <TableHead className="text-brand font-semibold whitespace-nowrap h-12">Section</TableHead>
                     </TableRow>
