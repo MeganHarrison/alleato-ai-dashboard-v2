@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 
 export default function PMChatWorking() {
   const chatHelpers = useChat({
-    api: '/api/pm-rag-fallback',
+    api: '/api/pm-rag',
     initialMessages: [
       {
         id: 'welcome',
@@ -99,7 +99,7 @@ export default function PMChatWorking() {
         </p>
         <Badge variant="outline" className="mt-2">
           <CheckCircle className="h-3 w-3 mr-1 text-green-500" />
-          Using /api/pm-rag-fallback
+          Using /api/pm-rag (Railway)
         </Badge>
       </div>
 
@@ -275,7 +275,7 @@ export default function PMChatWorking() {
           <div>Messages: {messages.length}</div>
           <div>Loading: {isLoading ? 'true' : 'false'}</div>
           <div>Error: {error ? error.message : 'none'}</div>
-          <div>API: /api/pm-rag-fallback</div>
+          <div>API: /api/pm-rag (Railway)</div>
         </div>
       </div>
     </div>
