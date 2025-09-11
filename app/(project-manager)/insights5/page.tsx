@@ -14,7 +14,7 @@ export default async function InsightsDashboard() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-foreground">
             Project Insights Dashboard
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -22,10 +22,10 @@ export default async function InsightsDashboard() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="px-4 py-2 bg-background border rounded-lg hover:bg-muted transition-colors">
             Export Report
           </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-opacity">
+          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
             Generate Summary
           </button>
         </div>
