@@ -11,11 +11,8 @@ import {
   Search, 
   Share2, 
   Users, 
-  FileText, 
   Upload, 
-  MessageCircle,
-  Sparkles,
-  BookOpen
+  Sparkles
 } from 'lucide-react';
 
 // Supabase Dropzone components
@@ -45,7 +42,6 @@ export default function CollaborativeSearchPage() {
   const [isSearching] = useState(false);
   const [status] = useState(false);
   // Ref to access chat functions
-  const chatRef = useRef<{ shareSearchResults: unknown; shareDocument: unknown }>(null);
 
   // Use realtime chat hook directly for sharing
   const { shareSearchResults, shareDocument } = useRealtimeChat({

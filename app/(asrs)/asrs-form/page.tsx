@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface ASRSFormData {
   asrs_type?: 'Shuttle' | 'Mini-Load' | 'Horizontal Carousel';
@@ -36,7 +36,7 @@ export default function ASRSRequirementsForm() {
   const [formData, setFormData] = useState<ASRSFormData>({});
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [designResult, setDesignResult] = useState<any>(null);
+  const [designResult, setDesignResult] = useState<Record<string, unknown> | null>(null);
   
 
   const questions: FormQuestion[] = [

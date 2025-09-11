@@ -17,7 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile, useIsSmallMobile, useViewportSize } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import {
-  Bot,
   Building,
   ChevronRight,
   CreditCard,
@@ -88,7 +87,6 @@ export default function MobileTestPage() {
   const isSmallMobile = useIsSmallMobile();
   const viewport = useViewportSize();
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [isTestModalOpen, setIsTestModalOpen] = React.useState(false);
 
   return (
     <SidebarProvider>

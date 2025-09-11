@@ -10,13 +10,38 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+interface DecisionOption {
+  label: string;
+  value: string;
+  next: string;
+}
+
+interface DecisionNode {
+  type: "decision";
+  question: string;
+  description: string;
+  options: DecisionOption[];
+}
+
+interface ResultNode {
+  type: "result";
+  title: string;
+  section: string;
+  description: string;
+  icon: string;
+  color: string;
+}
+
+type TreeNode = DecisionNode | ResultNode;
+type DecisionTree = Record<string, TreeNode>;
+
 const FMGlobalNavigator = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [path, setPath] = useState<string[]>([]);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isAnimating] = useState(false);
   // Decision tree structure based on FM Global 8-34 Figure 1
-  const decisionTree = {
+  const decisionTree: DecisionTree = {
     start: {
       type: "decision",
       question:
@@ -287,7 +312,7 @@ const FMGlobalNavigator = () => {
     }, 300);
   };
 
-  const current = (decisionTree as any)[currentStep];
+  const current = decisionTree[currentStep];
   const isResult = current?.type === "result";
 
   const getIcon = (iconName: unknown) => {
@@ -413,7 +438,7 @@ const FMGlobalNavigator = () => {
               <h3 className="font-semibold mb-2">Your Selection Path:</h3>
               <div className="text-sm space-y-1">
                 {path.map((step, idx) => {
-                  const stepData = (decisionTree as any)[step];
+                  const stepData = decisionTree[step];
                   const answer = answers[step];
                   return (
                     <div key={idx} className="flex items-center">
