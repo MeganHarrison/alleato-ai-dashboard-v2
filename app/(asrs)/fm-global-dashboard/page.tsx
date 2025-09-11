@@ -4,11 +4,11 @@ import React from 'react';
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Settings, FileText, Database } from "lucide-react";
+import { MessageCircle, FileText, Database } from "lucide-react";
 import Link from "next/link";
 import FMGlobalTablesFigures from "@/components/asrs/fm-global-tables-figures";
 
-export default function FMGlobalDashboard() {
+export default function FMGlobalDashboard(): React.ReactElement {
   return (
     <div className="mx-auto p-4 lg:p-6 space-y-6">
       <PageHeader
@@ -29,11 +29,11 @@ export default function FMGlobalDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/fm-global-expert">
-              <Button className="w-full">
+            <Button className="w-full" asChild>
+              <Link href="/fm-global-expert">
                 Start Conversation
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </CardContent>
         </Card>
 
@@ -48,11 +48,11 @@ export default function FMGlobalDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/fm-global-form">
-              <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" asChild>
+              <Link href="/fm-global-form">
                 Open Requirements Form
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </CardContent>
         </Card>
 
@@ -67,11 +67,11 @@ export default function FMGlobalDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/fm-global-tables">
-              <Button className="w-full" variant="outline">
+            <Button className="w-full" variant="outline" asChild>
+              <Link href="/fm-global-tables">
                 Full Database View
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -102,16 +102,16 @@ export default function FMGlobalDashboard() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 md:grid-cols-2">
-            <Link href="/asrs-dashboard">
-              <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start" asChild>
+              <Link href="/asrs-dashboard">
                 Return to Main ASRS Dashboard
-              </Button>
-            </Link>
-            <Link href="/asrs-design">
-              <Button variant="outline" className="w-full justify-start">
+              </Link>
+            </Button>
+            <Button variant="outline" className="w-full justify-start" asChild>
+              <Link href="/asrs-design">
                 ASRS Design Tools
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>

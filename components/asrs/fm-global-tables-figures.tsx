@@ -61,7 +61,7 @@ interface FMGlobalTablesFiguresProps {
 export default function FMGlobalTablesFigures({ 
   showHeader = false, 
   className = "" 
-}: FMGlobalTablesFiguresProps) {
+}: FMGlobalTablesFiguresProps): React.ReactElement {
   const [figures, setFigures] = useState<FMGlobalFigure[]>([]);
   const [tables, setTables] = useState<FMGlobalTable[]>([]);
   const [loadingFigures, setLoadingFigures] = useState(false);
@@ -72,7 +72,7 @@ export default function FMGlobalTablesFigures({
   const supabase = createClientComponentClient();
 
   // Function to get color class based on ASRS type
-  const getAsrsTypeColor = (type: string | null | undefined) => {
+  const getAsrsTypeColor = (type: string | null | undefined): string => {
     if (!type) return "";
     
     const normalizedType = type.toLowerCase();
@@ -98,7 +98,7 @@ export default function FMGlobalTablesFigures({
     }
   };
 
-  const fetchFigures = async () => {
+  const fetchFigures = async (): Promise<void> => {
     try {
       setLoadingFigures(true);
       setError(null);
@@ -118,7 +118,7 @@ export default function FMGlobalTablesFigures({
     }
   };
 
-  const fetchTables = async () => {
+  const fetchTables = async (): Promise<void> => {
     try {
       setLoadingTables(true);
       setError(null);
