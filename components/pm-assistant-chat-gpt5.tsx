@@ -139,12 +139,12 @@ export default function PMAssistantChatGPT5({
   className?: string;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input] = useState($2);
-  const [isLoading] = useState($2);
-  const [isListening] = useState($2);
-  const [isExpanded] = useState($2);
-  const [showQuickActions] = useState($2);
-  const [selectedTab] = useState($2);
+  const [input] = useState(false);
+  const [isLoading] = useState(false);
+  const [isListening] = useState(false);
+  const [isExpanded] = useState(false);
+  const [showQuickActions] = useState(false);
+  const [selectedTab] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);

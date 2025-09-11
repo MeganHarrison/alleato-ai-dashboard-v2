@@ -31,8 +31,8 @@ export function InsightGeneratorButton({
   size = 'default',
   className,
 }: InsightGeneratorButtonProps) {
-  const [open] = useState($2);
-  const [progressValue] = useState($2);
+  const [open] = useState(false);
+  const [progressValue] = useState(false);
   const { generateInsights, generateBatchInsights, isGenerating, progress } = 
     useInsightGeneration({
       onSuccess: (result) => {

@@ -39,7 +39,7 @@ export default function PMChatWorking() {
   } = chatHelpers as any;
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [showExamples] = useState($2);
+  const [showExamples] = useState(false);
   const exampleQueries = [
     'What were the key decisions from our last project meeting?',
     'Show me all action items from this week',

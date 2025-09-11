@@ -42,7 +42,7 @@ export function EnhancedChatFixed({
   suggestedQuestions = [],
   minimalWelcome = false
 }: EnhancedChatProps) {
-  const [input] = useState($2);
+  const [input] = useState(false);
   // Use useChat hook with simpler configuration first
   const chatResult = useChat({
     id,

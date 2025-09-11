@@ -78,7 +78,7 @@ export function DocumentsTable({
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editedDocument, setEditedDocument] = useState<Partial<Document>>({});
-  const [deleteDialogOpen] = useState($2);
+  const [deleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
     null
   );

@@ -95,9 +95,9 @@ interface Results {
 }
 
 const ASRSDesignForm: React.FC = () => {
-  const [currentStep] = useState($2);
-  const [isCalculating] = useState($2);
-  const [hasResults] = useState($2);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [hasResults, setHasResults] = useState(false);
   const steps: Step[] = [
     { title: "Project Info", description: "Basic project details" },
     { title: "ASRS Config", description: "System configuration" },

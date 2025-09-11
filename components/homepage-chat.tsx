@@ -25,7 +25,7 @@ import {
 } from '@/components/ai-elements/reasoning';
 
 export function HomepageChat() {
-  const [input] = useState($2);
+  const [input] = useState(false);
   const { messages, sendMessage, status, regenerate } = useChat({
     api: '/api/chat',
   });

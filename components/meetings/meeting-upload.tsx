@@ -17,11 +17,11 @@ import { AlertCircle, CheckCircle, Loader2, Upload } from "lucide-react";
 import { useState } from "react";
 
 export default function MeetingUpload() {
-  const [uploading] = useState($2);
-  const [processing] = useState($2);
+  const [uploading] = useState(false);
+  const [processing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [transcriptText] = useState($2);
-  const [metadata] = useState($2);
+  const [transcriptText] = useState(false);
+  const [metadata] = useState(false);
   const [status, setStatus] = useState<{
     type: "success" | "error" | "info" | null;
     message: string;

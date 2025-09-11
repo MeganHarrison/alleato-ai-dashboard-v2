@@ -72,7 +72,7 @@ export function Approvals({
   const [decisions, setDecisions] = useState<
     Map<string, 'approved' | 'rejected'>
   >(new Map());
-  const [isOpen] = useState($2);
+  const [isOpen] = useState(false);
   useEffect(() => {
     setDecisions(new Map());
     if (approvals.length > 0) {

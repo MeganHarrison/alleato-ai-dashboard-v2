@@ -18,7 +18,7 @@ interface ChatProps {
 }
 
 export function Chat({ id, initialMessages = [] }: ChatProps) {
-  const [input] = useState($2);
+  const [input] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

@@ -27,12 +27,12 @@ import { toast } from "sonner";
 
 export default function DocumentsManagementPage() {
   const [documents, setDocuments] = useState<RagDocument[]>([]);
-  const [loading] = useState($2);
-  const [searchQuery] = useState($2);
+  const [loading] = useState(false);
+  const [searchQuery] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [currentPage] = useState($2);
-  const [totalPages] = useState($2);
-  const [totalDocuments] = useState($2);
+  const [currentPage] = useState(false);
+  const [totalPages] = useState(false);
+  const [totalDocuments] = useState(false);
   const fetchDocuments = async () => {
     setLoading(true);
     try {

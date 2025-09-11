@@ -37,13 +37,13 @@ interface SearchResult {
 }
 
 export default function CollaborativeSearchPage() {
-  const [roomName] = useState($2);
-  const [username] = useState($2);
-  const [hasJoined] = useState($2);
-  const [query] = useState($2);
+  const [roomName] = useState(false);
+  const [username] = useState(false);
+  const [hasJoined] = useState(false);
+  const [query] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSearching] = useState($2);
-  const [status] = useState($2);
+  const [isSearching] = useState(false);
+  const [status] = useState(false);
   // Ref to access chat functions
   const chatRef = useRef<{ shareSearchResults: unknown; shareDocument: unknown }>(null);
 

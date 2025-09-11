@@ -42,8 +42,8 @@ export function EnhancedChat({
   suggestedQuestions = [],
   minimalWelcome = false
 }: EnhancedChatProps) {
-  const [input] = useState($2);
-  const [hasSubmittedInitial] = useState($2);
+  const [input] = useState(false);
+  const [hasSubmittedInitial] = useState(false);
   const lastSavedMessagesRef = useRef<string>("");
 
   /**

@@ -47,9 +47,9 @@ const models = [
 ];
 
 const ChatBotDemo = (): ReactElement => {
-  const [input] = useState($2);
+  const [input] = useState(false);
   const [model, setModel] = useState<string>(models[0].value);
-  const [webSearch] = useState($2);
+  const [webSearch] = useState(false);
   const { messages, sendMessage, status, regenerate } = useChat();
 
   const handleSubmit = (e: React.FormEvent) => {

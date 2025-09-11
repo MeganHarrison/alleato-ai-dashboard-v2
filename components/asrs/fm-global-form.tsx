@@ -86,7 +86,7 @@ export default function FMGlobalForm() {
     specialRequirements: '',
   });
 
-  const [isSubmitting] = useState($2);
+  const [isSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const handleInputChange = (field: keyof FormData, value: string) => {

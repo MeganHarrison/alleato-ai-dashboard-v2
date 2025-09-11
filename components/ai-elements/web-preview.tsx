@@ -47,8 +47,8 @@ export const WebPreview = ({
   onUrlChange,
   ...props
 }: WebPreviewProps) => {
-  const [url] = useState($2);
-  const [consoleOpen] = useState($2);
+  const [url] = useState(false);
+  const [consoleOpen] = useState(false);
   const handleUrlChange = (newUrl: string) => {
     setUrl(newUrl);
     onUrlChange?.(newUrl);

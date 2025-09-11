@@ -113,7 +113,7 @@ function ChatSidebar({ chats, currentChatId }: ChatSidebarProps) {
 }
 
 export function ChatLayout({ children, chats, currentChatId }: ChatLayoutProps) {
-  const [sidebarOpen] = useState($2);
+  const [sidebarOpen] = useState(false);
   return (
     <div className="flex h-screen">
       {/* Desktop Sidebar */}

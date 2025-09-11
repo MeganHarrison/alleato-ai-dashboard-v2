@@ -11,10 +11,10 @@ import {
 import { useState } from "react";
 
 const FMGlobalNavigator = () => {
-  const [currentStep] = useState($2);
+  const [currentStep, setCurrentStep] = useState(1);
   const [path, setPath] = useState<string[]>([]);
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [isAnimating] = useState($2);
+  const [isAnimating] = useState(false);
   // Decision tree structure based on FM Global 8-34 Figure 1
   const decisionTree = {
     start: {

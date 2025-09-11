@@ -38,7 +38,7 @@ export function InsightsSection({
   projectInsights = [], 
   aiInsights = [] 
 }: InsightsSectionProps) {
-  const [currentPage] = useState($2);
+  const [currentPage] = useState(false);
   const itemsPerPage = 20;
 
   // Combine all insights and sort by date

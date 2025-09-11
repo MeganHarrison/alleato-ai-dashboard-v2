@@ -69,7 +69,7 @@ const severityColors = {
 
 export default function AIInsightsDisplay() {
   const [insights, setInsights] = useState<AIInsight[]>([]);
-  const [loading] = useState($2);
+  const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");

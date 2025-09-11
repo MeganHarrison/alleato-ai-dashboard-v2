@@ -16,8 +16,8 @@ export function useRealtimeChat({
   initialMessages = []
 }: UseRealtimeChatOptions) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [isConnected] = useState($2);
-  const [isLoading] = useState($2);
+  const [isConnected] = useState(false);
+  const [isLoading] = useState(false);
   const supabase = createClient();
 
   // Load existing messages

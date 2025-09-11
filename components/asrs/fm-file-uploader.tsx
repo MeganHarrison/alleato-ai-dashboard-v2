@@ -21,10 +21,10 @@ interface UploadResult {
 
 export function FMFileUploader() {
   const [files, setFiles] = useState<File[]>([]);
-  const [uploading] = useState($2);
+  const [uploading] = useState(false);
   const [results, setResults] = useState<UploadResult[]>([]);
-  const [progress] = useState($2);
-  const [dragActive] = useState($2);
+  const [progress] = useState(false);
+  const [dragActive] = useState(false);
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();

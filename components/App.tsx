@@ -11,8 +11,8 @@ export type AppProps = {
 };
 
 export function App({ title = 'Agent Demo', history, onSend }: AppProps) {
-  const [message] = useState($2);
-  const [isLoading] = useState($2);
+  const [message] = useState(false);
+  const [isLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

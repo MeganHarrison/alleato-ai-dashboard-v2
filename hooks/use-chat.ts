@@ -25,9 +25,9 @@ interface UseChatReturn {
 
 export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [messages, setMessages] = useState<ChatMessage[]>(options.initialMessages || []);
-  const [isLoading] = useState($2);
-  const [isStreaming] = useState($2);
-  const [currentStreamingMessage] = useState($2);
+  const [isLoading] = useState(false);
+  const [isStreaming] = useState(false);
+  const [currentStreamingMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Keep track of the last message for retry functionality

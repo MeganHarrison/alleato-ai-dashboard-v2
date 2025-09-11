@@ -43,7 +43,7 @@ interface FormData {
 }
 
 const ASRSRequirementsForm: React.FC = () => {
-  const [currentStep] = useState($2);
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     buildingType: '',
     ceilingHeight: 0,

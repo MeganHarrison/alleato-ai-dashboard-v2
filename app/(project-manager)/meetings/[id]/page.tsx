@@ -67,11 +67,11 @@ export default function MeetingPage() {
   const router = useRouter();
   const [meeting, setMeeting] = useState<MeetingDocument | null>(null);
   const [actualTranscript, setActualTranscript] = useState<string | null>(null);
-  const [transcriptLoading] = useState($2);
+  const [transcriptLoading] = useState(false);
   const [insights, setInsights] = useState<AIInsight[]>([]);
-  const [insightsLoading] = useState($2);
+  const [insightsLoading] = useState(false);
   const [relatedMeetings, setRelatedMeetings] = useState<MeetingDocument[]>([]);
-  const [loading] = useState($2);
+  const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [supabase] = useState(() => createClient());
 

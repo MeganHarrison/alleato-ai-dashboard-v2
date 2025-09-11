@@ -17,7 +17,7 @@ export default function FMGlobalChatInterface() {
   
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [inputFocused] = useState($2);
+  const [inputFocused] = useState(false);
   // Example queries for quick access
   const exampleQueries = [
     { icon: '📊', text: 'Key ASRS specifications' },

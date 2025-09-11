@@ -39,7 +39,7 @@ export const Branch = ({
   className,
   ...props
 }: BranchProps) => {
-  const [currentBranch] = useState($2);
+  const [currentBranch] = useState(false);
   const [branches, setBranches] = useState<ReactElement[]>([]);
 
   const handleBranchChange = (newBranch: number) => {

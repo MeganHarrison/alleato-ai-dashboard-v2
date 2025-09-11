@@ -37,7 +37,7 @@ interface UploadedFile {
 
 export default function RagSystemUploadPage() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
-  const [isUploading] = useState($2);
+  const [isUploading] = useState(false);
   const [tags, setTags] = useState<string>("");
   const [category, setCategory] = useState<string>("");
 

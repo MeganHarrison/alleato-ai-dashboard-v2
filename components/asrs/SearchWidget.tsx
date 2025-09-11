@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 
 export default function SearchWidget() {
-  const [q] = useState($2);
+  const [q] = useState(false);
   const [results, setResults] = useState<any[]>([]);
-  const [loading] = useState($2);
+  const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [blocks, setBlocks] = useState<any[]>([]);
 

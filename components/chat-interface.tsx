@@ -21,7 +21,7 @@ interface Message {
 }
 
 export function ChatInterface() {
-  const [isFocused] = useState($2);
+  const [isFocused] = useState(false);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-4xl relative">

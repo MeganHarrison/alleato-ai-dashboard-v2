@@ -32,8 +32,8 @@ interface FormQuestion {
 
 const ASRSRequirementsForm: React.FC = () => {
   const [formData, setFormData] = useState<ASRSFormData>({});
-  const [currentStep] = useState($2);
-  const [isGenerating] = useState($2);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isGenerating] = useState(false);
   const [designResult, setDesignResult] = useState<{
     applicable_figures: string[];
     applicable_tables: string[];

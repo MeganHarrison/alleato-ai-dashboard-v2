@@ -97,7 +97,7 @@ export function EditableMeetingsTable({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Meeting>>({});
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [searchQuery] = useState($2);
+  const [searchQuery] = useState(false);
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(

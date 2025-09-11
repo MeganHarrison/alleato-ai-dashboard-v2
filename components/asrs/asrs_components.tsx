@@ -280,7 +280,7 @@ const SearchBar: React.FC<SearchProps> = ({
   onClear,
   isSearching,
 }) => {
-  const [query] = useState($2);
+  const [query] = useState(false);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
@@ -658,9 +658,9 @@ export const FMDocsApp: React.FC<FMDocsAppProps> = ({
     next_section: null,
   });
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSearching] = useState($2);
-  const [showSearch] = useState($2);
-  const [loading] = useState($2);
+  const [isSearching] = useState(false);
+  const [showSearch] = useState(false);
+  const [loading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load table of contents on mount

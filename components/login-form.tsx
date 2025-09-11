@@ -20,10 +20,10 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [email] = useState($2);
-  const [password] = useState($2);
+  const [email] = useState(false);
+  const [password] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading] = useState($2);
+  const [isLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {

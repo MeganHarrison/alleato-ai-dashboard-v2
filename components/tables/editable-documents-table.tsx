@@ -122,11 +122,11 @@ const formatDate = (dateStr: string): string => {
 export function EditableDocumentsTable({ documents }: EditableDocumentsTableProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editedDocument, setEditedDocument] = useState<Document | null>(null);
-  const [searchQuery] = useState($2);
+  const [searchQuery] = useState(false);
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [isGeneratingInsights] = useState($2);
+  const [isGeneratingInsights] = useState(false);
   const [generatingDocIds, setGeneratingDocIds] = useState<Set<number>>(new Set());
-  const [visibleColumns] = useState($2);
+  const [visibleColumns] = useState(false);
   // Check if any documents are missing AI insights
   const documentsWithoutInsights = useMemo(() => {
     return documents.filter(doc => !hasAIInsights(doc));

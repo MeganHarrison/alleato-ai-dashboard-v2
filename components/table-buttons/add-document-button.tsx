@@ -26,9 +26,9 @@ import { createDocument } from "@/app/actions/documents-full-actions";
 import { toast } from "sonner";
 
 export function AddDocumentButton() {
-  const [open] = useState($2);
-  const [isLoading] = useState($2);
-  const [formData] = useState($2);
+  const [open] = useState(false);
+  const [isLoading] = useState(false);
+  const [formData] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

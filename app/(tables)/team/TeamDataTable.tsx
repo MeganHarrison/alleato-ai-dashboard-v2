@@ -46,9 +46,9 @@ interface TeamDataTableProps {
 }
 
 export default function TeamDataTable({ employees }: TeamDataTableProps) {
-  const [searchQuery] = useState($2);
+  const [searchQuery] = useState(false);
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
-  const [currentPage] = useState($2);
+  const [currentPage] = useState(false);
   const itemsPerPage = 10;
 
   // Get unique departments for filter

@@ -37,7 +37,7 @@ export function EnhancedChatV5({
   suggestedQuestions = [],
   minimalWelcome = false
 }: EnhancedChatProps) {
-  const [input] = useState($2);
+  const [input] = useState(false);
   // Use the useChat hook properly according to AI SDK v5
   const { messages, handleSubmit, handleInputChange, isLoading, error, reload, stop } = useChat({
     id,

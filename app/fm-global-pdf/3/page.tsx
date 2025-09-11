@@ -54,11 +54,11 @@ interface FMGlobalTable {
 export default function FMGlobalTablesPage() {
   const [figures, setFigures] = useState<FMGlobalFigure[]>([]);
   const [tables, setTables] = useState<FMGlobalTable[]>([]);
-  const [loadingFigures] = useState($2);
-  const [loadingTables] = useState($2);
+  const [loadingFigures] = useState(false);
+  const [loadingTables] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm] = useState($2);
-  const [activeTab] = useState($2);
+  const [searchTerm] = useState(false);
+  const [activeTab] = useState(false);
   const supabase = createClientComponentClient();
 
   // Function to get color class based on ASRS type

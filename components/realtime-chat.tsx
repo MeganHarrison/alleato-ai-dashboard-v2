@@ -32,8 +32,8 @@ export function RealtimeChat({
   showHeader = true,
   height = '600px'
 }: RealtimeChatProps) {
-  const [inputMessage] = useState($2);
-  const [isSending] = useState($2);
+  const [inputMessage] = useState(false);
+  const [isSending] = useState(false);
   const {
     messages,
     sendMessage,

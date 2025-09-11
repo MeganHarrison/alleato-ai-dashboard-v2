@@ -28,12 +28,12 @@ export interface UseChatReturn {
 
 export function usePMRAGChat(options: UseChatOptions = {}): UseChatReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoading] = useState($2);
-  const [isStreaming] = useState($2);
+  const [isLoading] = useState(false);
+  const [isStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentStreamingMessage] = useState($2);
+  const [currentStreamingMessage] = useState(false);
   const [sources, setSources] = useState<string[]>([]);
-  const [confidence] = useState($2);
+  const [confidence] = useState(false);
   const lastMessageRef = useRef<string>('');
   const lastOptionsRef = useRef<ChatOptions>({});
 

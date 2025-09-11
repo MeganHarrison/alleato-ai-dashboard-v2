@@ -71,14 +71,14 @@ interface ActionResult {
 export default function RAGDashboard() {
   const supabase = createClientComponentClient();
   const [stats, setStats] = useState<WorkerStats | null>(null);
-  const [loading] = useState($2);
+  const [loading] = useState(false);
   const [processing, setProcessing] = useState<Record<string, boolean>>({});
   const [results, setResults] = useState<ActionResult[]>([]);
   const [selectedMeetings, setSelectedMeetings] = useState<string[]>([]);
   const [workerHealth, setWorkerHealth] = useState<
     "healthy" | "degraded" | "offline"
   >("offline");
-  const [autoRefresh] = useState($2);
+  const [autoRefresh] = useState(false);
   // Worker URL - update this based on environment
   const WORKER_URL =
     process.env.NEXT_PUBLIC_WORKER_URL || "http://localhost:57097";
