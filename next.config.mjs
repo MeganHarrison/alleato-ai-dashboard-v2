@@ -15,6 +15,10 @@ const nextConfig = {
       },
     ],
   },
+  // Use Turbopack for production builds to bypass webpack issues
+  experimental: {
+    turbo: {},
+  },
   // Basic optimizations for production
   poweredByHeader: false,
   compress: true,
