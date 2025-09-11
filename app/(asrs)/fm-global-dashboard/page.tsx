@@ -4,23 +4,25 @@ import React from 'react';
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Settings, FileText } from "lucide-react";
+import { MessageCircle, Settings, FileText, Database } from "lucide-react";
 import Link from "next/link";
+import FMGlobalTablesFigures from "@/components/asrs/fm-global-tables-figures";
 
-export default function ASRSMainChat() {
+export default function FMGlobalDashboard() {
   return (
-    <div className="space-y-6">
+    <div className="mx-auto p-4 lg:p-6 space-y-6">
       <PageHeader
-        title="ASRS Main Chat"
-        description="General ASRS consultation for system design, project planning, and technical guidance"
+        title="FM Global Dashboard"
+        description="Comprehensive FM Global resource center with chat interface, forms, tables, and figures"
       />
 
+      {/* Main Action Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
-              Start Chat
+              FM Global Expert Chat
             </CardTitle>
             <CardDescription>
               Get instant answers about ASRS sprinkler systems, compliance requirements, and design specifications.
@@ -29,7 +31,7 @@ export default function ASRSMainChat() {
           <CardContent>
             <Link href="/fm-global-expert">
               <Button className="w-full">
-                Open FM Global Expert Chat
+                Start Conversation
               </Button>
             </Link>
           </CardContent>
@@ -57,40 +59,57 @@ export default function ASRSMainChat() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Design Tools
+              <Database className="h-5 w-5" />
+              Browse All Tables & Figures
             </CardTitle>
             <CardDescription>
-              Access design tools and resources for planning ASRS sprinkler installations.
+              Access the complete database view with advanced filtering and detailed information.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/asrs-design">
+            <Link href="/fm-global-tables">
               <Button className="w-full" variant="outline">
-                Open Design Tools
+                Full Database View
               </Button>
             </Link>
           </CardContent>
         </Card>
       </div>
 
+      {/* Integrated Tables & Figures */}
       <Card>
         <CardHeader>
-          <CardTitle>Quick Access</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            FM Global Tables & Figures
+          </CardTitle>
           <CardDescription>
-            Jump directly to commonly used resources
+            Browse and search through FM Global reference tables and figures directly from the dashboard
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FMGlobalTablesFigures />
+        </CardContent>
+      </Card>
+
+      {/* Quick Navigation */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Navigation</CardTitle>
+          <CardDescription>
+            Jump to other ASRS resources and tools
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 md:grid-cols-2">
-            <Link href="/fm-global-tables">
-              <Button variant="outline" className="w-full justify-start">
-                Browse Tables & Figures
-              </Button>
-            </Link>
             <Link href="/asrs-dashboard">
               <Button variant="outline" className="w-full justify-start">
-                Return to Dashboard
+                Return to Main ASRS Dashboard
+              </Button>
+            </Link>
+            <Link href="/asrs-design">
+              <Button variant="outline" className="w-full justify-start">
+                ASRS Design Tools
               </Button>
             </Link>
           </div>
