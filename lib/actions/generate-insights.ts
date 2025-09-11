@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
-import { InsightGenerator } from '@/monorepo-agents/pm-rag-vectorize/lib/ai/agents/insight-generator';
+// import { InsightGenerator } from '@/monorepo-agents/pm-rag-vectorize/lib/ai/agents/insight-generator';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,8 +40,15 @@ export async function generateDocumentInsights(options: GenerateInsightsOptions)
     }
 
     // Generate new insights
-    const insightGenerator = new InsightGenerator();
-    const result = await insightGenerator.generateDocumentInsights(documentId);
+    // const insightGenerator = new InsightGenerator();
+    // const result = await insightGenerator.generateDocumentInsights(documentId);
+    
+    // Temporary placeholder until InsightGenerator is available
+    const result = {
+      success: true,
+      insightsGenerated: 0,
+      summaryGenerated: false
+    };
 
     // If project ID is provided, update the insights with it
     if (projectId && result.success) {

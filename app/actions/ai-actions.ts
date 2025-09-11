@@ -14,10 +14,15 @@ type TableName = keyof Database["public"]["Tables"]
 export async function askAI(question: string, history: Message[]) {
   try {
     // Try to use PM RAG Railway endpoint first
-    const railwayEndpoint = process.env.RAILWAY_RAG_API_URL || 'https://rag-agent-api-production.up.railway.app';
+    const railwayEndpoint = process.env.RAILWAY_RAG_API_URL;
     
-    try {
-      // Build conversation context
+    if (!railwayEndpoint) {
+      console.log('Railway RAG API URL not configured, falling back to OpenAI');
+    }
+    
+    if (railwayEndpoint) {
+      try {
+        // Build conversation context
       const conversationContext = history.slice(-4).map(msg => 
         `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
       ).join('\n');
@@ -39,8 +44,9 @@ export async function askAI(question: string, history: Message[]) {
         const data = await railwayResponse.json();
         return data.response || "I'm not sure how to respond to that.";
       }
-    } catch (railwayError) {
-      console.log("Railway RAG unavailable, falling back to OpenAI:", railwayError);
+      } catch (railwayError) {
+        console.log("Railway RAG unavailable, falling back to OpenAI:", railwayError);
+      }
     }
 
     // Fallback to OpenAI if Railway fails

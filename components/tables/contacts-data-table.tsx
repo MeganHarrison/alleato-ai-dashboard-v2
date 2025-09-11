@@ -135,15 +135,6 @@ const columns: ColumnDef<ContactWithCompany>[] = [
     },
   },
   {
-    accessorKey: "job_title",
-    header: "Job Title",
-    cell: ({ row }) => {
-      const jobTitle = row.original.job_title
-      
-      return jobTitle || <span className="text-muted-foreground">N/A</span>
-    },
-  },
-  {
     accessorKey: "company.name",
     header: "Company",
     cell: ({ row }) => {
@@ -221,7 +212,7 @@ export function ContactsDataTable({ contacts, showEmployeesOnly = false }: Conta
   // Filter for employees if needed (contacts without company_id)
   const filteredContacts = React.useMemo(() => {
     if (showEmployeesOnly) {
-      return contacts.filter(contact => !contact.company_id)
+      return contacts.filter(contact => !contact.company)
     }
     return contacts
   }, [contacts, showEmployeesOnly])

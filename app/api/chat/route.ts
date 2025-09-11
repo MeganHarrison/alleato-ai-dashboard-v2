@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Railway API endpoint
-const RAILWAY_API_URL = process.env.RAILWAY_PM_RAG || 'https://rag-agent-api-production.up.railway.app';
+const RAILWAY_API_URL = process.env.RAILWAY_PM_RAG;
+
+if (!RAILWAY_API_URL) {
+  console.error('❌ RAILWAY_PM_RAG environment variable not set');
+}
 
 async function queryRailwayRAG(message: string, conversationHistory: any[] = []) {
+  if (!RAILWAY_API_URL) {
+    throw new Error('Railway API URL not configured');
+  }
+  
   try {
     const payload = {
       message: message,
@@ -78,7 +86,7 @@ export async function POST(req: NextRequest) {
       console.warn('⚠️ Railway API failed, providing helpful message:', railwayError);
       
       return NextResponse.json({ 
-        message: `I'm having trouble accessing your meeting data right now. The Railway RAG system (${RAILWAY_API_URL}) appears to be unavailable. 
+        message: `I'm having trouble accessing your meeting data right now. The Railway RAG system appears to be unavailable. 
 
 Please check:
 1. Is the Railway service running?

@@ -3,10 +3,10 @@ import { createHash } from 'crypto';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     unoptimized: true,
@@ -21,8 +21,8 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   
-  // Reduce memory usage during build
-  output: 'standalone',
+  // Remove standalone for Vercel deployment
+  // output: 'standalone', // Commented out for Vercel
   
   // Optimize bundle size
   productionBrowserSourceMaps: false,

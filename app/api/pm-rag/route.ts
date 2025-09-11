@@ -51,7 +51,12 @@ export async function POST(request: NextRequest) {
  * Try to connect to Railway API
  */
 async function tryRailwayAPI(message: string, conversationHistory: any[]) {
-  const RAILWAY_RAG_API = process.env.RAILWAY_PM_RAG || 'https://rag-agent-api-production.up.railway.app';
+  const RAILWAY_RAG_API = process.env.RAILWAY_PM_RAG;
+  
+  if (!RAILWAY_RAG_API) {
+    console.warn('⚠️ RAILWAY_PM_RAG environment variable not set');
+    return { success: false, error: 'Railway API URL not configured' };
+  }
   
   try {
     const payload = {
@@ -468,7 +473,7 @@ export async function GET() {
         strategic_planning: true
       },
       configuration: {
-        railway_url: process.env.RAILWAY_PM_RAG || 'https://rag-agent-api-production.up.railway.app',
+        railway_url: process.env.RAILWAY_PM_RAG || 'not_configured',
         fallback_mode: 'enhanced_local_processing',
         data_sources: ['meetings', 'documents', 'insights', 'projects', 'tasks']
       },
@@ -487,7 +492,15 @@ export async function GET() {
 
 async function testRailwayConnection() {
   try {
-    const RAILWAY_RAG_API = process.env.RAILWAY_PM_RAG || 'https://rag-agent-api-production.up.railway.app';
+    const RAILWAY_RAG_API = process.env.RAILWAY_PM_RAG;
+    
+    if (!RAILWAY_RAG_API) {
+      return {
+        healthy: false,
+        error: 'Railway API URL not configured',
+        url: 'not_configured'
+      };
+    }
     
     const response = await fetch(`${RAILWAY_RAG_API}/health`, {
       method: 'GET',
@@ -505,7 +518,7 @@ async function testRailwayConnection() {
     return {
       healthy: false,
       error: error instanceof Error ? error.message : 'Connection failed',
-      url: process.env.RAILWAY_PM_RAG || 'https://rag-agent-api-production.up.railway.app'
+      url: process.env.RAILWAY_PM_RAG || 'not_configured'
     };
   }
 }

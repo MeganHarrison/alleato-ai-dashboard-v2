@@ -117,5 +117,5 @@ test('AI Insights Chat - Railway PM RAG Integration', async ({ page }) => {
   console.log(`Chat Interface: ✅ Visible`);
   console.log(`Railway Endpoint: ${isOnline ? '✅ Connected' : '⚠️ Check connection'}`);
   console.log(`Chat Functionality: ${responseCount > 0 ? '✅ Working' : '⚠️ Check response'}`);
-  console.log(`Endpoint URL: https://rag-agent-api-production.up.railway.app`);
+  console.log(`Endpoint URL: ${process.env.RAILWAY_PM_RAG || 'Environment variable not set'}`);
 });

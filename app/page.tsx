@@ -6,6 +6,7 @@ import ErrorBoundary from "@/components/error-boundary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useIsMobile, useIsSmallMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -127,6 +128,10 @@ export default function DashboardHome() {
   );
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  
+  // Mobile responsive hooks
+  const isMobile = useIsMobile();
+  const isSmallMobile = useIsSmallMobile();
 
   const services: Service[] = [
     {
@@ -327,13 +332,20 @@ export default function DashboardHome() {
   };
 
   const CardView = () => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className={cn(
+      "grid gap-4",
+      isSmallMobile 
+        ? "grid-cols-1" 
+        : isMobile 
+          ? "grid-cols-1 sm:grid-cols-2" 
+          : "md:grid-cols-2 lg:grid-cols-3"
+    )}>
       {filteredProjects.map((project) => (
         <Card
           key={project.id}
           className="group bg-white border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-200"
         >
-          <CardContent className="p-5">
+          <CardContent className={cn(isMobile ? "p-4" : "p-5")}>
             {/* Header */}
             <div className="flex items-start justify-between text-brand-500 text-sm mb-3">
               <div className="flex-1">
@@ -397,10 +409,80 @@ export default function DashboardHome() {
   );
 
   const TableView = () => (
-    <div className="border rounded-lg overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-gray-50">
+    <div className={cn(
+      "border rounded-lg overflow-hidden",
+      isMobile && "border-0 rounded-none"
+    )}>
+      {isMobile ? (
+        // Mobile: Use stacked cards instead of table
+        <div className="space-y-3">
+          {filteredProjects.map((project) => (
+            <Card 
+              key={project.id}
+              className="border border-gray-200 hover:shadow-md transition-shadow"
+            >
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="font-semibold text-base hover:text-brand-600 hover:underline"
+                  >
+                    {project.name}
+                  </Link>
+                  <Badge
+                    className={cn("text-xs ml-2 flex-shrink-0", getStatusColor(project.phase))}
+                  >
+                    {project.phase}
+                  </Badge>
+                </div>
+                
+                <div className="space-y-2 text-sm text-gray-600">
+                  {project.clients?.name && (
+                    <div className="flex items-center gap-2">
+                      <Building className="h-4 w-4" />
+                      <span>{project.clients.name}</span>
+                    </div>
+                  )}
+                  
+                  {project["est revenue"] && (
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      <span className="font-medium text-gray-900">
+                        {formatCurrency(project["est revenue"])}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {project.category && (
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      <span>{project.category}</span>
+                    </div>
+                  )}
+                  
+                  {project.created_at && (
+                    <div className="text-xs text-gray-500">
+                      Created {format(new Date(project.created_at), "MMM d, yyyy")}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex justify-end mt-4 pt-3 border-t border-gray-100">
+                  <Link href={`/projects/${project.id}`}>
+                    <Button size="sm" className="bg-black text-white hover:bg-black/90">
+                      View Details
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        // Desktop: Use traditional table
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50">
             {visibleColumns.has("name") && (
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
@@ -468,64 +550,65 @@ export default function DashboardHome() {
                 </div>
               </TableHead>
             )}
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredProjects.map((project) => (
-            <TableRow key={project.id} className="hover:bg-gray-50">
-              {visibleColumns.has("name") && (
-                <TableCell className="font-medium">
-                  <Link
-                    href={`/projects/${project.id}`}
-                    className="hover:text-brand-600 hover:underline flex items-center gap-1"
-                  >
-                    {project.name}
-                    <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100" />
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredProjects.map((project) => (
+              <TableRow key={project.id} className="hover:bg-gray-50">
+                {visibleColumns.has("name") && (
+                  <TableCell className="font-medium">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="hover:text-brand-600 hover:underline flex items-center gap-1"
+                    >
+                      {project.name}
+                      <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100" />
+                    </Link>
+                  </TableCell>
+                )}
+                {visibleColumns.has("phase") && (
+                  <TableCell>
+                    <Badge
+                      className={cn("text-xs", getStatusColor(project.phase))}
+                    >
+                      {project.phase}
+                    </Badge>
+                  </TableCell>
+                )}
+                {visibleColumns.has("company") && (
+                  <TableCell>{project.clients?.name || "—"}</TableCell>
+                )}
+                {visibleColumns.has("revenue") && (
+                  <TableCell className="font-medium">
+                    {formatCurrency(project["est revenue"])}
+                  </TableCell>
+                )}
+                {visibleColumns.has("category") && (
+                  <TableCell>{project.category || "—"}</TableCell>
+                )}
+                {visibleColumns.has("location") && (
+                  <TableCell>{project.location || "—"}</TableCell>
+                )}
+                {visibleColumns.has("created") && (
+                  <TableCell>
+                    {project.created_at
+                      ? format(new Date(project.created_at), "MMM d, yyyy")
+                      : "—"}
+                  </TableCell>
+                )}
+                <TableCell className="text-right">
+                  <Link href={`/projects/${project.id}`}>
+                    <Button size="sm" variant="ghost">
+                      View
+                    </Button>
                   </Link>
                 </TableCell>
-              )}
-              {visibleColumns.has("phase") && (
-                <TableCell>
-                  <Badge
-                    className={cn("text-xs", getStatusColor(project.phase))}
-                  >
-                    {project.phase}
-                  </Badge>
-                </TableCell>
-              )}
-              {visibleColumns.has("company") && (
-                <TableCell>{project.clients?.name || "—"}</TableCell>
-              )}
-              {visibleColumns.has("revenue") && (
-                <TableCell className="font-medium">
-                  {formatCurrency(project["est revenue"])}
-                </TableCell>
-              )}
-              {visibleColumns.has("category") && (
-                <TableCell>{project.category || "—"}</TableCell>
-              )}
-              {visibleColumns.has("location") && (
-                <TableCell>{project.location || "—"}</TableCell>
-              )}
-              {visibleColumns.has("created") && (
-                <TableCell>
-                  {project.created_at
-                    ? format(new Date(project.created_at), "MMM d, yyyy")
-                    : "—"}
-                </TableCell>
-              )}
-              <TableCell className="text-right">
-                <Link href={`/projects/${project.id}`}>
-                  <Button size="sm" variant="ghost">
-                    View
-                  </Button>
-                </Link>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 
@@ -584,19 +667,35 @@ export default function DashboardHome() {
             <DynamicBreadcrumbs />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 mx-[10%] sm:mx-[8%] lg:mx-[12%] xl:mx-[15%]">
+        <div className={cn(
+          "flex flex-1 flex-col gap-4 pt-0",
+          isMobile ? "p-3" : "p-4",
+          isMobile 
+            ? "mx-0" // No side margins on mobile
+            : "mx-[10%] sm:mx-[8%] lg:mx-[12%] xl:mx-[15%]"
+        )}>
           <ErrorBoundary>
             <div className="min-h-screen">
               {/* Service Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <div className={cn(
+                "grid gap-6 mb-8",
+                isSmallMobile 
+                  ? "grid-cols-1 gap-4 mb-6"
+                  : isMobile 
+                    ? "grid-cols-1 gap-4 mb-6"
+                    : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              )}>
                 {services.map((service, index) => (
                   <Link
                     href={service.href}
                     key={index}
-                    className="block transition-transform hover:-translate-y-1"
+                    className={cn(
+                      "block transition-transform",
+                      isMobile ? "hover:scale-[1.02]" : "hover:-translate-y-1"
+                    )}
                   >
                     <Card className="h-full bg-gray-50 border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-gray-200">
-                      <CardContent className="p-8">
+                      <CardContent className={cn(isMobile ? "p-6" : "p-8")}>
                         {service.price ? (
                           <div className="flex items-start justify-between mb-4">
                             <h3 className="text-base font-semibold text-gray-900">
@@ -634,43 +733,65 @@ export default function DashboardHome() {
               </div>
 
               {/* Filters and Controls */}
-              <div className="rounded-lg mb-6">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className={cn("rounded-lg", isMobile ? "mb-4" : "mb-6")}>
+                <div className={cn(
+                  "flex flex-col gap-4",
+                  !isMobile && "lg:flex-row lg:items-center lg:justify-between"
+                )}>
+                  <div className={cn(
+                    "flex flex-col gap-4",
+                    isMobile ? "space-y-4" : "sm:flex-row sm:items-center sm:gap-4"
+                  )}>
                     {/* Search */}
-                    <div className="relative w-full sm:w-64">
+                    <div className="relative w-full">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         type="text"
                         placeholder="Search projects..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
+                        className={cn(
+                          "pl-10",
+                          isMobile ? "h-12 text-base" : "h-10 text-sm"
+                        )}
                       />
                     </div>
 
                     {/* Active Projects Toggle */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-3">
                       <Switch
                         id="active-only"
                         checked={showOnlyActive}
                         onCheckedChange={setShowOnlyActive}
+                        className={cn(isMobile && "scale-110")}
                       />
                       <Label
                         htmlFor="active-only"
-                        className="text-sm font-medium cursor-pointer"
+                        className={cn(
+                          "font-medium cursor-pointer",
+                          isMobile ? "text-base" : "text-sm"
+                        )}
                       >
                         Current projects only
                       </Label>
                     </div>
 
                     {/* Filters */}
-                    <div className="flex items-center gap-2">
-                      <Filter className="h-4 w-4 text-gray-400" />
+                    <div className={cn(
+                      "flex gap-3",
+                      isMobile ? "flex-col" : "items-center gap-2"
+                    )}>
+                      {!isMobile && <Filter className="h-4 w-4 text-gray-400" />}
+                      
                       <select
                         value={selectedPhase}
                         onChange={(e) => setSelectedPhase(e.target.value)}
-                        className="text-sm border rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className={cn(
+                          "border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white",
+                          isMobile 
+                            ? "text-base px-4 py-3 w-full" 
+                            : "text-sm px-3 py-1.5"
+                        )}
                       >
                         <option value="all">All Status</option>
                         {phases
@@ -685,7 +806,12 @@ export default function DashboardHome() {
                       <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="text-sm border rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className={cn(
+                          "border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white",
+                          isMobile 
+                            ? "text-base px-4 py-3 w-full" 
+                            : "text-sm px-3 py-1.5"
+                        )}
                       >
                         <option value="all">All Categories</option>
                         {categories
@@ -699,54 +825,80 @@ export default function DashboardHome() {
                     </div>
                   </div>
 
-                  {/* Column selector for table view */}
-                  <div className="flex items-center gap-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Columns3 className="h-4 w-4 mr-2" />
-                          Columns
-                          <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        {COLUMNS.map((column) => (
-                          <DropdownMenuCheckboxItem
-                            key={column.id}
-                            checked={visibleColumns.has(column.id)}
-                            onCheckedChange={() => toggleColumn(column.id)}
-                          >
-                            {column.label}
-                          </DropdownMenuCheckboxItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <span className="text-sm text-gray-600">
+                  {/* Column selector and count */}
+                  <div className={cn(
+                    "flex gap-3",
+                    isMobile ? "flex-col-reverse" : "items-center gap-2"
+                  )}>
+                    {/* Project count */}
+                    <div className={cn(
+                      "text-gray-600 text-center",
+                      isMobile ? "text-sm py-2" : "text-sm"
+                    )}>
                       {filteredProjects.length} of {projects.length} projects
-                    </span>
+                    </div>
+
+                    {/* Column selector - only show on desktop for table view */}
+                    {!isMobile && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Columns3 className="h-4 w-4 mr-2" />
+                            Columns
+                            <ChevronDown className="ml-2 h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          {COLUMNS.map((column) => (
+                            <DropdownMenuCheckboxItem
+                              key={column.id}
+                              checked={visibleColumns.has(column.id)}
+                              onCheckedChange={() => toggleColumn(column.id)}
+                            >
+                              {column.label}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Content with View Toggle */}
-              <Tabs defaultValue="table" className="space-y-4">
-                <TabsList className="bg-gray-50 border">
+              <Tabs 
+                defaultValue={isMobile ? "cards" : "table"} 
+                className="space-y-4"
+              >
+                <TabsList className={cn(
+                  "bg-gray-50 border",
+                  isMobile ? "w-full grid grid-cols-2" : ""
+                )}>
                   <TabsTrigger
                     value="cards"
-                    className="flex items-center gap-2"
+                    className={cn(
+                      "flex items-center gap-2",
+                      isMobile ? "flex-1 py-3" : ""
+                    )}
                   >
-                    <LayoutGrid className="h-4 w-4" />
-                    Cards
+                    <LayoutGrid className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
+                    <span className={cn(isMobile ? "text-base font-medium" : "")}>
+                      Cards
+                    </span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="table"
-                    className="flex items-center gap-2"
+                    className={cn(
+                      "flex items-center gap-2",
+                      isMobile ? "flex-1 py-3" : ""
+                    )}
                   >
-                    <List className="h-4 w-4" />
-                    Table
+                    <List className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
+                    <span className={cn(isMobile ? "text-base font-medium" : "")}>
+                      Table
+                    </span>
                   </TabsTrigger>
                 </TabsList>
 

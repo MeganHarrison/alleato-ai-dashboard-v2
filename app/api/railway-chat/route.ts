@@ -3,9 +3,17 @@ import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 // Railway API endpoint
-const RAILWAY_API_URL = process.env.RAILWAY_PM_RAG || 'https://rag-agent-api-production.up.railway.app';
+const RAILWAY_API_URL = process.env.RAILWAY_PM_RAG;
+
+if (!RAILWAY_API_URL) {
+  console.error('❌ RAILWAY_PM_RAG environment variable not set');
+}
 
 async function queryRailwayRAG(message: string, conversationHistory: any[] = []) {
+  if (!RAILWAY_API_URL) {
+    throw new Error('Railway API URL not configured');
+  }
+  
   try {
     const payload = {
       query: message,
@@ -182,6 +190,10 @@ Remember: You have access to real-time data through the Railway RAG system. Use 
 export async function GET() {
   try {
     // Test Railway API connection
+    if (!RAILWAY_API_URL) {
+      throw new Error('Railway API URL not configured');
+    }
+    
     const testResponse = await fetch(`${RAILWAY_API_URL}/health`, {
       method: 'GET',
       headers: {
@@ -197,7 +209,7 @@ export async function GET() {
       status: 'healthy',
       railway_api: {
         status: railwayStatus,
-        url: RAILWAY_API_URL,
+        url: RAILWAY_API_URL || 'not_configured',
         response_time: railwayInfo ? 'fast' : 'slow',
         info: railwayInfo
       },
@@ -215,7 +227,7 @@ export async function GET() {
       status: 'degraded',
       railway_api: {
         status: 'error',
-        url: RAILWAY_API_URL,
+        url: RAILWAY_API_URL || 'not_configured',
         error: error instanceof Error ? error.message : 'Connection failed'
       },
       fallback: 'Local AI processing available',

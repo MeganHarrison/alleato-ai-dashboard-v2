@@ -7,6 +7,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Alleato - AI Intelligence",
   description: "Transform your data into powerful insights",
+  icons: {
+    icon: '/logos/Alleato Favicon.png',
+    shortcut: '/logos/Alleato Favicon.png',
+    apple: '/logos/Alleato Favicon.png',
+  },
 };
 
 export default function RootLayout({
