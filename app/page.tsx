@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { DynamicBreadcrumbs } from "@/components/dynamic-breadcrumbs";
 import ErrorBoundary from "@/components/error-boundary";
 import { AddProjectButton } from "@/components/table-buttons/add-project-button";
+import { EditableProjectsTable } from "@/components/tables/editable-projects-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -408,209 +409,6 @@ export default function DashboardHome() {
     </div>
   );
 
-  const TableView = () => (
-    <div className={cn(
-      "border rounded-lg overflow-hidden",
-      isMobile && "border-0 rounded-none"
-    )}>
-      {isMobile ? (
-        // Mobile: Use stacked cards instead of table
-        <div className="space-y-3">
-          {filteredProjects.map((project) => (
-            <Card 
-              key={project.id}
-              className="border border-gray-200 hover:shadow-md transition-shadow"
-            >
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-3">
-                  <Link
-                    href={`/projects/${project.id}`}
-                    className="font-semibold text-base hover:text-brand-600 hover:underline"
-                  >
-                    {project.name}
-                  </Link>
-                  <Badge
-                    className={cn("text-xs ml-2 flex-shrink-0", getStatusColor(project.phase))}
-                  >
-                    {project.phase}
-                  </Badge>
-                </div>
-                
-                <div className="space-y-2 text-sm text-gray-600">
-                  {project.clients?.name && (
-                    <div className="flex items-center gap-2">
-                      <Building className="h-4 w-4" />
-                      <span>{project.clients.name}</span>
-                    </div>
-                  )}
-                  
-                  {project["est revenue"] && (
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      <span className="font-medium text-gray-900">
-                        {formatCurrency(project["est revenue"])}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {project.category && (
-                    <div className="flex items-center gap-2">
-                      <Briefcase className="h-4 w-4" />
-                      <span>{project.category}</span>
-                    </div>
-                  )}
-                  
-                  {project.created_at && (
-                    <div className="text-xs text-gray-500">
-                      Created {format(new Date(project.created_at), "MMM d, yyyy")}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-end mt-4 pt-3 border-t border-gray-100">
-                  <Link href={`/projects/${project.id}`}>
-                    <Button size="sm" className="bg-black text-white hover:bg-black/90">
-                      View Details
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        // Desktop: Use traditional table
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50">
-            {visibleColumns.has("name") && (
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("name")}
-              >
-                <div className="flex items-center">
-                  Project Name
-                  {getSortIcon("name")}
-                </div>
-              </TableHead>
-            )}
-            {visibleColumns.has("phase") && (
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("phase")}
-              >
-                <div className="flex items-center">
-                  Status
-                  {getSortIcon("phase")}
-                </div>
-              </TableHead>
-            )}
-            {visibleColumns.has("company") && (
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("company")}
-              >
-                <div className="flex items-center">
-                  Company
-                  {getSortIcon("company")}
-                </div>
-              </TableHead>
-            )}
-            {visibleColumns.has("revenue") && (
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("revenue")}
-              >
-                <div className="flex items-center">
-                  Est. Revenue
-                  {getSortIcon("revenue")}
-                </div>
-              </TableHead>
-            )}
-            {visibleColumns.has("category") && (
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("category")}
-              >
-                <div className="flex items-center">
-                  Category
-                  {getSortIcon("category")}
-                </div>
-              </TableHead>
-            )}
-            {visibleColumns.has("location") && <TableHead>Location</TableHead>}
-            {visibleColumns.has("created") && (
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("created")}
-              >
-                <div className="flex items-center">
-                  Created
-                  {getSortIcon("created")}
-                </div>
-              </TableHead>
-            )}
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredProjects.map((project) => (
-              <TableRow key={project.id} className="hover:bg-gray-50">
-                {visibleColumns.has("name") && (
-                  <TableCell className="font-medium">
-                    <Link
-                      href={`/projects/${project.id}`}
-                      className="hover:text-brand-600 hover:underline flex items-center gap-1"
-                    >
-                      {project.name}
-                      <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100" />
-                    </Link>
-                  </TableCell>
-                )}
-                {visibleColumns.has("phase") && (
-                  <TableCell>
-                    <Badge
-                      className={cn("text-xs", getStatusColor(project.phase))}
-                    >
-                      {project.phase}
-                    </Badge>
-                  </TableCell>
-                )}
-                {visibleColumns.has("company") && (
-                  <TableCell>{project.clients?.name || "—"}</TableCell>
-                )}
-                {visibleColumns.has("revenue") && (
-                  <TableCell className="font-medium">
-                    {formatCurrency(project["est revenue"])}
-                  </TableCell>
-                )}
-                {visibleColumns.has("category") && (
-                  <TableCell>{project.category || "—"}</TableCell>
-                )}
-                {visibleColumns.has("location") && (
-                  <TableCell>{project.location || "—"}</TableCell>
-                )}
-                {visibleColumns.has("created") && (
-                  <TableCell>
-                    {project.created_at
-                      ? format(new Date(project.created_at), "MMM d, yyyy")
-                      : "—"}
-                  </TableCell>
-                )}
-                <TableCell className="text-right">
-                  <Link href={`/projects/${project.id}`}>
-                    <Button size="sm" variant="ghost">
-                      View
-                    </Button>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </div>
-  );
 
   if (loading) {
     return (
@@ -925,7 +723,7 @@ export default function DashboardHome() {
                       </p>
                     </div>
                   ) : (
-                    <TableView />
+                    <EditableProjectsTable projects={filteredProjects} />
                   )}
                 </TabsContent>
               </Tabs>
