@@ -98,7 +98,7 @@ export default function MeetingsPage() {
   );
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
   const [editData, setEditData] = useState<Partial<Document>>({});
-  const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [supabase] = useState(() => {
     const client = createClient();
     if (!client) {
@@ -142,7 +142,10 @@ export default function MeetingsPage() {
         throw new Error(projectsError.message || "Failed to load projects");
       }
       
-      setDocuments(documentsData || []);
+      setDocuments((documentsData || []).map(doc => ({
+        ...doc,
+        id: String(doc.id) // Ensure ID is string
+      })) as Document[]);
       setProjects((projectsData || []).map(proj => ({
         id: proj.id,
         name: proj.name || 'Unnamed Project'
@@ -399,17 +402,17 @@ export default function MeetingsPage() {
         <div className="rounded-lg border">
           <Table>
             <TableHeader>
-              <TableRow>
-                {visibleColumns.has('title') && <TableHead>Title</TableHead>}
-                {visibleColumns.has('date') && <TableHead>Date</TableHead>}
-                {visibleColumns.has('project') && <TableHead>Project</TableHead>}
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="h-8">
+                {visibleColumns.has('title') && <TableHead className="py-2 text-xs font-medium w-48">Title</TableHead>}
+                {visibleColumns.has('date') && <TableHead className="py-2 text-xs font-medium w-24">Date</TableHead>}
+                {visibleColumns.has('project') && <TableHead className="py-2 text-xs font-medium">Project</TableHead>}
+                <TableHead className="text-right py-2 text-xs font-medium w-16">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredDocuments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8 text-sm">
                     No meetings found
                   </TableCell>
                 </TableRow>
@@ -417,75 +420,75 @@ export default function MeetingsPage() {
                 filteredDocuments.map((document) => (
                   <TableRow 
                     key={document.id} 
-                    className="cursor-pointer hover:bg-muted/50"
+                    className="cursor-pointer hover:bg-muted/50 h-10"
                     onClick={() => router.push(`/meetings/${document.id}`)}
                   >
                     {visibleColumns.has('title') && (
-                      <TableCell>
-                        <div className="font-medium">
+                      <TableCell className="py-2 w-48">
+                        <div className="font-medium text-sm truncate">
                           {document.title || <span className="text-muted-foreground">Untitled</span>}
                         </div>
                       </TableCell>
                     )}
                     {visibleColumns.has('date') && (
-                      <TableCell>
+                      <TableCell className="py-2 w-24">
                         {document.date && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Calendar className="h-3 w-3 text-muted-foreground" />
-                            {format(new Date(document.date), 'MMM d, yyyy')}
+                          <div className="text-xs whitespace-nowrap">
+                            {format(new Date(document.date), 'MMM d')}
                           </div>
                         )}
                       </TableCell>
                     )}
                     {visibleColumns.has('project') && (
-                      <TableCell>
+                      <TableCell className="py-2">
                         {(document.project || projects.find(p => p.id === document.project_id)?.name) && (
-                          <Badge variant="secondary" className="font-normal">
+                          <Badge variant="secondary" className="font-normal text-xs px-2 py-0.5">
                             {document.project || projects.find(p => p.id === document.project_id)?.name}
                           </Badge>
                         )}
                       </TableCell>
                     )}
-                    <TableCell className="text-right">
+                    <TableCell className="text-right py-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            className="h-6 w-6 p-0"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <MoreHorizontal className="h-4 w-4" />
+                            <MoreHorizontal className="h-3 w-3" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel className="text-xs">Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="w-full justify-start"
+                            className="w-full justify-start h-7 text-xs"
                             onClick={() => handleEdit(document)}
                           >
-                            <Pencil className="h-4 w-4 mr-2" />
+                            <Pencil className="h-3 w-3 mr-2" />
                             Edit
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="w-full justify-start"
+                            className="w-full justify-start h-7 text-xs"
                             onClick={() => handleDownload(document)}
                           >
-                            <Download className="h-4 w-4 mr-2" />
+                            <Download className="h-3 w-3 mr-2" />
                             Download
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="w-full justify-start text-destructive"
+                            className="w-full justify-start text-destructive h-7 text-xs"
                             onClick={() => handleDelete(document.id)}
                             disabled={isDeleting === document.id}
                           >
-                            <Trash2 className="h-4 w-4 mr-2" />
+                            <Trash2 className="h-3 w-3 mr-2" />
                             Delete
                           </Button>
                         </DropdownMenuContent>
