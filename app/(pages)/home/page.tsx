@@ -101,12 +101,12 @@ function formatCurrency(amount: number | null | undefined) {
 
 export default function DashboardHome() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedPhase, setSelectedPhase] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showOnlyActive] = useState(false);
+  const [showOnlyActive, setShowOnlyActive] = useState<boolean>(false);
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
     new Set(COLUMNS.filter((col) => col.defaultVisible).map((col) => col.id))
   );
