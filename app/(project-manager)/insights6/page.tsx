@@ -26,7 +26,7 @@ interface Meeting {
 }
 
 export default function PMRAGPage() {
-  const [activeTab] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("insights");
   const [recentMeetings, setRecentMeetings] = useState<Meeting[]>([]);
 
   useEffect(() => {
