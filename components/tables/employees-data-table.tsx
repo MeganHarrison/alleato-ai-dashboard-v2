@@ -107,7 +107,7 @@ export function EmployeesDataTable({ employees: initialEmployees }: EmployeesDat
 
   // Get unique departments for filter
   const departments = useMemo(() => {
-    const deptSet = new Set(employees.map(e => e.department).filter(Boolean))
+    const deptSet = new Set(employees.map(e => e.department).filter((dept): dept is string => Boolean(dept)))
     return ["all", ...Array.from(deptSet).sort()]
   }, [employees])
 

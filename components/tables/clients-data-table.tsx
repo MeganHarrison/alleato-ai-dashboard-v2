@@ -261,8 +261,8 @@ export function ClientsDataTable({ clients: initialClients }: ClientsDataTablePr
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Industries</SelectItem>
-              {industries.slice(1).map(industry => (
-                <SelectItem key={industry} value={industry}>
+              {industries.slice(1).filter(industry => industry).map(industry => (
+                <SelectItem key={industry} value={industry!}>
                   {industry}
                 </SelectItem>
               ))}

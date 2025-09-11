@@ -12,23 +12,23 @@ import {
 } from 'lucide-react';
 
 interface InsightWithDetails {
-  id: string;
-  project_id: number | null;
-  insight_type: string;
-  title: string;
-  description: string;
-  severity?: string;
-  assignee?: string;
-  due_date?: string;
-  financial_impact?: string;
-  created_at: string;
-  meeting_date?: string;
-  meeting_name?: string;
-  document_id?: string;
+  id: any;
+  project_id: any;
+  insight_type: any;
+  title: any;
+  description: any;
+  severity?: any;
+  assignee?: any;
+  due_date?: any;
+  financial_impact?: any;
+  created_at: any;
+  meeting_date?: any;
+  meeting_name?: any;
+  document_id?: any;
   projects?: {
-    id: number;
-    name: string | null;
-  } | null;
+    id: any;
+    name: any;
+  }[];
 }
 
 // Insight type configuration with colors and labels
@@ -168,9 +168,9 @@ export default async function AiInsightsPage() {
                           
                           {/* Metadata row */}
                           <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-muted-foreground">
-                            {insight.projects?.name && (
+                            {insight.projects && insight.projects.length > 0 && insight.projects[0]?.name && (
                               <span className="font-medium text-foreground">
-                                {insight.projects.name}
+                                {insight.projects[0].name}
                               </span>
                             )}
                             

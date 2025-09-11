@@ -5,7 +5,7 @@ interface OneClickIntegrationsIllustrationProps {
 }
 
 const OneClickIntegrationsIllustration: React.FC<OneClickIntegrationsIllustrationProps> = ({ className = "" }) => {
-  const themeVars = {
+  const themeVars: Record<string, string> = {
     "--oci-primary-color": "hsl(var(--primary))",
     "--oci-background-color": "hsl(var(--background))",
     "--oci-foreground-color": "hsl(var(--foreground))",
@@ -14,7 +14,7 @@ const OneClickIntegrationsIllustration: React.FC<OneClickIntegrationsIllustratio
     "--oci-shadow-color": "rgba(0, 0, 0, 0.12)",
     "--oci-gradient-light-gray-start": "hsl(var(--foreground) / 0.2)",
     "--oci-gradient-light-gray-end": "transparent",
-  } as React.CSSProperties
+  }
 
   // Helper component for rendering each logo box
   const LogoBox: React.FC<{
@@ -32,7 +32,7 @@ const OneClickIntegrationsIllustration: React.FC<OneClickIntegrationsIllustratio
       alignItems: "center",
       overflow: "hidden",
       flexShrink: 0,
-    }
+    } as React.CSSProperties
 
     const innerContentStyle: React.CSSProperties = {
       width: "36px",
@@ -45,10 +45,12 @@ const OneClickIntegrationsIllustration: React.FC<OneClickIntegrationsIllustratio
     }
 
     if (isGradientBg) {
-      boxStyle.background = `linear-gradient(180deg, ${themeVars["--oci-gradient-light-gray-start"]} 0%, ${themeVars["--oci-gradient-light-gray-end"]} 100%)`
-      boxStyle.boxShadow = `0px 1px 2px ${themeVars["--oci-shadow-color"]}`
-      boxStyle.backdropFilter = "blur(18px)"
-      boxStyle.padding = "6px 8px"
+      const gradientStart = themeVars["--oci-gradient-light-gray-start"]
+      const gradientEnd = themeVars["--oci-gradient-light-gray-end"]
+      ;(boxStyle as any).background = `linear-gradient(180deg, ${gradientStart} 0%, ${gradientEnd} 100%)`
+      (boxStyle as any).boxShadow = `0px 1px 2px ${themeVars["--oci-shadow-color"]}`
+      ;(boxStyle as any).backdropFilter = "blur(18px)"
+      ;(boxStyle as any).padding = "6px 8px"
     }
 
     return <div style={boxStyle}>{logoSvg && <div style={innerContentStyle}>{logoSvg}</div>}</div>

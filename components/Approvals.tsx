@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from './ui/Button';
+import { Button } from './ui/button';
 import { useEffect, useState } from 'react';
 
 type Item = ReturnType<RunToolApprovalItem['toJSON']>;
@@ -38,10 +38,10 @@ function ToolApprovalEntry({
       </pre>
       {decision === undefined && (
         <div className="flex gap-2">
-          <Button size="smRounded" variant="primary" onClick={onApprove}>
+          <Button size="sm" variant="default" onClick={onApprove}>
             Approve
           </Button>
-          <Button size="smRounded" variant="secondary" onClick={onReject}>
+          <Button size="sm" variant="secondary" onClick={onReject}>
             Reject
           </Button>
         </div>
@@ -139,7 +139,7 @@ export function Approvals({
         </div>
         <DialogFooter>
           <Button
-            variant="primary"
+            variant="default"
             type="submit"
             disabled={decisions.size !== approvals.length}
             onClick={handleDone}

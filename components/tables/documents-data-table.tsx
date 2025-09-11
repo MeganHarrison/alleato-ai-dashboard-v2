@@ -141,12 +141,12 @@ export function DocumentsDataTable({ documents: initialDocuments }: DocumentsDat
 
   // Get unique types and sources for filters
   const documentTypes = useMemo(() => {
-    const typeSet = new Set(documents.map(d => d.document_type).filter(Boolean))
+    const typeSet = new Set(documents.map(d => d.document_type).filter((type): type is string => Boolean(type)))
     return ["all", ...Array.from(typeSet).sort()]
   }, [documents])
 
   const sources = useMemo(() => {
-    const sourceSet = new Set(documents.map(d => d.source).filter(Boolean))
+    const sourceSet = new Set(documents.map(d => d.source).filter((source): source is string => Boolean(source)))
     return ["all", ...Array.from(sourceSet).sort()]
   }, [documents])
 
@@ -421,7 +421,7 @@ export function DocumentsDataTable({ documents: initialDocuments }: DocumentsDat
                             size="sm"
                             className="w-full justify-start"
                             onClick={() => {
-                              const link = document.createElement('a')
+                              const link = window.document.createElement('a')
                               link.href = document.file_path!
                               link.download = document.title || 'document'
                               link.click()

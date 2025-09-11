@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
               transcript_url: transcript.transcript_url,
               topics_discussed: transcript.summary?.topics_discussed || [],
               outline: transcript.summary?.outline || [],
-              shorthand_bullet: transcript.summary?.shorthand_bullet || []
+              shorthand_bullet: (transcript.summary as any)?.shorthand_bullet || []
             },
             tags: transcript.summary?.keywords || [],
             processing_status: "pending",

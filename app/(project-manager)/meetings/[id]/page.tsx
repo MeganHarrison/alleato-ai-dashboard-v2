@@ -25,7 +25,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 interface MeetingDocument {
-  id: number;
+  id: string;
   title: string | null;
   content: string | null;
   summary: string | null;
@@ -91,7 +91,7 @@ export default function MeetingPage() {
         throw new Error("Meeting not found");
       }
 
-      setMeeting(meetingData as MeetingDocument);
+      setMeeting(meetingData as unknown as MeetingDocument);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error("Error in loadMeeting:", error);

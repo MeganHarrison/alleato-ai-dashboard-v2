@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { Message as UIMessage } from 'ai';
+import type { UIMessage } from 'ai';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import type { ComponentProps, HTMLAttributes, ReactElement } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';

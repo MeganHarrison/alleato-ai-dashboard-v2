@@ -34,7 +34,7 @@ export async function getInsightsMetrics(): Promise<InsightsMetrics> {
     // Get total insights count
     const { data: insights, error: insightsError } = await supabase
       .from('ai_insights')
-      .select('id, created_at', { count: 'exact' });
+      .select('id, created_at, resolved, severity', { count: 'exact' });
 
     if (insightsError) {
       console.error('Error fetching insights:', insightsError);

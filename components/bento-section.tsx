@@ -5,7 +5,13 @@ import MCPConnectivityIllustration from "./bento/mcp-connectivity-illustration" 
 import EasyDeployment from "./bento/easy-deployment"
 import ParallelCodingAgents from "./bento/parallel-agents" // Updated import
 
-const BentoCard = ({ title, description, Component }) => (
+interface BentoCardProps {
+  title: string;
+  description: string;
+  Component: React.ComponentType;
+}
+
+const BentoCard = ({ title, description, Component }: BentoCardProps) => (
   <div className="overflow-hidden rounded-2xl border border-white/20 flex flex-col justify-start items-start relative">
     {/* Background with blur effect */}
     <div

@@ -34,8 +34,20 @@ const ASRSRequirementsForm: React.FC = () => {
   const [formData, setFormData] = useState<ASRSFormData>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [designResult, setDesignResult] = useState(null);
-  const [costEstimate, setCostEstimate] = useState(null);
+  const [designResult, setDesignResult] = useState<{
+    applicable_figures: string[];
+    applicable_tables: string[];
+    sprinkler_count: number;
+    protection_scheme: string;
+    estimated_cost: number;
+  } | null>(null);
+  const [costEstimate, setCostEstimate] = useState<{
+    sprinklers: { count: number; unit_cost: number; total: number };
+    piping: { feet: number; unit_cost: number; total: number };
+    labor: { total: number };
+    equipment: { total: number };
+    total: number;
+  } | null>(null);
 
   const questions: FormQuestion[] = [
     {

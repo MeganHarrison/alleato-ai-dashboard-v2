@@ -44,12 +44,14 @@ import { toast } from "sonner";
 
 interface Document {
   id: number;
-  title: string | null;
-  date: string | null;
-  summary: string | null;
-  project: string | null;
+  title?: string | null;
+  date?: string | null;
+  summary?: string | null;
+  project?: string | null;
   project_id?: number | null;
   content: string | null;
+  document_type: string | null;
+  embedding: string | null;
   metadata: any;
   created_at?: string | null;
   updated_at?: string | null;

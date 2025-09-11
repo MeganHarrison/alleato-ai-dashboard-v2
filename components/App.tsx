@@ -1,6 +1,6 @@
 import type { AgentInputItem } from '@openai/agents';
 import { History } from '@/components/History';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { useState, useRef, useEffect } from 'react';
 import ArrowUpIcon from './icons/ArrowUpIcon';
 
@@ -66,7 +66,7 @@ export function App({ title = 'Agent Demo', history, onSend }: AppProps) {
               ref={inputRef}
             />
             <Button
-              variant="primary"
+              variant="default"
               size="icon"
               type="submit"
               disabled={isLoading || !message.trim()}

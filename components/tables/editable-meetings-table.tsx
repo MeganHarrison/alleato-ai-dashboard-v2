@@ -119,7 +119,7 @@ export function EditableMeetingsTable({
   }, [meetings]);
 
   const categories = useMemo(() => {
-    const catSet = new Set(meetings.map((m) => m.category).filter(Boolean));
+    const catSet = new Set(meetings.map((m) => m.category).filter((cat): cat is string => Boolean(cat)));
     return ["all", ...Array.from(catSet).sort()];
   }, [meetings]);
 

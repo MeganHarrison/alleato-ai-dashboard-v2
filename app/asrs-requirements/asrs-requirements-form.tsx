@@ -133,7 +133,7 @@ const ASRSRequirementsForm: React.FC = () => {
     setFormData(prev => ({
       ...prev,
       [parent]: {
-        ...prev[parent as keyof FormData],
+        ...(prev[parent as keyof FormData] as Record<string, any> || {}),
         [field]: value
       }
     }));

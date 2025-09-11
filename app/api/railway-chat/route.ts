@@ -28,6 +28,9 @@ async function queryRailwayRAG(message: string, conversationHistory: any[] = [])
     console.log(`🚂 Querying Railway API: ${RAILWAY_API_URL}/query`);
     console.log('📝 Payload:', JSON.stringify(payload, null, 2));
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
     const response = await fetch(`${RAILWAY_API_URL}/query`, {
       method: 'POST',
       headers: {
@@ -35,8 +38,10 @@ async function queryRailwayRAG(message: string, conversationHistory: any[] = [])
         'User-Agent': 'Alleato-AI-Dashboard/1.0',
       },
       body: JSON.stringify(payload),
-      timeout: 30000, // 30 second timeout
+      signal: controller.signal,
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -149,12 +154,10 @@ Remember: You have access to real-time data through the Railway RAG system. Use 
         content: msg.content,
       })),
       temperature: 0.7,
-      maxTokens: 1500,
-      stream: true,
     });
 
     // Return the streaming response
-    return result.toDataStreamResponse({
+    return result.toTextStreamResponse({
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'X-Railway-Connected': railwayResponse ? 'true' : 'false',
@@ -174,10 +177,9 @@ Remember: You have access to real-time data through the Railway RAG system. Use 
         content: 'The AI system encountered a technical issue. Please explain what might have happened and suggest next steps.'
       }],
       temperature: 0.3,
-      maxTokens: 500,
     });
 
-    return errorResult.toDataStreamResponse({
+    return errorResult.toTextStreamResponse({
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'X-Error': 'true',
@@ -194,13 +196,18 @@ export async function GET() {
       throw new Error('Railway API URL not configured');
     }
     
+    const testController = new AbortController();
+    const testTimeoutId = setTimeout(() => testController.abort(), 10000);
+    
     const testResponse = await fetch(`${RAILWAY_API_URL}/health`, {
       method: 'GET',
       headers: {
         'User-Agent': 'Alleato-AI-Dashboard/1.0',
       },
-      timeout: 10000,
+      signal: testController.signal,
     });
+    
+    clearTimeout(testTimeoutId);
 
     const railwayStatus = testResponse.ok ? 'connected' : 'error';
     const railwayInfo = testResponse.ok ? await testResponse.json() : null;

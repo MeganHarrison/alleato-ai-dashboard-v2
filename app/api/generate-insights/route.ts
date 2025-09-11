@@ -103,7 +103,7 @@ async function processSingleDocument(documentId: string) {
     const insights = await extractInsightsWithAI(
       document.title,
       document.content,
-      document.projects?.name || 'Unknown Project'
+      (document.projects as any)?.name || 'Unknown Project'
     );
 
     // Store insights
@@ -185,7 +185,7 @@ async function processProjectDocuments(projectId: string) {
         const insights = await extractInsightsWithAI(
           doc.title,
           doc.content,
-          doc.projects?.name || 'Unknown Project'
+          (doc.projects as any)?.name || 'Unknown Project'
         );
 
         const stored = await storeInsights(
@@ -276,7 +276,7 @@ async function processBatchDocuments() {
           const insights = await extractInsightsWithAI(
             doc.title,
             doc.content,
-            doc.projects?.name || 'Unknown Project'
+            (doc.projects as any)?.name || 'Unknown Project'
           );
 
           const stored = await storeInsights(

@@ -59,7 +59,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface Document {
-  id: number;
+  id: string;
   content: string | null;
   document_type: string | null;
   embedding: string | null;

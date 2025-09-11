@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     // Try Railway API first, then fallback
     const railwayResult = await tryRailwayAPI(message, conversationHistory);
     
-    if (railwayResult.success) {
+    if (railwayResult.success && railwayResult.data) {
       return NextResponse.json({
         message: railwayResult.data.response,
         response: railwayResult.data.response,
@@ -101,12 +101,14 @@ async function tryRailwayAPI(message: string, conversationHistory: any[]) {
     }
 
   } catch (error) {
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       console.warn('⏰ Railway API timeout');
-    } else {
+    } else if (error instanceof Error) {
       console.warn('🚨 Railway API connection error:', error.message);
+    } else {
+      console.warn('🚨 Railway API unknown error:', String(error));
     }
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -197,14 +199,13 @@ ${conversationHistory.slice(-3).map((msg: any) => `${msg.role}: ${msg.content}`)
 
 Please provide a comprehensive, strategic response that leverages all available data sources and connects the user's question to broader project management insights and recommendations.`,
       temperature: 0.7,
-      maxTokens: 1200,
     });
 
     // Extract sources for metadata
     const sources = [
-      ...meetings.slice(0, 3).map(m => ({ type: 'meeting', title: m.title, date: m.date })),
-      ...documents.slice(0, 2).map(d => ({ type: 'document', title: d.title, date: d.date })),
-      ...insights.slice(0, 2).map(i => ({ type: 'insight', title: i.title, severity: i.severity }))
+      ...meetings.slice(0, 3).map((m: any) => ({ type: 'meeting', title: m.title, date: m.date })),
+      ...documents.slice(0, 2).map((d: any) => ({ type: 'document', title: d.title, date: d.date })),
+      ...insights.slice(0, 2).map((i: any) => ({ type: 'insight', title: i.title, severity: i.severity }))
     ];
 
     return NextResponse.json({

@@ -247,7 +247,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="ml-2">
             {section.children
               .sort((a, b) => a.sort_key - b.sort_key)
-              .map((child) => renderSection(child, level + 1))}
+              .map((child) => renderSection(child as Section & { children: Section[] }, level + 1))}
           </div>
         )}
       </div>
