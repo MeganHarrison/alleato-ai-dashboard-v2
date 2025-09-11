@@ -99,7 +99,6 @@ const callOpenAIFallback = traceable(
         model: openai('gpt-4-turbo'),
         messages: [systemMessage, ...messages],
         temperature: 0.3,
-        maxTokens: 4000,
       });
 
       const response = result.toTextStreamResponse();
@@ -274,7 +273,6 @@ async function handleNonTracedRequest(body: any) {
     model: openai('gpt-4-turbo'),
     messages: [systemMessage, ...messages],
     temperature: 0.3,
-    maxTokens: 4000,
   });
 
   const response = result.toTextStreamResponse();

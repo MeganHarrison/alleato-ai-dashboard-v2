@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FMGlobal834Calculator } from '@/lib/fm-global/calculator';
-import type { ASRSConfiguration, CommodityClass } from '@/lib/fm-global/calculator';
+import type { ASRSConfiguration } from '@/lib/fm-global/calculator';
+
+type CommodityClass = 'I' | 'II' | 'III' | 'IV' | 'cartoned-plastic' | 'uncartoned-plastic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,18 +21,18 @@ export async function POST(request: NextRequest) {
 
     // Transform form data to calculator configuration
     const configuration: ASRSConfiguration = {
-      asrsType: formData.asrs_type.toLowerCase().replace('-', '_') as 'shuttle' | 'mini_load' | 'top_loading',
-      containerType: formData.container_type.toLowerCase().replace('-', '_') as 'closed_top' | 'open_top' | 'mixed',
+      asrsType: formData.asrs_type.toLowerCase().replace('_', '-') as 'shuttle' | 'mini-load' | 'top-loading' | 'carousel',
+      containerType: formData.container_type.toLowerCase().replace('_', '-') as 'closed-top' | 'open-top' | 'mixed',
       rackDepth: formData.rack_depth_ft || 6,
       rackSpacing: formData.rack_spacing_ft || 5,
       ceilingHeight: formData.ceiling_height_ft || 30,
       storageHeight: formData.storage_height_ft || 25,
       commodityClass: mapCommodityType(formData.commodity_type),
+      containerMaterial: formData.container_material || 'noncombustible',
       sprinklerSystem: formData.system_type || 'wet',
       storageLength: formData.storage_length_ft || 100,
       storageWidth: formData.storage_width_ft || 50,
-      seismicZone: formData.seismic_zone || 'low',
-      ambientTemperature: formData.ambient_temperature || 'ambient'
+      seismicZone: formData.seismic_zone || 'low'
     };
 
     // Use deterministic calculator for consistent results
@@ -103,10 +105,10 @@ function mapCommodityType(commodityTypes: string[] | undefined): CommodityClass 
     'Class II': 'II',
     'Class III': 'III',
     'Class IV': 'IV',
-    'Cartoned Unexpanded Plastics': 'CUP',
-    'Cartoned Expanded Plastics': 'CEP',
-    'Uncartoned Unexpanded Plastics': 'UUP',
-    'Uncartoned Expanded Plastics': 'UEP',
+    'Cartoned Unexpanded Plastics': 'cartoned-plastic',
+    'Cartoned Expanded Plastics': 'cartoned-plastic',
+    'Uncartoned Unexpanded Plastics': 'uncartoned-plastic',
+    'Uncartoned Expanded Plastics': 'uncartoned-plastic',
     'Class 1': 'I',
     'Class 2': 'II',
     'Class 3': 'III',

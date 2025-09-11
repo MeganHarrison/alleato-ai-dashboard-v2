@@ -190,7 +190,6 @@ ${conversationHistory.slice(-5).map((m: any) => `${m.role}: ${m.content}`).join(
 
 Please provide a helpful response based on the available data.`,
       temperature: 0.7,
-      maxTokens: 1000,
     });
 
     // Extract key information for metadata

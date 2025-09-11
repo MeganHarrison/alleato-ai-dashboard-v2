@@ -204,8 +204,7 @@ export default async function ProjectDetailPage({
               <h4 className="text-sm text-gray-600">
                 Client:{" "}
                 <span className="font-medium text-gray-900">
-                  {project.client ||
-                    project.clients?.name ||
+                  {project.clients?.name ||
                     "No client assigned"}
                 </span>
               </h4>
@@ -268,13 +267,13 @@ export default async function ProjectDetailPage({
                     {formatCurrency(project["est profit"])}
                   </span>
                 </div>
-                {project["est completion date"] && (
+                {project["est completion"] && (
                   <div className="flex items-center gap-4 pt-2 border-t border-gray-200">
                     <span className="text-sm text-gray-600">
                       Est Completion:
                     </span>
                     <span className="text-sm font-medium text-gray-900">
-                      {formatDate(project["est completion date"])}
+                      {formatDate(project["est completion"])}
                     </span>
                   </div>
                 )}
