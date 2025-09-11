@@ -19,6 +19,8 @@ const nextConfig = {
   experimental: {
     turbo: {},
   },
+  // Disable static optimization to prevent useState prerendering issues
+  output: 'standalone',
   // Basic optimizations for production
   poweredByHeader: false,
   compress: true,

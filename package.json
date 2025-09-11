@@ -122,7 +122,7 @@
     "marked": "^16.2.1",
     "motion": "^12.23.12",
     "nanoid": "^5.0.9",
-    "next": "15.2.4",
+    "next": "15.0.3",
     "next-themes": "^0.4.4",
     "openai": "latest",
     "openapi-fetch": "^0.14.0",
@@ -150,6 +150,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240909.0",
     "@playwright/test": "^1.55.0",
     "@supabase/mcp-server-supabase": "^0.4.5",
     "@types/classnames": "^2.3.4",
@@ -163,13 +164,13 @@
     "eslint": "^9.28.0",
     "eslint-config-next": "15.3.3",
     "husky": "^9.1.7",
+    "miniflare": "^3.20240909.0",
     "postcss": "^8.5",
     "puppeteer": "^24.17.0",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.20.5",
     "typescript": "^5",
     "vitest": "^2.0.0",
-    "@cloudflare/workers-types": "^4.20240909.0",
-    "miniflare": "^3.20240909.0"
+    "webpack": "^5.101.3"
   }
 }
