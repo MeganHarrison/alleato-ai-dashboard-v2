@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { 
   Table,
@@ -85,6 +86,7 @@ const COLUMNS = [
 ];
 
 export default function MeetingsPage() {
+  const router = useRouter();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -413,7 +415,11 @@ export default function MeetingsPage() {
                 </TableRow>
               ) : (
                 filteredDocuments.map((document) => (
-                  <TableRow key={document.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableRow 
+                    key={document.id} 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => router.push(`/meetings/${document.id}`)}
+                  >
                     {visibleColumns.has('title') && (
                       <TableCell>
                         <div className="font-medium">
@@ -443,7 +449,11 @@ export default function MeetingsPage() {
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>

@@ -17,7 +17,7 @@ import {
   FolderOpen
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getProjectInsights } from "@/lib/actions/insights-data"
+// Remove server action import
 
 interface ProjectHealth {
   id: string
@@ -40,7 +40,12 @@ export function ProjectHealthMatrix() {
   useEffect(() => {
     const fetchProjectHealth = async () => {
       try {
-        const insights = await getProjectInsights()
+        const response = await fetch('/api/insights/projects')
+        if (!response.ok) {
+          throw new Error('Failed to fetch project insights')
+        }
+        
+        const insights = await response.json()
         
         // Group insights by project
         const projectMap = new Map()

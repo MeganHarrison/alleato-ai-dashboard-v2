@@ -18,7 +18,7 @@ import {
   Target
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getProjectInsights } from "@/lib/actions/insights-data"
+// Remove server action import
 
 interface ActionItem {
   id: string
@@ -37,7 +37,12 @@ export function ActionCommandCenter() {
   useEffect(() => {
     const fetchActions = async () => {
       try {
-        const insights = await getProjectInsights()
+        const response = await fetch('/api/insights/projects')
+        if (!response.ok) {
+          throw new Error('Failed to fetch insights')
+        }
+        
+        const insights = await response.json()
         
         // Filter for actionable insights (high priority unresolved items)
         const actionableInsights: ActionItem[] = insights

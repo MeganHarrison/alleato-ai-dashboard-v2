@@ -15,7 +15,7 @@ import {
   Calendar
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getMeetingAnalytics } from "@/lib/actions/insights-data"
+// Remove server action import
 
 interface SentimentData {
   overall: number
@@ -38,7 +38,12 @@ export function SentimentAnalytics() {
   useEffect(() => {
     const fetchSentiment = async () => {
       try {
-        const meetings = await getMeetingAnalytics()
+        const response = await fetch('/api/insights/meetings')
+        if (!response.ok) {
+          throw new Error('Failed to fetch meetings')
+        }
+        
+        const meetings = await response.json()
         
         // Calculate mock sentiment scores (in real app, this would come from NLP analysis)
         const mockSentiment: SentimentData = {

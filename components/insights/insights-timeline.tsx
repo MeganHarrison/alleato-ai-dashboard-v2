@@ -19,7 +19,7 @@ import {
   Sparkles
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getProjectInsights } from "@/lib/actions/insights-data"
+// Remove server action import
 
 interface TimelineInsight {
   id: string
@@ -53,7 +53,12 @@ export function InsightsTimeline() {
   useEffect(() => {
     const fetchInsights = async () => {
       try {
-        const data = await getProjectInsights()
+        const response = await fetch('/api/insights/projects')
+        if (!response.ok) {
+          throw new Error('Failed to fetch insights')
+        }
+        
+        const data = await response.json()
         
         const timelineInsights: TimelineInsight[] = data.map((insight: any) => ({
           id: insight.id.toString(),

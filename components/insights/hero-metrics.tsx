@@ -14,7 +14,7 @@ import {
   FolderOpen
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getInsightsMetrics, type InsightsMetrics } from "@/lib/actions/insights-data"
+// Remove server action import
 
 interface Metric {
   label: string
@@ -32,7 +32,12 @@ export function HeroMetrics() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const data = await getInsightsMetrics()
+        const response = await fetch('/api/insights/metrics')
+        if (!response.ok) {
+          throw new Error('Failed to fetch metrics')
+        }
+        
+        const data = await response.json()
         
         // Calculate trends (simplified - in real app, compare with previous period)
         const meetingsTrend = data.recentTrend.meetings > 5 ? "up" : data.recentTrend.meetings < 2 ? "down" : "neutral"
