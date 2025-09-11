@@ -27,28 +27,41 @@ const nextConfig = {
   // Optimize bundle size
   productionBrowserSourceMaps: false,
   
-  // Experimental features to reduce memory usage
+  // Experimental features for faster builds
   experimental: {
-    // Reduce memory pressure during build
-    optimizeServerReact: false,
-    // Disable partial prerendering to reduce memory
-    ppr: false,
-    // Limit concurrent builds to reduce memory
-    workerThreads: false,
-    cpus: 1,
-    // Optimize package imports
+    // Enable turbo for faster builds on Vercel
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js'
+        }
+      }
+    },
+    // Optimize server components
+    serverComponentsExternalPackages: [
+      '@supabase/supabase-js',
+      'pdfjs-dist',
+      'sharp'
+    ],
+    // Optimize package imports for faster bundling
     optimizePackageImports: [
       '@radix-ui/react-accordion',
-      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-alert-dialog', 
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
       '@radix-ui/react-select',
       '@radix-ui/react-tabs',
       'lucide-react',
       'recharts',
-      '@supabase/supabase-js',
-      '@tanstack/react-table'
+      'date-fns'
     ],
+    // Enable faster bundling
+    bundlePagesRouterDependencies: true,
+    // Optimize concurrent processing
+    cpus: 2,
+    // Enable webpack cache
+    webpackBuildWorker: true,
   },
   
   transpilePackages: [
@@ -90,39 +103,44 @@ const nextConfig = {
       '.jsx': ['.tsx', '.jsx'],
     };
     
-    // Simplified memory optimization for production builds
-    if (!dev && !isServer) {
-      config.optimization = {
-        ...config.optimization,
-        minimize: true,
-        splitChunks: {
-          chunks: 'all',
-          maxSize: 244000,
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            framework: {
-              name: 'framework',
-              chunks: 'all',
-              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
-              priority: 40,
-              enforce: true,
-            },
-            lib: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'lib',
-              priority: 30,
-              minChunks: 1,
-              reuseExistingChunk: true,
-            },
-            commons: {
-              name: 'commons',
-              minChunks: 2,
-              priority: 20,
-            },
-          },
+    // Optimized build configuration for faster builds
+    if (!dev) {
+      config.cache = {
+        type: 'filesystem',
+        cacheDirectory: '.next/cache/webpack',
+        buildDependencies: {
+          config: [__filename],
         },
       };
+      
+      if (!isServer) {
+        config.optimization = {
+          ...config.optimization,
+          minimize: true,
+          usedExports: true,
+          splitChunks: {
+            chunks: 'all',
+            maxSize: 300000,
+            minSize: 20000,
+            cacheGroups: {
+              framework: {
+                name: 'framework',
+                test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+                priority: 40,
+                enforce: true,
+                reuseExistingChunk: true,
+              },
+              vendor: {
+                name: 'vendor',
+                test: /[\\/]node_modules[\\/]/,
+                priority: 20,
+                reuseExistingChunk: true,
+                maxSize: 200000,
+              },
+            },
+          },
+        };
+      }
     }
     
     // Optimize for memory usage in serverless environment
