@@ -508,7 +508,7 @@ export default function DashboardHome() {
                             {service.title}
                           </h3>
                         )}
-                        <p className="text-gray-600 text-base leading-relaxed">
+                        <p className="text-gray-600 text-sm leading-relaxed">
                           {service.description}
                         </p>
                       </CardContent>
@@ -550,25 +550,6 @@ export default function DashboardHome() {
                           isMobile ? "h-12 text-base" : "h-10 text-sm"
                         )}
                       />
-                    </div>
-
-                    {/* Active Projects Toggle */}
-                    <div className="flex items-center space-x-3">
-                      <Switch
-                        id="active-only"
-                        checked={showOnlyActive}
-                        onCheckedChange={setShowOnlyActive}
-                        className={cn(isMobile && "scale-110")}
-                      />
-                      <Label
-                        htmlFor="active-only"
-                        className={cn(
-                          "font-medium cursor-pointer",
-                          isMobile ? "text-base" : "text-sm"
-                        )}
-                      >
-                        Current projects only
-                      </Label>
                     </div>
 
                     {/* Filters */}
@@ -617,6 +598,25 @@ export default function DashboardHome() {
                             </option>
                           ))}
                       </select>
+                    </div>
+
+                    {/* Active Projects Toggle */}
+                    <div className="flex items-center space-x-3">
+                      <Switch
+                        id="active-only"
+                        checked={showOnlyActive}
+                        onCheckedChange={setShowOnlyActive}
+                        className={cn(isMobile && "scale-110")}
+                      />
+                      <Label
+                        htmlFor="active-only"
+                        className={cn(
+                          "font-medium cursor-pointer",
+                          isMobile ? "text-base" : "text-sm"
+                        )}
+                      >
+                        Current projects only
+                      </Label>
                     </div>
                   </div>
 

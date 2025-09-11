@@ -181,8 +181,6 @@ export function EditableProjectsTable({ projects }: EditableProjectsTableProps) 
             <th className="text-left p-3 font-medium">Client</th>
             <th className="text-left p-3 font-medium">Status</th>
             <th className="text-left p-3 font-medium">Start Date</th>
-            <th className="text-left p-3 font-medium">End Date</th>
-            <th className="text-left p-3 font-medium">Created</th>
           </tr>
         </thead>
         <tbody>
@@ -197,8 +195,6 @@ export function EditableProjectsTable({ projects }: EditableProjectsTableProps) 
               <td className="p-3">{renderEditableCell(project, "client", project.client)}</td>
               <td className="p-3">{renderEditableCell(project, "status", project.status)}</td>
               <td className="p-3">{renderEditableCell(project, "start_date", project.start_date)}</td>
-              <td className="p-3">{renderEditableCell(project, "end_date", project.end_date)}</td>
-              <td className="p-3">{renderEditableCell(project, "created_at", project.created_at)}</td>
             </tr>
           ))}
         </tbody>
