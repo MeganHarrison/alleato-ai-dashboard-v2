@@ -8,30 +8,19 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'lgveqfnpkxvzbnnwuled.supabase.co',
-      },
-    ],
   },
-  // Use Turbopack for production builds to bypass webpack issues
+  // Minimal experimental features to reduce conflicts
   experimental: {
-    turbo: {},
+    // Disable turbo for now to avoid potential issues
   },
-  // Disable static optimization to prevent useState prerendering issues
+  // Force dynamic rendering for all pages
   output: 'standalone',
-  // Basic optimizations for production
+  trailingSlash: false,
+  // Increase timeout for static page generation
+  staticPageGenerationTimeout: 120,
+  // Basic optimizations
   poweredByHeader: false,
-  compress: true,
-  
-  // Optimize bundle size
   productionBrowserSourceMaps: false,
-  
-  transpilePackages: [
-    '@tanstack/react-table',
-    '@tanstack/table-core',
-  ],
 }
 
 export default nextConfig
