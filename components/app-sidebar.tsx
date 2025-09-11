@@ -38,12 +38,36 @@ const data = {
           url: "/fm-global-expert",
         },
         {
+          title: "FM Global PDF",
+          url: "/fm-global-pdf",
+        },
+        {
           title: "Tables & Figures",
           url: "/fm-global-tables",
         },
         {
           title: "FM-Global Form",
           url: "/fm-global-form",
+        },
+        {
+          title: "ASRS Design",
+          url: "/asrs-design",
+        },
+        {
+          title: "ASRS Form",
+          url: "/asrs-form",
+        },
+        {
+          title: "Main Chat",
+          url: "/asrs-main-chat",
+        },
+        {
+          title: "FM Global Resources",
+          url: "/fm-resources",
+        },
+        {
+          title: "ASRS 3",
+          url: "/asrs3",
         },
       ],
     },

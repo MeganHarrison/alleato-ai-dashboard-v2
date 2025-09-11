@@ -59,6 +59,9 @@
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^3.9.1",
     "@monaco-editor/react": "^4.7.0",
+    "@openai/agents": "^0.1.1",
+    "@openai/agents-extensions": "^0.1.0",
+    "@paper-design/shaders-react": "^0.0.52",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -114,6 +117,7 @@
     "langsmith": "^0.3.67",
     "lucide-react": "^0.454.0",
     "marked": "^16.2.1",
+    "motion": "^12.23.12",
     "nanoid": "^5.0.9",
     "next": "15.2.4",
     "next-themes": "^0.4.4",
@@ -139,7 +143,8 @@
     "use-stick-to-bottom": "^1.1.1",
     "vaul": "^0.9.6",
     "ws": "latest",
-    "zod": "^4.1.5"
+    "zod": "^4.1.5",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@playwright/test": "^1.7.1",
