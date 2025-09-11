@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, Loader2 } from 'lucide-react';
+import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -14,15 +14,19 @@ interface Message {
 }
 
 export default function OpenAIChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: 'Hello! I\'m your AI assistant. How can I help you today?'
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Check if conversation has started (has user messages)
+  const hasConversation = messages.some(msg => msg.role === 'user');
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -78,161 +82,308 @@ export default function OpenAIChat() {
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto h-screen flex flex-col p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-        AI Chat Assistant
-      </h1>
-      
-      <ScrollArea className="flex-1 mb-4 border rounded-lg p-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-3 ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              <Card className={`max-w-[80%] p-4 ${
-                message.role === 'user'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0'
-                  : 'bg-white border-gray-200 shadow-sm'
-              }`}>
-                <div className="flex items-start gap-3">
-                  {message.role === 'assistant' ? (
-                    <Bot className="w-5 h-5 mt-0.5 flex-shrink-0 text-blue-600" />
-                  ) : (
-                    <User className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                  )}
-                  <div className="text-sm leading-relaxed">
-                    {message.content.split('\n').map((line, index) => {
-                      // Handle numbered lists
-                      if (line.match(/^\d+\.\s\*\*.*\*\*/)) {
-                        return (
-                          <div key={index} className="mb-4">
-                            <h4 className="font-semibold text-blue-700 mb-2">{line.replace(/^\d+\.\s/, '').replace(/\*\*/g, '')}</h4>
-                          </div>
-                        );
-                      }
-                      // Handle sub-bullets with dashes
-                      else if (line.match(/^\s*-\s\*\*.*\*\*/)) {
-                        return (
-                          <div key={index} className="ml-4 mb-1 flex items-start gap-2">
-                            <span className="text-blue-500 mt-1">•</span>
-                            <span className="font-medium">{line.replace(/^\s*-\s/, '').replace(/\*\*/g, '')}</span>
-                          </div>
-                        );
-                      }
-                      // Handle regular sub-bullets
-                      else if (line.match(/^\s*-\s/)) {
-                        return (
-                          <div key={index} className="ml-4 mb-1 flex items-start gap-2">
-                            <span className="text-gray-400 mt-1">•</span>
-                            <span>{line.replace(/^\s*-\s/, '')}</span>
-                          </div>
-                        );
-                      }
-                      // Handle markdown links
-                      else if (line.includes('[') && line.includes('](')) {
-                        const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-                        const parts = line.split(linkRegex);
-                        return (
-                          <div key={index} className="mb-2">
-                            {parts.map((part, partIndex) => {
-                              if (partIndex % 3 === 1) {
-                                // This is the link text
-                                return (
-                                  <a 
-                                    key={partIndex} 
-                                    href={parts[partIndex + 1]} 
-                                    className="text-blue-600 hover:text-blue-800 underline"
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                  >
-                                    {part}
-                                  </a>
-                                );
-                              } else if (partIndex % 3 === 2) {
-                                // This is the URL, skip it
-                                return null;
-                              } else {
-                                // This is regular text
-                                return <span key={partIndex}>{part}</span>;
-                              }
-                            })}
-                          </div>
-                        );
-                      }
-                      // Handle bold text
-                      else if (line.includes('**')) {
-                        const parts = line.split(/(\*\*[^*]+\*\*)/);
-                        return (
-                          <div key={index} className="mb-2">
-                            {parts.map((part, partIndex) => 
-                              part.startsWith('**') && part.endsWith('**') ? (
-                                <strong key={partIndex} className="font-semibold text-gray-900">
-                                  {part.replace(/\*\*/g, '')}
-                                </strong>
-                              ) : (
-                                <span key={partIndex}>{part}</span>
-                              )
-                            )}
-                          </div>
-                        );
-                      }
-                      // Handle empty lines
-                      else if (line.trim() === '') {
-                        return <div key={index} className="mb-3" />;
-                      }
-                      // Regular paragraphs
-                      else {
-                        return (
-                          <p key={index} className="mb-2 text-gray-700">
-                            {line}
-                          </p>
-                        );
-                      }
-                    })}
+  if (!hasConversation) {
+    // Centered input design when no conversation
+    return (
+      <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
+        {/* Header */}
+        <div className="flex-none p-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <div className="relative">
+                <Sparkles className="w-8 h-8 text-violet-600" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+              </div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-600 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                AI Assistant
+              </h1>
+            </div>
+            <p className="text-center text-slate-600 text-lg">
+              Ask me anything. I&apos;m here to help.
+            </p>
+          </div>
+        </div>
+
+        {/* Centered input area */}
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="w-full max-w-2xl">
+            <div className="relative">
+              <form onSubmit={sendMessage} className="relative">
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-cyan-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+                  <div className="relative bg-white rounded-2xl shadow-xl border border-slate-200/50 p-1.5">
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <Input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Start a conversation..."
+                        disabled={isLoading}
+                        className="flex-1 border-0 bg-transparent text-lg placeholder:text-slate-400 focus:ring-0 focus:outline-none"
+                        autoFocus
+                      />
+                      <Button 
+                        type="submit" 
+                        disabled={isLoading || !input.trim()}
+                        size="sm"
+                        className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 border-0 rounded-xl px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                      >
+                        {isLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Send className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </Card>
+              </form>
             </div>
-          ))}
-          
-          {isLoading && (
-            <div className="flex justify-start">
-              <Card className="p-4 bg-white border-gray-200 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <Bot className="w-5 h-5 text-blue-600" />
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                  <span className="text-sm text-gray-600">AI is thinking...</span>
-                </div>
-              </Card>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
 
-      <form onSubmit={sendMessage} className="flex gap-3 p-4 bg-gray-50 rounded-lg">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message here..."
-          disabled={isLoading}
-          className="flex-1 border-gray-200 focus:border-blue-500"
-        />
-        <Button 
-          type="submit" 
-          disabled={isLoading || !input.trim()}
-          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-        >
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Send className="w-4 h-4" />
-          )}
-        </Button>
-      </form>
+            {/* Suggestion cards */}
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { icon: "💡", title: "Get Ideas", desc: "Brainstorm creative solutions" },
+                { icon: "📊", title: "Analyze Data", desc: "Help with data insights" },
+                { icon: "✍️", title: "Write Content", desc: "Create compelling copy" },
+                { icon: "🔍", title: "Research Topics", desc: "Find detailed information" }
+              ].map((suggestion, index) => (
+                <Card 
+                  key={index}
+                  className="p-4 hover:shadow-lg transition-all duration-200 cursor-pointer border-slate-200/60 hover:border-violet-300 group"
+                  onClick={() => setInput(suggestion.desc)}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">{suggestion.icon}</span>
+                    <div>
+                      <h3 className="font-semibold text-slate-800 group-hover:text-violet-600 transition-colors">
+                        {suggestion.title}
+                      </h3>
+                      <p className="text-sm text-slate-600">
+                        {suggestion.desc}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Chat interface when conversation exists
+  return (
+    <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
+      {/* Compact header */}
+      <div className="flex-none border-b border-slate-200/60 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Sparkles className="w-6 h-6 text-violet-600" />
+              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+            </div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent">
+              AI Assistant
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      {/* Messages area with auto-scroll */}
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea ref={scrollAreaRef} className="h-full">
+          <div className="max-w-4xl mx-auto px-6 py-6">
+            <div className="space-y-6">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex gap-4 ${
+                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
+                >
+                  {message.role === 'assistant' && (
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                      <Bot className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  
+                  <div className={`max-w-[85%] ${message.role === 'user' ? 'order-1' : ''}`}>
+                    <Card className={`p-4 shadow-sm border-0 ${
+                      message.role === 'user'
+                        ? 'bg-gradient-to-br from-violet-500 to-cyan-500 text-white'
+                        : 'bg-white border border-slate-200/60'
+                    }`}>
+                      <div className="prose prose-sm max-w-none">
+                        {message.content.split('\n').map((line, index) => {
+                          // Handle numbered lists
+                          if (line.match(/^\d+\.\s\*\*.*\*\*/)) {
+                            return (
+                              <div key={index} className="mb-3">
+                                <h4 className={`font-semibold mb-2 ${
+                                  message.role === 'user' ? 'text-white' : 'text-violet-700'
+                                }`}>
+                                  {line.replace(/^\d+\.\s/, '').replace(/\*\*/g, '')}
+                                </h4>
+                              </div>
+                            );
+                          }
+                          // Handle sub-bullets with dashes
+                          else if (line.match(/^\s*-\s\*\*.*\*\*/)) {
+                            return (
+                              <div key={index} className="ml-4 mb-1 flex items-start gap-2">
+                                <span className={`mt-1 ${
+                                  message.role === 'user' ? 'text-violet-200' : 'text-violet-500'
+                                }`}>•</span>
+                                <span className="font-medium">
+                                  {line.replace(/^\s*-\s/, '').replace(/\*\*/g, '')}
+                                </span>
+                              </div>
+                            );
+                          }
+                          // Handle regular sub-bullets
+                          else if (line.match(/^\s*-\s/)) {
+                            return (
+                              <div key={index} className="ml-4 mb-1 flex items-start gap-2">
+                                <span className={`mt-1 ${
+                                  message.role === 'user' ? 'text-violet-200' : 'text-slate-400'
+                                }`}>•</span>
+                                <span>{line.replace(/^\s*-\s/, '')}</span>
+                              </div>
+                            );
+                          }
+                          // Handle markdown links
+                          else if (line.includes('[') && line.includes('](')) {
+                            const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+                            const parts = line.split(linkRegex);
+                            return (
+                              <div key={index} className="mb-2">
+                                {parts.map((part, partIndex) => {
+                                  if (partIndex % 3 === 1) {
+                                    return (
+                                      <a 
+                                        key={partIndex} 
+                                        href={parts[partIndex + 1]} 
+                                        className={`underline hover:no-underline ${
+                                          message.role === 'user' 
+                                            ? 'text-violet-100 hover:text-white' 
+                                            : 'text-violet-600 hover:text-violet-800'
+                                        }`}
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                      >
+                                        {part}
+                                      </a>
+                                    );
+                                  } else if (partIndex % 3 === 2) {
+                                    return null;
+                                  } else {
+                                    return <span key={partIndex}>{part}</span>;
+                                  }
+                                })}
+                              </div>
+                            );
+                          }
+                          // Handle bold text
+                          else if (line.includes('**')) {
+                            const parts = line.split(/(\*\*[^*]+\*\*)/);
+                            return (
+                              <div key={index} className="mb-2">
+                                {parts.map((part, partIndex) => 
+                                  part.startsWith('**') && part.endsWith('**') ? (
+                                    <strong key={partIndex} className={`font-semibold ${
+                                      message.role === 'user' ? 'text-white' : 'text-slate-900'
+                                    }`}>
+                                      {part.replace(/\*\*/g, '')}
+                                    </strong>
+                                  ) : (
+                                    <span key={partIndex}>{part}</span>
+                                  )
+                                )}
+                              </div>
+                            );
+                          }
+                          // Handle empty lines
+                          else if (line.trim() === '') {
+                            return <div key={index} className="mb-3" />;
+                          }
+                          // Regular paragraphs
+                          else {
+                            return (
+                              <p key={index} className={`mb-2 leading-relaxed ${
+                                message.role === 'user' ? 'text-white' : 'text-slate-700'
+                              }`}>
+                                {line}
+                              </p>
+                            );
+                          }
+                        })}
+                      </div>
+                    </Card>
+                  </div>
+
+                  {message.role === 'user' && (
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg order-2">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+              ))}
+              
+              {isLoading && (
+                <div className="flex justify-start gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                  <Card className="p-4 bg-white border border-slate-200/60">
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-4 h-4 animate-spin text-violet-600" />
+                      <span className="text-sm text-slate-600">AI is thinking...</span>
+                    </div>
+                  </Card>
+                </div>
+              )}
+
+              {/* Scroll anchor */}
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
+
+      {/* Bottom input */}
+      <div className="flex-none border-t border-slate-200/60 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto p-6">
+          <form onSubmit={sendMessage} className="relative">
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
+              <div className="relative bg-white rounded-2xl shadow-lg border border-slate-200/50 p-1.5">
+                <div className="flex items-center gap-3 px-4 py-2">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type your message..."
+                    disabled={isLoading}
+                    className="flex-1 border-0 bg-transparent placeholder:text-slate-400 focus:ring-0 focus:outline-none"
+                  />
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading || !input.trim()}
+                    size="sm"
+                    className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 border-0 rounded-xl px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Send className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
