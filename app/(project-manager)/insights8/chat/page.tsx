@@ -27,9 +27,9 @@ interface Message {
 
 export default function RagChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input] = useState(false);
-  const [isLoading] = useState(false);
-  const [sessionId] = useState(`session_${Date.now()}`);
+  const [input, setInput] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string>(`session_${Date.now()}`);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
