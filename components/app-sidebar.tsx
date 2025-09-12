@@ -47,14 +47,10 @@ const data = {
         },
         {
           title: "Tables & Figures",
-          url: "/fm-global-tables",
+          url: "/asrs-tables",
         },
         {
           title: "FM-Global Form",
-          url: "/fm-global-form",
-        },
-        {
-          title: "ASRS Form",
           url: "/asrs-form",
         },
         {
@@ -66,13 +62,29 @@ const data = {
           url: "/asrs-form-3",
         },
         {
-          title: "Alleato Intel",
-          url: "/insights8",
+          title: "File Upload",
+          url: "/file-upload",
+        },
+        {
+          title: "FM Global Agent",
+          url: "/asrs-chat",
+        },
+        {
+          title: "FM Global Chat",
+          url: "/asrs-chat2",
+        },
+        {
+          title: "ASRS Requirements",
+          url: "/asrs-requirements",
+        },
+        {
+          title: "FM Global PDF",
+          url: "/fm-global-pdf",
         },
       ],
     },
     {
-      title: "FM Global",
+      title: "Projects",
       url: "#",
       items: [
         {
@@ -103,7 +115,7 @@ const data = {
         },
         {
           title: "Leads",
-          url: "/leads",
+          url: "/prospects",
         },
         {
           title: "Contacts",
@@ -120,6 +132,24 @@ const data = {
         {
           title: "Notion Projects",
           url: "/notion-projects",
+        },
+      ],
+    },
+    {
+      title: "Admin",
+      url: "#",
+      items: [
+        {
+          title: "RAG Admin",
+          url: "/rag-admin",
+        },
+        {
+          title: "Sitemap",
+          url: "/sitemap",
+        },
+        {
+          title: "Trigger Vectorization",
+          url: "/trigger-vectorization",
         },
       ],
     },

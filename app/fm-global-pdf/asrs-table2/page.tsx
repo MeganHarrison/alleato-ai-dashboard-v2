@@ -134,10 +134,10 @@ const table1Data = {
 };
 
 const Table1Display = () => {
-  const [selectedDataPoint] = useState(false);
-  const [showEquations] = useState(false);
-  const [showFootnotes] = useState(false);
-  const [calculatorInputs] = useState(false);
+  const [selectedDataPoint, setSelectedDataPoint] = useState<any>(null);
+  const [showEquations, setShowEquations] = useState<boolean>(false);
+  const [showFootnotes, setShowFootnotes] = useState<boolean>(false);
+  const [calculatorInputs, setCalculatorInputs] = useState<any>({});
   const getSprinklersPerBranch = (condition: unknown, sprinklersInDesign: number, savg = 12, lavg = 12) => {
     if (typeof condition.sprinklers_per_branch === 'number') {
       return condition.sprinklers_per_branch;

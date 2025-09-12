@@ -18,3 +18,25 @@ This add-on auto-applies the `autonomous` label for trusted PR authors and lets 
 3. Commit these files to `main`. Done.
 
 Pro tip: Combine with the Path Guard and Auto-merge workflows so only safe-path PRs with passing checks can auto-merge.
+
+# Claude Code Autonomy — Safe Automation Mode
+
+Enables trusted users (e.g., Claude Code) to open PRs that auto-merge when:
+- PR has `autonomous` label
+- Author in `CLAUDE_ALLOWED_LOGINS` variable
+- Only safe paths changed (not protected in CODEOWNERS)
+- All required checks pass
+
+## Quick Setup
+
+1. **Variables**: Add `CLAUDE_ALLOWED_LOGINS` with comma-separated usernames
+2. **Labels**: Create `autonomous` and `human-review-required` labels  
+3. **Branch Protection**: Require status checks, allow auto-merge
+4. **CODEOWNERS**: Protected paths require human review
+
+## Documentation
+
+📋 **Detailed Setup & Configuration**: See [documentation/technical/claude-code-autonomous-mode.md](../documentation/technical/claude-code-autonomous-mode.md)
+
+This implements a two-lane workflow: autonomous merges for safe changes, human review for protected areas.
+

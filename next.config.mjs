@@ -15,8 +15,15 @@ const nextConfig = {
       },
     ],
   },
-  // Force dynamic rendering to prevent static generation failures
+  // Minimal experimental features to reduce conflicts
+  experimental: {
+    // Disable turbo for now to avoid potential issues
+  },
+  // Force dynamic rendering for all pages
   output: 'standalone',
+  trailingSlash: false,
+  // Increase timeout for static page generation
+  staticPageGenerationTimeout: 120,
   // Basic optimizations for production
   poweredByHeader: false,
   compress: true,
