@@ -4,6 +4,9 @@ import type { Metadata } from "next";
 import React, { type ReactElement } from "react";
 import "./globals.css";
 
+// Force dynamic rendering for entire app to prevent static generation failures
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Alleato - AI Intelligence",
   description: "Transform your data into powerful insights",
