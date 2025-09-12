@@ -105,7 +105,7 @@ export function ModernHomepage() {
       const { data: insightData } = await supabase
         .from('ai_insights')
         .select(`
-          id, title, insight_type, severity, created_at, project_id,
+          id, description, insight_type, severity, created_at, project_id,
           projects:project_id(id, name)
         `)
         .order('created_at', { ascending: false })
@@ -164,38 +164,32 @@ export function ModernHomepage() {
     return groups;
   }, [meetings]);
 
-  // Group insights by time periods and sort by most recent first
+  // Group insights by project and sort by most recent first
   const groupedInsights = useMemo(() => {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    // Sort all insights by newest first
+    const sortedInsights = [...insights].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
     
-    const groups = {
-      today: [] as any[],
-      yesterday: [] as any[],
-      thisWeek: [] as any[]
-    };
+    // Group by project
+    const projectGroups: { [key: string]: any[] } = {};
     
-    insights.forEach(insight => {
-      const insightDate = new Date(insight.created_at);
-      const insightDay = new Date(insightDate.getFullYear(), insightDate.getMonth(), insightDate.getDate());
-      
-      if (insightDay.getTime() === today.getTime()) {
-        groups.today.push(insight);
-      } else if (insightDay.getTime() === yesterday.getTime()) {
-        groups.yesterday.push(insight);
-      } else if (insightDay >= weekAgo) {
-        groups.thisWeek.push(insight);
+    sortedInsights.forEach(insight => {
+      const projectName = insight.projects?.name || 'Unknown Project';
+      if (!projectGroups[projectName]) {
+        projectGroups[projectName] = [];
       }
+      projectGroups[projectName].push(insight);
     });
     
-    // Sort each group by most recent first
-    groups.today.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    groups.yesterday.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    groups.thisWeek.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    // Convert to array and sort projects by their most recent insight
+    const projectArray = Object.entries(projectGroups).map(([projectName, insights]) => ({
+      projectName,
+      insights,
+      mostRecent: new Date(insights[0].created_at).getTime()
+    })).sort((a, b) => b.mostRecent - a.mostRecent);
     
-    return groups;
+    return projectArray;
   }, [insights]);
 
   if (loading) {
@@ -491,19 +485,30 @@ export function ModernHomepage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Today */}
-                {groupedInsights.today.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Today</h3>
+                {/* Group by Project - Most Recent First */}
+                {groupedInsights.slice(0, 3).map((projectGroup) => (
+                  <div key={projectGroup.projectName}>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">{projectGroup.projectName}</h3>
                     <div className="space-y-1">
-                      {groupedInsights.today.map((insight) => (
+                      {projectGroup.insights.slice(0, 2).map((insight) => (
                         <div
                           key={insight.id}
                           className="p-3 bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
                         >
                           <div className="flex items-start justify-between mb-2">
                             <p className="text-sm font-medium text-gray-900 leading-snug pr-2">
-                              {insight.title}
+                              {(() => {
+                                // Parse JSON description if needed
+                                if (typeof insight.description === 'string' && insight.description.startsWith('{')) {
+                                  try {
+                                    const parsed = JSON.parse(insight.description);
+                                    return parsed.item || parsed.description || parsed.content || insight.description;
+                                  } catch {
+                                    return insight.description;
+                                  }
+                                }
+                                return insight.description;
+                              })()}
                             </p>
                             <span className={cn(
                               "text-xs px-2 py-1 rounded-full font-medium flex-shrink-0",
@@ -523,75 +528,7 @@ export function ModernHomepage() {
                       ))}
                     </div>
                   </div>
-                )}
-
-                {/* Yesterday */}
-                {groupedInsights.yesterday.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Yesterday</h3>
-                    <div className="space-y-1">
-                      {groupedInsights.yesterday.map((insight) => (
-                        <div
-                          key={insight.id}
-                          className="p-3 bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <p className="text-sm font-medium text-gray-900 leading-snug pr-2">
-                              {insight.title}
-                            </p>
-                            <span className={cn(
-                              "text-xs px-2 py-1 rounded-full font-medium flex-shrink-0",
-                              insight.severity === 'high' 
-                                ? 'bg-red-100 text-red-700'
-                                : insight.severity === 'medium'
-                                ? 'bg-yellow-100 text-yellow-700'
-                                : 'bg-green-100 text-green-700'
-                            )}>
-                              {insight.severity}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-500 capitalize">
-                            {insight.insight_type?.replace('_', ' ')} • {insight.projects?.name || 'Unknown Project'} • {format(new Date(insight.created_at), 'h:mm a')}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* This Week */}
-                {groupedInsights.thisWeek.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">This Week</h3>
-                    <div className="space-y-1">
-                      {groupedInsights.thisWeek.slice(0, 3).map((insight) => (
-                        <div
-                          key={insight.id}
-                          className="p-3 bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <p className="text-sm font-medium text-gray-900 leading-snug pr-2">
-                              {insight.title}
-                            </p>
-                            <span className={cn(
-                              "text-xs px-2 py-1 rounded-full font-medium flex-shrink-0",
-                              insight.severity === 'high' 
-                                ? 'bg-red-100 text-red-700'
-                                : insight.severity === 'medium'
-                                ? 'bg-yellow-100 text-yellow-700'
-                                : 'bg-green-100 text-green-700'
-                            )}>
-                              {insight.severity}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-500 capitalize">
-                            {insight.insight_type?.replace('_', ' ')} • {insight.projects?.name || 'Unknown Project'} • {format(new Date(insight.created_at), 'MMM d')}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                ))
 
                 {insights.length === 0 && !insightsLoading && (
                   <div className="text-center py-8 text-gray-500">
