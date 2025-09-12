@@ -8,7 +8,6 @@ import { EditableProjectsTable } from "@/components/tables/editable-projects-tab
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useIsMobile, useIsSmallMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -28,14 +27,13 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
+import { useIsMobile, useIsSmallMobile } from "@/hooks/use-mobile";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import {
   Briefcase,
   Building,
   ChevronDown,
-  ChevronUp,
-  ChevronsUpDown,
   Columns3,
   DollarSign,
   ExternalLink,
@@ -49,7 +47,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 interface Project {
-  id: string;
+  id: number;
   name: string;
   phase: string;
   category?: string;
@@ -61,12 +59,13 @@ interface Project {
   clients?: {
     id: number;
     name: string;
-  };
+  } | null;
   created_at?: string;
   updated_at?: string;
   due_date?: string;
   team?: string;
   documents?: unknown[];
+  client_id?: number | null;
 }
 
 interface Service {
@@ -78,7 +77,6 @@ interface Service {
 
 const COLUMNS = [
   { id: "name", label: "Project Name", defaultVisible: true },
-  { id: "phase", label: "Status", defaultVisible: true },
   { id: "company", label: "Company", defaultVisible: true },
   { id: "revenue", label: "Est. Revenue", defaultVisible: true },
   { id: "category", label: "Category", defaultVisible: true },
@@ -120,7 +118,7 @@ export default function DashboardHome() {
   );
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  
+
   // Mobile responsive hooks
   const isMobile = useIsMobile();
   const isSmallMobile = useIsSmallMobile();
@@ -153,15 +151,20 @@ export default function DashboardHome() {
         setError(null);
 
         // Check if required environment variables are set
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        if (
+          !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+          !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        ) {
           throw new Error(
             "Missing Supabase configuration. Please check your .env.local file and ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set with valid values."
           );
         }
 
         // Check for placeholder values
-        if (process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") || 
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes("placeholder")) {
+        if (
+          process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") ||
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes("placeholder")
+        ) {
           throw new Error(
             "Supabase configuration uses placeholder values. Please update your .env.local file with actual Supabase project credentials."
           );
@@ -169,7 +172,7 @@ export default function DashboardHome() {
 
         const supabase = createClient();
 
-        const query = supabase.from("projects").select(`
+        let query = supabase.from("projects").select(`
             *,
             clients (
               id,
@@ -198,7 +201,7 @@ export default function DashboardHome() {
         }
       } catch (err: unknown) {
         // Log error silently in development to avoid React error boundary
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === "development") {
           console.warn("Projects fetch failed:", err);
         }
         setError(
@@ -264,10 +267,6 @@ export default function DashboardHome() {
             aValue = a.name?.toLowerCase() || "";
             bValue = b.name?.toLowerCase() || "";
             break;
-          case "phase":
-            aValue = a.phase?.toLowerCase() || "";
-            bValue = b.phase?.toLowerCase() || "";
-            break;
           case "company":
             aValue = a.clients?.name?.toLowerCase() || "";
             bValue = b.clients?.name?.toLowerCase() || "";
@@ -321,16 +320,17 @@ export default function DashboardHome() {
     setVisibleColumns(newVisible);
   };
 
-
   const CardView = () => (
-    <div className={cn(
-      "grid gap-4",
-      isSmallMobile 
-        ? "grid-cols-1" 
-        : isMobile 
-          ? "grid-cols-1 sm:grid-cols-2" 
+    <div
+      className={cn(
+        "grid gap-4",
+        isSmallMobile
+          ? "grid-cols-1"
+          : isMobile
+          ? "grid-cols-1 sm:grid-cols-2"
           : "md:grid-cols-2 lg:grid-cols-3"
-    )}>
+      )}
+    >
       {filteredProjects.map((project) => (
         <Card
           key={project.id}
@@ -399,7 +399,6 @@ export default function DashboardHome() {
     </div>
   );
 
-
   if (loading) {
     return (
       <SidebarProvider>
@@ -422,25 +421,53 @@ export default function DashboardHome() {
         <AppSidebar />
         <SidebarInset>
           <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center max-w-2xl mx-auto px-4">
+            <div className="text-center max-w-4xl px-4">
               <div className="text-red-500 text-6xl mb-4">⚠️</div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 Failed to Load Projects
               </h1>
               <p className="text-gray-600 mb-4">{error}</p>
-              
-              {(error.includes("Missing Supabase configuration") || error.includes("placeholder")) && (
+
+              {(error.includes("Missing Supabase configuration") ||
+                error.includes("placeholder")) && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 text-left">
-                  <h3 className="text-lg font-semibold text-blue-900 mb-2">Setup Instructions:</h3>
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                    Setup Instructions:
+                  </h3>
                   <ol className="text-sm text-blue-800 space-y-2">
-                    <li>1. Copy <code className="bg-blue-100 px-1 rounded">.env.example</code> to <code className="bg-blue-100 px-1 rounded">.env.local</code></li>
-                    <li>2. Update the Supabase URL and keys with your actual project credentials</li>
-                    <li>3. Get your Supabase credentials from your <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer" className="underline">Supabase dashboard</a></li>
-                    <li>4. Restart the development server after updating the environment variables</li>
+                    <li>
+                      1. Copy{" "}
+                      <code className="bg-blue-100 px-1 rounded">
+                        .env.example
+                      </code>{" "}
+                      to{" "}
+                      <code className="bg-blue-100 px-1 rounded">
+                        .env.local
+                      </code>
+                    </li>
+                    <li>
+                      2. Update the Supabase URL and keys with your actual
+                      project credentials
+                    </li>
+                    <li>
+                      3. Get your Supabase credentials from your{" "}
+                      <a
+                        href="https://supabase.com/dashboard"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        Supabase dashboard
+                      </a>
+                    </li>
+                    <li>
+                      4. Restart the development server after updating the
+                      environment variables
+                    </li>
                   </ol>
                 </div>
               )}
-              
+
               <div className="flex gap-2 justify-center mt-6">
                 <button
                   onClick={() => window.location.reload()}
@@ -451,7 +478,7 @@ export default function DashboardHome() {
                 <a
                   href="https://github.com/MeganHarrison/alleato-ai-dashboard-v2#environment-variables"
                   target="_blank"
-                  rel="noopener noreferrer" 
+                  rel="noopener noreferrer"
                   className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                 >
                   View Setup Guide
@@ -478,24 +505,28 @@ export default function DashboardHome() {
             <DynamicBreadcrumbs />
           </div>
         </header>
-        <div className={cn(
-          "flex flex-1 flex-col gap-4 pt-0",
-          isMobile ? "p-3" : "p-4",
-          isMobile 
-            ? "mx-0" // No side margins on mobile
-            : "mx-[10%] sm:mx-[8%] lg:mx-[12%] xl:mx-[15%]"
-        )}>
+        <div
+          className={cn(
+            "flex flex-1 flex-col gap-4 pt-0",
+            isMobile ? "p-3" : "p-4",
+            isMobile
+              ? "mx-0" // No side margins on mobile
+              : "mx-[5%] sm:mx-[8%] lg:mx-[5%] xl:mx-[5%]"
+          )}
+        >
           <ErrorBoundary>
             <div className="min-h-screen">
               {/* Service Cards */}
-              <div className={cn(
-                "grid gap-6 mb-8",
-                isSmallMobile 
-                  ? "grid-cols-1 gap-4 mb-6"
-                  : isMobile 
+              <div
+                className={cn(
+                  "grid gap-6 mb-8",
+                  isSmallMobile
+                    ? "grid-cols-1 gap-4 mb-6"
+                    : isMobile
                     ? "grid-cols-1 gap-4 mb-6"
                     : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-              )}>
+                )}
+              >
                 {services.map((service, index) => (
                   <Link
                     href={service.href}
@@ -512,16 +543,16 @@ export default function DashboardHome() {
                             <h3 className="text-base font-semibold text-gray-900">
                               {service.title}
                             </h3>
-                            <span className="text-2xl font-bold text-gray-900">
+                            <span className="text-xl font-bold text-gray-900">
                               {service.price}
                             </span>
                           </div>
                         ) : (
-                          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                          <h3 className="text-l font-semibold text-gray-900 mb-4">
                             {service.title}
                           </h3>
                         )}
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                        <p className="text-sm leading-relaxed">
                           {service.description}
                         </p>
                       </CardContent>
@@ -542,14 +573,21 @@ export default function DashboardHome() {
 
               {/* Filters and Controls */}
               <div className={cn("rounded-lg", isMobile ? "mb-4" : "mb-6")}>
-                <div className={cn(
-                  "flex flex-col gap-4",
-                  !isMobile && "lg:flex-row lg:items-center lg:justify-between"
-                )}>
-                  <div className={cn(
+                <div
+                  className={cn(
                     "flex flex-col gap-4",
-                    isMobile ? "space-y-4" : "sm:flex-row sm:items-center sm:gap-4"
-                  )}>
+                    !isMobile &&
+                      "lg:flex-row lg:items-center lg:justify-between"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex flex-col gap-4",
+                      isMobile
+                        ? "space-y-4"
+                        : "sm:flex-row sm:items-center sm:gap-4"
+                    )}
+                  >
                     {/* Search */}
                     <div className="relative w-full">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -566,19 +604,23 @@ export default function DashboardHome() {
                     </div>
 
                     {/* Filters */}
-                    <div className={cn(
-                      "flex gap-3",
-                      isMobile ? "flex-col" : "items-center gap-2"
-                    )}>
-                      {!isMobile && <Filter className="h-4 w-4 text-gray-400" />}
-                      
+                    <div
+                      className={cn(
+                        "flex gap-3",
+                        isMobile ? "flex-col" : "items-center gap-2"
+                      )}
+                    >
+                      {!isMobile && (
+                        <Filter className="h-4 w-4 text-gray-400" />
+                      )}
+
                       <select
                         value={selectedPhase}
                         onChange={(e) => setSelectedPhase(e.target.value)}
                         className={cn(
                           "border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white",
-                          isMobile 
-                            ? "text-base px-4 py-3 w-full" 
+                          isMobile
+                            ? "text-base px-4 py-3 w-full"
                             : "text-sm px-3 py-1.5"
                         )}
                       >
@@ -597,8 +639,8 @@ export default function DashboardHome() {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         className={cn(
                           "border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white",
-                          isMobile 
-                            ? "text-base px-4 py-3 w-full" 
+                          isMobile
+                            ? "text-base px-4 py-3 w-full"
                             : "text-sm px-3 py-1.5"
                         )}
                       >
@@ -634,15 +676,19 @@ export default function DashboardHome() {
                   </div>
 
                   {/* Column selector and count */}
-                  <div className={cn(
-                    "flex gap-3",
-                    isMobile ? "flex-col-reverse" : "items-center gap-2"
-                  )}>
+                  <div
+                    className={cn(
+                      "flex gap-3",
+                      isMobile ? "flex-col-reverse" : "items-center gap-2"
+                    )}
+                  >
                     {/* Project count */}
-                    <div className={cn(
-                      "text-gray-600 text-center",
-                      isMobile ? "text-sm py-2" : "text-sm"
-                    )}>
+                    <div
+                      className={cn(
+                        "text-gray-600 text-center",
+                        isMobile ? "text-sm py-2" : "text-sm"
+                      )}
+                    >
                       {filteredProjects.length} of {projects.length} projects
                     </div>
 
@@ -676,14 +722,16 @@ export default function DashboardHome() {
               </div>
 
               {/* Content with View Toggle */}
-              <Tabs 
-                defaultValue={isMobile ? "cards" : "table"} 
+              <Tabs
+                defaultValue={isMobile ? "cards" : "table"}
                 className="space-y-4"
               >
-                <TabsList className={cn(
-                  "bg-gray-50 border",
-                  isMobile ? "w-full grid grid-cols-2" : ""
-                )}>
+                <TabsList
+                  className={cn(
+                    "bg-gray-50 border",
+                    isMobile ? "w-full grid grid-cols-2" : ""
+                  )}
+                >
                   <TabsTrigger
                     value="cards"
                     className={cn(
@@ -691,8 +739,12 @@ export default function DashboardHome() {
                       isMobile ? "flex-1 py-3" : ""
                     )}
                   >
-                    <LayoutGrid className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
-                    <span className={cn(isMobile ? "text-base font-medium" : "")}>
+                    <LayoutGrid
+                      className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")}
+                    />
+                    <span
+                      className={cn(isMobile ? "text-base font-medium" : "")}
+                    >
                       Cards
                     </span>
                   </TabsTrigger>
@@ -704,7 +756,9 @@ export default function DashboardHome() {
                     )}
                   >
                     <List className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
-                    <span className={cn(isMobile ? "text-base font-medium" : "")}>
+                    <span
+                      className={cn(isMobile ? "text-base font-medium" : "")}
+                    >
                       Table
                     </span>
                   </TabsTrigger>

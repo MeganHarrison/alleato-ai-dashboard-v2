@@ -103,7 +103,7 @@ export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedPhase, setSelectedPhase] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showOnlyActive, setShowOnlyActive] = useState<boolean>(false);
+  const [showOnlyActive, setShowOnlyActive] = useState<boolean>(true);
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
     new Set(COLUMNS.filter((col) => col.defaultVisible).map((col) => col.id))
   );

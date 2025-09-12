@@ -74,6 +74,7 @@ interface Project {
 
 const COLUMNS = [
   { id: "title", label: "Title", defaultVisible: true },
+  { id: "summary", label: "Summary", defaultVisible: true },
   { id: "date", label: "Date", defaultVisible: true },
   { id: "project", label: "Project", defaultVisible: true },
 ];
@@ -272,9 +273,10 @@ export default function MeetingsPage() {
   };
 
   const exportToCSV = () => {
-    const headers = ['Title', 'Date', 'Project'];
+    const headers = ['Title', 'Summary', 'Date', 'Project'];
     const rows = filteredDocuments.map(d => [
       d.title || '',
+      d.summary || '',
       d.date ? format(new Date(d.date), 'yyyy-MM-dd') : '',
       d.project || projects.find(p => p.id === d.project_id)?.name || ''
     ]);
@@ -391,6 +393,7 @@ export default function MeetingsPage() {
             <TableHeader>
               <TableRow className="h-8">
                 {visibleColumns.has('title') && <TableHead className="py-2 text-xs font-medium w-48">Title</TableHead>}
+                {visibleColumns.has('summary') && <TableHead className="py-2 text-xs font-medium">Summary</TableHead>}
                 {visibleColumns.has('date') && <TableHead className="py-2 text-xs font-medium w-24">Date</TableHead>}
                 {visibleColumns.has('project') && <TableHead className="py-2 text-xs font-medium">Project</TableHead>}
                 <TableHead className="text-right py-2 text-xs font-medium w-16">Actions</TableHead>
@@ -399,7 +402,7 @@ export default function MeetingsPage() {
             <TableBody>
               {filteredDocuments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8 text-sm">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8 text-sm">
                     No meetings found
                   </TableCell>
                 </TableRow>
@@ -414,6 +417,13 @@ export default function MeetingsPage() {
                       <TableCell className="py-2 w-48">
                         <div className="font-medium text-sm truncate">
                           {document.title || <span className="text-muted-foreground">Untitled</span>}
+                        </div>
+                      </TableCell>
+                    )}
+                    {visibleColumns.has('summary') && (
+                      <TableCell className="py-2">
+                        <div className="text-sm text-muted-foreground truncate max-w-xs">
+                          {document.summary || <span className="text-muted-foreground italic">No summary</span>}
                         </div>
                       </TableCell>
                     )}

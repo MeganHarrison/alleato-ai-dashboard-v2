@@ -32,6 +32,7 @@ async function queryRailwayRAG(message: string, conversationHistory: unknown[] =
         'User-Agent': 'Alleato-AI-Dashboard/1.0',
       },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(30000), // 30 second timeout
     });
 
     if (!response.ok) {
@@ -81,17 +82,14 @@ export async function POST(req: NextRequest) {
         
         responseText = rawResponse || 'No response generated';
         
-        // Add sources if available
+        // Extract sources separately
         const sources = railwayResponse.sources || railwayResponse.documents || [];
-        if (sources.length > 0) {
-          responseText += '\n\n**Sources:**\n';
-          responseText += sources.map((source: any, index: number) => 
-            `${index + 1}. ${source.title || source.document_name || 'Document'} ${source.relevance_score ? `(${Math.round(source.relevance_score * 100)}% relevant)` : ''}`
-          ).join('\n');
-        }
       }
 
-      return NextResponse.json({ message: responseText });
+      return NextResponse.json({ 
+        message: responseText,
+        sources: sources || []
+      });
 
     } catch (railwayError) {
       console.warn('⚠️ Railway API failed, providing helpful message:', railwayError);

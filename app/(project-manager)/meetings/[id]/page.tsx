@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -67,28 +67,22 @@ export default function MeetingPage() {
   const router = useRouter();
   const [meeting, setMeeting] = useState<MeetingDocument | null>(null);
   const [actualTranscript, setActualTranscript] = useState<string | null>(null);
-  const [transcriptLoading] = useState(false);
+  const [transcriptLoading, setTranscriptLoading] = useState(false);
   const [insights, setInsights] = useState<AIInsight[]>([]);
-  const [insightsLoading] = useState(false);
+  const [insightsLoading, setInsightsLoading] = useState(false);
   const [relatedMeetings, setRelatedMeetings] = useState<MeetingDocument[]>([]);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [supabase] = useState(() => createClient());
 
   const meetingId = params.id as string;
 
-  useEffect(() => {
-    if (meetingId) {
-      loadMeeting();
-    }
-  }, [meetingId]);
-
-  const fetchActualTranscript = async (meeting: MeetingDocument) => {
+  const fetchActualTranscript = useCallback(async (meeting: MeetingDocument) => {
     try {
       setTranscriptLoading(true);
       
       // Check if metadata contains storage_bucket_path
-      const metadata = meeting.metadata;
+      let metadata = meeting.metadata;
       if (typeof metadata === 'string') {
         metadata = JSON.parse(metadata);
       }
@@ -116,9 +110,9 @@ export default function MeetingPage() {
     } finally {
       setTranscriptLoading(false);
     }
-  };
+  }, []);
 
-  const fetchMeetingInsights = async (documentId: string) => {
+  const fetchMeetingInsights = useCallback(async (documentId: string) => {
     try {
       setInsightsLoading(true);
       
@@ -143,9 +137,9 @@ export default function MeetingPage() {
     } finally {
       setInsightsLoading(false);
     }
-  };
+  }, [supabase]);
 
-  const fetchRelatedMeetings = async (projectId: number, currentMeetingId: string) => {
+  const fetchRelatedMeetings = useCallback(async (projectId: number, currentMeetingId: string) => {
     try {
       if (!supabase) return;
       
@@ -166,9 +160,9 @@ export default function MeetingPage() {
     } catch (error) {
       console.error('Error fetching related meetings:', error);
     }
-  };
+  }, [supabase]);
 
-  const loadMeeting = async () => {
+  const loadMeeting = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -222,7 +216,13 @@ export default function MeetingPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [meetingId, supabase, fetchActualTranscript, fetchMeetingInsights, fetchRelatedMeetings]);
+
+  useEffect(() => {
+    if (meetingId) {
+      loadMeeting();
+    }
+  }, [meetingId, loadMeeting]);
 
   const handleDownload = () => {
     if (!meeting?.content) {

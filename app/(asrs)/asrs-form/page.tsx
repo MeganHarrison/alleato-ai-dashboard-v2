@@ -21,7 +21,7 @@ interface FormQuestion {
   id: keyof ASRSFormData;
   type: 'select' | 'number' | 'multiselect' | 'radio';
   question: string;
-  options?: { value: unknown; label: string; description?: string }[];
+  options?: { value: string; label: string; description?: string }[];
   min?: number;
   max?: number;
   step?: number;
@@ -34,9 +34,16 @@ interface FormQuestion {
 
 export default function ASRSRequirementsForm() {
   const [formData, setFormData] = useState<ASRSFormData>({});
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [designResult, setDesignResult] = useState<Record<string, unknown> | null>(null);
+  const [designResult, setDesignResult] = useState<{
+    applicable_figures: string[];
+    applicable_tables: string[];
+    sprinkler_count: number;
+    protection_scheme: string;
+    in_rack_required?: boolean;
+    submission_id?: string;
+  } | null>(null);
   
 
   const questions: FormQuestion[] = [
@@ -184,9 +191,10 @@ export default function ASRSRequirementsForm() {
     }
   ];
 
-  const currentQuestions = questions.filter(q => 
+  const availableQuestions = questions.filter(q => 
     !q.conditional || q.conditional(formData)
-  ).slice(currentStep, currentStep + 1);
+  );
+  const currentQuestions = availableQuestions.slice(currentStep, currentStep + 1);
 
   const handleInputChange = (questionId: keyof ASRSFormData, value: unknown) => {
     setFormData(prev => ({
@@ -211,7 +219,7 @@ export default function ASRSRequirementsForm() {
   };
 
   const nextStep = () => {
-    if (currentStep < questions.length - 1) {
+    if (currentStep < availableQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -347,7 +355,7 @@ export default function ASRSRequirementsForm() {
           {question.type === 'multiselect' && question.options && (
             <div className="grid gap-2">
               {question.options.map((option) => {
-                const isSelected = Array.isArray(value) && value.includes(option.value);
+                const isSelected = Array.isArray(value) && (value as string[]).includes(option.value);
                 return (
                   <label
                     key={option.value}
@@ -361,7 +369,7 @@ export default function ASRSRequirementsForm() {
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => {
-                        const currentArray = Array.isArray(value) ? value : [];
+                        const currentArray = Array.isArray(value) ? value as string[] : [];
                         if (e.target.checked) {
                           handleInputChange(question.id, [...currentArray, option.value]);
                         } else {
@@ -429,7 +437,7 @@ export default function ASRSRequirementsForm() {
     );
   };
 
-  const progress = ((currentStep + 1) / questions.length) * 100;
+  const progress = ((currentStep + 1) / availableQuestions.length) * 100;
 
   if (designResult) {
     return (
@@ -460,8 +468,8 @@ export default function ASRSRequirementsForm() {
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-bold mb-4">FM Global 8-34 Requirements</h3>
             <div className="space-y-3">
-              <div><span className="font-medium">Applicable Figures:</span> {designResult.applicable_figures.join(', ') || 'Standard configurations'}</div>
-              <div><span className="font-medium">Applicable Tables:</span> {designResult.applicable_tables.join(', ') || 'See FM Global 8-34'}</div>
+              <div><span className="font-medium">Applicable Figures:</span> {designResult.applicable_figures?.length > 0 ? designResult.applicable_figures.join(', ') : 'Standard configurations'}</div>
+              <div><span className="font-medium">Applicable Tables:</span> {designResult.applicable_tables?.length > 0 ? designResult.applicable_tables.join(', ') : 'See FM Global 8-34'}</div>
               <div><span className="font-medium">Sprinkler Count:</span> {designResult.sprinkler_count} sprinklers</div>
               <div><span className="font-medium">Protection Scheme:</span> {designResult.protection_scheme}</div>
               {designResult.in_rack_required && (
@@ -510,7 +518,7 @@ export default function ASRSRequirementsForm() {
           />
         </div>
         <div className="text-sm text-gray-600">
-          Step {currentStep + 1} of {questions.length}
+          Step {currentStep + 1} of {availableQuestions.length}
         </div>
       </div>
 
@@ -529,7 +537,7 @@ export default function ASRSRequirementsForm() {
           ← Previous
         </button>
 
-        {currentStep < questions.length - 1 ? (
+        {currentStep < availableQuestions.length - 1 ? (
           <button
             onClick={nextStep}
             disabled={!isCurrentStepValid()}

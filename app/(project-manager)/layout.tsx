@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
-import type { Metadata } from "next";
 import { AppSidebar } from "@/components/app-sidebar";
 import { DynamicBreadcrumbs } from "@/components/dynamic-breadcrumbs";
+import ErrorBoundary from "@/components/error-boundary";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -9,7 +8,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
-import ErrorBoundary from "@/components/error-boundary";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Alleato - AI Intelligence",
@@ -32,9 +32,7 @@ export default function FM834Layout({ children }: { children: ReactNode }) {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0 ml-6 mr-6">
-          <ErrorBoundary>
-            {children}
-          </ErrorBoundary>
+          <ErrorBoundary>{children}</ErrorBoundary>
         </div>
       </SidebarInset>
       <Toaster />

@@ -341,7 +341,7 @@ export class FMGlobal834Calculator {
   private calculateDensity(config: ASRSConfiguration): number {
     const heightRange = this.getHeightRange(config.storageHeight);
     const densityMap = this.DENSITY_REQUIREMENTS[config.commodityClass] || this.DENSITY_REQUIREMENTS['III'];
-    const density = densityMap[heightRange] || 0.35;
+    let density = densityMap[heightRange] || 0.35;
     
     // Adjustments
     if (config.sprinklerSystem === 'dry') {
@@ -374,7 +374,7 @@ export class FMGlobal834Calculator {
    * Calculate spacing requirements
    */
   private calculateSpacing(config: ASRSConfiguration): { ceiling: number; inRack?: number } {
-    const ceilingSpacing = this.MAX_SPACING['ceiling_standard'];
+    let ceilingSpacing = this.MAX_SPACING['ceiling_standard'];
     
     // Adjust for hazard level
     if (config.commodityClass.includes('plastic')) {
@@ -445,7 +445,7 @@ export class FMGlobal834Calculator {
     const ceiling = Math.ceil(area / sprinklerCoverage);
     
     // In-rack sprinklers
-    const inRack = 0;
+    let inRack = 0;
     if (scheme === 'ceiling-and-in-rack' && spacing.inRack) {
       const racksPerRow = Math.ceil(length / spacing.inRack);
       const rows = Math.ceil(width / config.rackSpacing);
@@ -546,7 +546,7 @@ export class FMGlobal834Calculator {
 
   private calculateMinimumPressure(config: ASRSConfiguration, density: number): number {
     // Base pressure requirement
-    const pressure = 7; // Minimum 7 psi
+    let pressure = 7; // Minimum 7 psi
     
     // Adjust for density
     pressure += density * 50;

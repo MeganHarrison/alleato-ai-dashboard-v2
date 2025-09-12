@@ -23,7 +23,16 @@ import {
   Search,
   TableIcon,
   X,
+  Filter,
+  Briefcase,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useEffect, useState } from "react";
 
 interface FMGlobalFigure {
@@ -58,12 +67,14 @@ export default function FMGlobalTablesPage() {
   const [loadingTables, setLoadingTables] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [asrsTypeFilter, setAsrsTypeFilter] = useState<string>("all");
+  const [protectionFilter, setProtectionFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<string>("figures");
   const supabase = createClientComponentClient();
 
-  // Function to get color class based on ASRS type
+  // Function to get color class based on ASRS type (text only, no background)
   const getAsrsTypeColor = (type: string | null | undefined) => {
-    if (!type) return "";
+    if (!type) return "text-gray-500";
 
     const normalizedType = type.toLowerCase();
 
@@ -71,32 +82,32 @@ export default function FMGlobalTablesPage() {
       normalizedType.includes("top-load") ||
       normalizedType.includes("top load")
     ) {
-      return "bg-red-100 text-red-700 border-red-300";
+      return "text-red-600 font-semibold";
     } else if (
       normalizedType.includes("mini-load") ||
       normalizedType.includes("mini load")
     ) {
-      return "bg-blue-100 text-blue-700 border-blue-300";
+      return "text-blue-600 font-semibold";
     } else if (
       normalizedType.includes("unit-load") ||
       normalizedType.includes("unit load")
     ) {
-      return "bg-green-100 text-green-700 border-green-300";
+      return "text-green-600 font-semibold";
     } else if (
       normalizedType.includes("carousel") ||
       normalizedType.includes("horizontal")
     ) {
-      return "bg-purple-100 text-purple-700 border-purple-300";
+      return "text-purple-600 font-semibold";
     } else if (normalizedType.includes("vertical")) {
-      return "bg-orange-100 text-orange-700 border-orange-300";
+      return "text-orange-600 font-semibold";
     } else if (normalizedType.includes("shuttle")) {
-      return "bg-pink-100 text-pink-700 border-pink-300";
+      return "text-pink-600 font-semibold";
     } else if (normalizedType.includes("crane")) {
-      return "bg-indigo-100 text-indigo-700 border-indigo-300";
+      return "text-indigo-600 font-semibold";
     } else if (normalizedType.includes("robot")) {
-      return "bg-teal-100 text-teal-700 border-teal-300";
+      return "text-teal-600 font-semibold";
     } else {
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "text-gray-600 font-medium";
     }
   };
 
@@ -146,6 +157,10 @@ export default function FMGlobalTablesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Get unique ASRS types and protection schemes for filters
+  const asrsTypes = Array.from(new Set(tables.map((t) => t.asrs_type).filter(Boolean))).sort();
+  const protectionSchemes = Array.from(new Set(tables.map((t) => t.protection_scheme).filter(Boolean))).sort();
+
   const filteredFigures = figures.filter(
     (figure) =>
       figure.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -158,24 +173,27 @@ export default function FMGlobalTablesPage() {
   );
 
   const filteredTables = tables.filter(
-    (table) =>
-      table.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      table.table_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      table.asrs_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      table.protection_scheme
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      table.commodity_types?.toLowerCase().includes(searchTerm.toLowerCase())
+    (table) => {
+      const matchesSearch = 
+        table.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        table.table_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        table.asrs_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        table.protection_scheme?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        table.commodity_types?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesAsrsType = asrsTypeFilter === "all" || table.asrs_type === asrsTypeFilter;
+      const matchesProtection = protectionFilter === "all" || table.protection_scheme === protectionFilter;
+
+      return matchesSearch && matchesAsrsType && matchesProtection;
+    }
   );
 
   return (
-    <div className="mx-auto p-4 lg:p-6 space-y-6 animate-in fade-in">
+    <div className="mx-auto p-2 lg:p-2 space-y-2 animate-in fade-in">
       {/* Enhanced Header with Search */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-6 border-b border-border/30 brand-accent">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="flex-1 pl-5">
-          <h1 className="text-3xl font-bold tracking-tight text-brand mb-2">
-            FM Global Reference
-          </h1>
+          <h1 className="text-3xl tracking-tight mb-2">FM Global Reference</h1>
           <p className="text-muted-foreground text-lg">
             Tables & Figures Database
           </p>
@@ -187,7 +205,7 @@ export default function FMGlobalTablesPage() {
               placeholder="Search tables and figures..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-[280px] lg:w-[350px] h-11 border-brand/20 focus:border-brand/50 focus:ring-brand/20"
+              className="pl-10 w-[280px] lg:w-[350px] h-11"
             />
             {searchTerm && (
               <button
@@ -198,6 +216,7 @@ export default function FMGlobalTablesPage() {
               </button>
             )}
           </div>
+          
           <Button
             onClick={() => {
               if (activeTab === "figures") fetchFigures();
@@ -228,33 +247,93 @@ export default function FMGlobalTablesPage() {
         className="space-y-6"
       >
         <div className="flex justify-center">
-          <TabsList className="grid w-full max-w-lg grid-cols-2 h-12 bg-muted/30 border border-brand/20">
-            <TabsTrigger
-              value="figures"
-              className="flex items-center gap-2 data-[state=active]:bg-brand data-[state=active]:text-white"
-            >
+          <TabsList className="grid w-full max-w-lg grid-cols-2 h-12 bg-muted/30">
+            <TabsTrigger value="figures" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
               <span className="font-medium">
                 Figures{" "}
-                <span className="ml-1 px-2 py-0.5 text-xs bg-brand/20 rounded-full">
+                <span
+                  className={`ml-1 px-2 py-0.5 text-xs rounded-full ${
+                    activeTab === "figures"
+                      ? "bg-white/20"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
                   {filteredFigures.length}
                 </span>
               </span>
             </TabsTrigger>
             <TabsTrigger
               value="tables"
-              className="flex items-center gap-2 data-[state=active]:bg-brand data-[state=active]:text-white"
+              className="flex items-center gap-2"
             >
               <TableIcon className="w-4 h-4" />
               <span className="font-medium">
                 Tables{" "}
-                <span className="ml-1 px-2 py-0.5 text-xs bg-brand/20 rounded-full">
+                <span
+                  className={`ml-1 px-2 py-0.5 text-xs rounded-full ${
+                    activeTab === "tables"
+                      ? "bg-white/20"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
                   {filteredTables.length}
                 </span>
               </span>
             </TabsTrigger>
           </TabsList>
         </div>
+
+        {/* Filters - only show for tables tab */}
+        {activeTab === "tables" && (
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              <Select value={asrsTypeFilter} onValueChange={setAsrsTypeFilter}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by ASRS type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All ASRS Types</SelectItem>
+                  {asrsTypes.map(type => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={protectionFilter} onValueChange={setProtectionFilter}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <Briefcase className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by protection" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Protection Types</SelectItem>
+                  {protectionSchemes.map(scheme => (
+                    <SelectItem key={scheme} value={scheme}>
+                      {scheme}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {(asrsTypeFilter !== "all" || protectionFilter !== "all" || searchTerm) && (
+              <Button
+                onClick={() => {
+                  setAsrsTypeFilter("all");
+                  setProtectionFilter("all");
+                  setSearchTerm("");
+                }}
+                variant="outline"
+                size="sm"
+              >
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        )}
 
         {/* Figures Tab */}
         <TabsContent value="figures" className="space-y-4">
@@ -270,33 +349,33 @@ export default function FMGlobalTablesPage() {
                 : "No figures available."}
             </div>
           ) : (
-            <Card className="overflow-hidden">
+            <div className="rounded-lg border">
               <div className="overflow-x-auto">
                 <Table className="min-w-[900px]">
                   <TableHeader>
-                    <TableRow className="border-brand/20 bg-gradient-to-r from-brand/5 to-brand/10">
-                      <TableHead className="w-32 text-brand font-semibold whitespace-nowrap h-12">
+                    <TableRow>
+                      <TableHead className="w-32 font-medium whitespace-nowrap h-12">
                         Figure #
                       </TableHead>
-                      <TableHead className="min-w-[200px] text-brand font-semibold h-12">
+                      <TableHead className="min-w-[200px] font-medium h-12">
                         Title
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
+                      <TableHead className="font-medium whitespace-nowrap h-12">
                         ASRS Type
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
+                      <TableHead className="font-medium whitespace-nowrap h-12">
                         Container
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
+                      <TableHead className="font-medium whitespace-nowrap h-12">
                         Max Depth
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
+                      <TableHead className="font-medium whitespace-nowrap h-12">
                         Max Spacing
                       </TableHead>
-                      <TableHead className="min-w-[150px] text-brand font-semibold h-12">
+                      <TableHead className="min-w-[150px] font-medium h-12">
                         Commodities
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
+                      <TableHead className="font-medium whitespace-nowrap h-12">
                         Section
                       </TableHead>
                     </TableRow>
@@ -305,7 +384,7 @@ export default function FMGlobalTablesPage() {
                     {filteredFigures.map((figure, index) => (
                       <TableRow
                         key={figure.id}
-                        className="hover:bg-brand/5 transition-colors duration-200 border-border/50 animate-in slide-in-from-bottom"
+                        className="hover:bg-muted/50 transition-colors duration-200 animate-in slide-in-from-bottom"
                         style={{
                           animationDelay: `${index * 50}ms`,
                           animationFillMode: "both",
@@ -319,13 +398,9 @@ export default function FMGlobalTablesPage() {
                         </TableCell>
                         <TableCell className="h-12">
                           {figure.asrs_type ? (
-                            <Badge
-                              className={`${getAsrsTypeColor(
-                                figure.asrs_type
-                              )} border font-medium`}
-                            >
+                            <span className={getAsrsTypeColor(figure.asrs_type)}>
                               {figure.asrs_type}
-                            </Badge>
+                            </span>
                           ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
@@ -362,7 +437,7 @@ export default function FMGlobalTablesPage() {
                   </TableBody>
                 </Table>
               </div>
-            </Card>
+            </div>
           )}
         </TabsContent>
 
@@ -380,34 +455,28 @@ export default function FMGlobalTablesPage() {
                 : "No tables available."}
             </div>
           ) : (
-            <Card className="overflow-hidden">
+            <div className="rounded-lg border">
               <div className="overflow-x-auto">
-                <Table className="min-w-[1000px]">
+                <Table className="min-w-[800px]">
                   <TableHeader>
-                    <TableRow className="border-brand/20 bg-gradient-to-r from-brand/5 to-brand/10">
-                      <TableHead className="w-32 text-brand font-semibold whitespace-nowrap h-12">
-                        Table #
+                    <TableRow>
+                      <TableHead className="w-16 font-medium whitespace-nowrap h-12">
+                        #
                       </TableHead>
-                      <TableHead className="min-w-[200px] text-brand font-semibold h-12">
+                      <TableHead className="min-w-[200px] font-medium h-12">
                         Title
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
-                        ASRS Type
+                      <TableHead className="font-medium whitespace-nowrap h-12">
+                        ASRS
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
-                        System Type
+                      <TableHead className="font-medium whitespace-nowrap h-12">
+                        Container Type
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
-                        Protection
-                      </TableHead>
-                      <TableHead className="min-w-[150px] text-brand font-semibold h-12">
+                      <TableHead className="min-w-[150px] font-medium h-12">
                         Commodities
                       </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
-                        Ceiling Height
-                      </TableHead>
-                      <TableHead className="text-brand font-semibold whitespace-nowrap h-12">
-                        Section
+                      <TableHead className="font-medium whitespace-nowrap h-12">
+                        Protection Type
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -415,7 +484,7 @@ export default function FMGlobalTablesPage() {
                     {filteredTables.map((table, index) => (
                       <TableRow
                         key={table.id}
-                        className="hover:bg-brand/5 transition-colors duration-200 border-border/50 animate-in slide-in-from-bottom"
+                        className="hover:bg-muted/50 transition-colors duration-200 animate-in slide-in-from-bottom"
                         style={{
                           animationDelay: `${index * 50}ms`,
                           animationFillMode: "both",
@@ -429,13 +498,9 @@ export default function FMGlobalTablesPage() {
                         </TableCell>
                         <TableCell className="h-12">
                           {table.asrs_type ? (
-                            <Badge
-                              className={`${getAsrsTypeColor(
-                                table.asrs_type
-                              )} border font-medium`}
-                            >
+                            <span className={getAsrsTypeColor(table.asrs_type)}>
                               {table.asrs_type}
-                            </Badge>
+                            </span>
                           ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
@@ -449,18 +514,13 @@ export default function FMGlobalTablesPage() {
                                 <Badge
                                   key={idx}
                                   variant="outline"
-                                  className="text-xs border-brand/30 hover:border-brand/50 hover:text-brand"
+                                  className="text-xs hover:text-brand"
                                 >
                                   {type}
                                 </Badge>
                               ))}
                             </div>
                           ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="h-12">
-                          {table.protection_scheme || (
                             <span className="text-muted-foreground">-</span>
                           )}
                         </TableCell>
@@ -472,23 +532,7 @@ export default function FMGlobalTablesPage() {
                           </span>
                         </TableCell>
                         <TableCell className="h-12">
-                          {table.ceiling_height_min ||
-                          table.ceiling_height_max ? (
-                            <span className="text-sm font-medium">
-                              {table.ceiling_height_min &&
-                                `${table.ceiling_height_min}`}
-                              {table.ceiling_height_min &&
-                                table.ceiling_height_max &&
-                                " - "}
-                              {table.ceiling_height_max &&
-                                `${table.ceiling_height_max}`}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="h-12">
-                          {table.section || (
+                          {table.protection_scheme || (
                             <span className="text-muted-foreground">-</span>
                           )}
                         </TableCell>
@@ -497,7 +541,7 @@ export default function FMGlobalTablesPage() {
                   </TableBody>
                 </Table>
               </div>
-            </Card>
+            </div>
           )}
         </TabsContent>
       </Tabs>

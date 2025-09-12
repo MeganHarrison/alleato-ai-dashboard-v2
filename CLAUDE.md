@@ -1,3 +1,10 @@
+# CRITICAL RULES
+1. Never ask me to do something that you could do yourself. Be proactive and always look for ways to use MCP servers, API's, or CLI connections.
+
+2. Be proactive
+
+3. Always Test
+
 # CRITICAL: ARCHON-FIRST RULE - READ THIS FIRST
 
   BEFORE doing ANYTHING else, when you see ANY task management scenario:

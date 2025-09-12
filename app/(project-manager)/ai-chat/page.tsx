@@ -1,102 +1,114 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Bot, FileText, Loader2, Send, Sparkles, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+interface Source {
+  title?: string;
+  document_name?: string;
+  relevance_score?: number;
+  content?: string;
+  url?: string;
+}
 
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
+  sources?: Source[];
 }
 
 export default function OpenAIChat() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [apiStatus, setApiStatus] = useState<
+    "checking" | "connected" | "disconnected"
+  >("checking");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   // Check API status on component mount
   useEffect(() => {
     const checkApiStatus = async () => {
       try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: [{ role: 'user', content: 'test' }]
-          })
+            messages: [{ role: "user", content: "test" }],
+          }),
         });
-        setApiStatus(response.ok ? 'connected' : 'disconnected');
+        setApiStatus(response.ok ? "connected" : "disconnected");
       } catch (error) {
-        setApiStatus('disconnected');
+        setApiStatus("disconnected");
       }
     };
     checkApiStatus();
   }, []);
 
   // Check if conversation has started (has user messages)
-  const hasConversation = messages.some(msg => msg.role === 'user');
+  const hasConversation = messages.some((msg) => msg.role === "user");
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
-      content: input.trim()
+      role: "user",
+      content: input.trim(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [...messages, userMessage].map(msg => ({
+          messages: [...messages, userMessage].map((msg) => ({
             role: msg.role,
-            content: msg.content
-          }))
+            content: msg.content,
+          })),
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response');
+        throw new Error("Failed to get response");
       }
 
       const data = await response.json();
-      
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.message.replace(/\\n/g, '\n')
+        role: "assistant",
+        content: data.message.replace(/\\n/g, "\n"),
+        sources: data.sources || [],
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.'
+        role: "assistant",
+        content: "Sorry, I encountered an error. Please try again.",
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -115,35 +127,72 @@ export default function OpenAIChat() {
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
               </div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-600 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                AI Assistant
+                Alleato AI Agent
               </h1>
             </div>
             <p className="text-center text-slate-600 text-lg">
-              Ask me anything. I&apos;m here to help.
+              Your strategic ally - Connecting every project, initiative, and
+              insight
             </p>
-            
+
             {/* API Status Indicator */}
             <div className="flex justify-center mt-4">
-              <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
-                apiStatus === 'connected' 
-                  ? 'bg-emerald-100 text-emerald-700' 
-                  : apiStatus === 'disconnected'
-                  ? 'bg-red-100 text-red-700'
-                  : 'bg-yellow-100 text-yellow-700'
-              }`}>
-                <div className={`w-2 h-2 rounded-full ${
-                  apiStatus === 'connected' 
-                    ? 'bg-emerald-500' 
-                    : apiStatus === 'disconnected'
-                    ? 'bg-red-500'
-                    : 'bg-yellow-500 animate-pulse'
-                }`} />
-                {apiStatus === 'checking' && 'Checking API...'}
-                {apiStatus === 'connected' && 'Railway API Connected'}
-                {apiStatus === 'disconnected' && 'API Disconnected'}
+              <div
+                className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
+                  apiStatus === "connected"
+                    ? "bg-emerald-100 text-emerald-700"
+                    : apiStatus === "disconnected"
+                    ? "bg-red-100 text-red-700"
+                    : "bg-yellow-100 text-yellow-700"
+                }`}
+              >
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    apiStatus === "connected"
+                      ? "bg-emerald-500"
+                      : apiStatus === "disconnected"
+                      ? "bg-red-500"
+                      : "bg-yellow-500 animate-pulse"
+                  }`}
+                />
+                {apiStatus === "checking" && "Checking API..."}
+                {apiStatus === "connected" && "Railway API Connected"}
+                {apiStatus === "disconnected" && "API Disconnected"}
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Suggestion cards */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            {
+              title: "Show me recent meeting insights",
+            },
+            {
+              title: "What decisions need to be made?",
+            },
+            {
+              title: "Give me the weekly summary",
+            },
+            {
+              title: "What's happening with our projects?",
+            },
+          ].map((suggestion, index) => (
+            <Card
+              key={index}
+              className="p-4 hover:shadow-lg transition-all duration-200 cursor-pointer border-slate-200/60 hover:border-violet-300 group"
+              onClick={() => setInput(suggestion.desc)}
+            >
+              <div className="flex items-start gap-3">
+                <div>
+                  <h3 className="font-semibold text-slate-800 group-hover:text-violet-600 transition-colors">
+                    {suggestion.title}
+                  </h3>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
 
         {/* Centered input area */}
@@ -163,8 +212,8 @@ export default function OpenAIChat() {
                         className="flex-1 border-0 bg-transparent text-lg placeholder:text-slate-400 focus:ring-0 focus:outline-none"
                         autoFocus
                       />
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         disabled={isLoading || !input.trim()}
                         size="sm"
                         className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 border-0 rounded-xl px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
@@ -179,34 +228,6 @@ export default function OpenAIChat() {
                   </div>
                 </div>
               </form>
-            </div>
-
-            {/* Suggestion cards */}
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { icon: "💡", title: "Get Ideas", desc: "Brainstorm creative solutions" },
-                { icon: "📊", title: "Analyze Data", desc: "Help with data insights" },
-                { icon: "✍️", title: "Write Content", desc: "Create compelling copy" },
-                { icon: "🔍", title: "Research Topics", desc: "Find detailed information" }
-              ].map((suggestion, index) => (
-                <Card 
-                  key={index}
-                  className="p-4 hover:shadow-lg transition-all duration-200 cursor-pointer border-slate-200/60 hover:border-violet-300 group"
-                  onClick={() => setInput(suggestion.desc)}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="text-xl">{suggestion.icon}</span>
-                    <div>
-                      <h3 className="font-semibold text-slate-800 group-hover:text-violet-600 transition-colors">
-                        {suggestion.title}
-                      </h3>
-                      <p className="text-sm text-slate-600">
-                        {suggestion.desc}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
             </div>
           </div>
         </div>
@@ -226,25 +247,29 @@ export default function OpenAIChat() {
               <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent">
-              AI Assistant
+              Alleato AI Agent
             </h1>
-            <div className={`ml-4 flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium ${
-              apiStatus === 'connected' 
-                ? 'bg-emerald-100 text-emerald-700' 
-                : apiStatus === 'disconnected'
-                ? 'bg-red-100 text-red-700'
-                : 'bg-yellow-100 text-yellow-700'
-            }`}>
-              <div className={`w-2 h-2 rounded-full ${
-                apiStatus === 'connected' 
-                  ? 'bg-emerald-500' 
-                  : apiStatus === 'disconnected'
-                  ? 'bg-red-500'
-                  : 'bg-yellow-500 animate-pulse'
-              }`} />
-              {apiStatus === 'checking' && 'Checking...'}
-              {apiStatus === 'connected' && 'Connected'}
-              {apiStatus === 'disconnected' && 'Disconnected'}
+            <div
+              className={`ml-4 flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium ${
+                apiStatus === "connected"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : apiStatus === "disconnected"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-yellow-100 text-yellow-700"
+              }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  apiStatus === "connected"
+                    ? "bg-emerald-500"
+                    : apiStatus === "disconnected"
+                    ? "bg-red-500"
+                    : "bg-yellow-500 animate-pulse"
+                }`}
+              />
+              {apiStatus === "checking" && "Checking..."}
+              {apiStatus === "connected" && "Connected"}
+              {apiStatus === "disconnected" && "Disconnected"}
             </div>
           </div>
         </div>
@@ -259,48 +284,69 @@ export default function OpenAIChat() {
                 <div
                   key={message.id}
                   className={`flex gap-4 ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                    message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {message.role === 'assistant' && (
+                  {message.role === "assistant" && (
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg">
                       <Bot className="w-4 h-4 text-white" />
                     </div>
                   )}
-                  
-                  <div className={`max-w-[85%] ${message.role === 'user' ? 'order-1' : ''}`}>
-                    <Card className={`p-4 shadow-sm border-0 ${
-                      message.role === 'user'
-                        ? 'bg-gradient-to-br from-violet-500 to-cyan-500 text-white'
-                        : 'bg-white border border-slate-200/60'
-                    }`}>
+
+                  <div
+                    className={`max-w-[85%] ${
+                      message.role === "user" ? "order-1" : ""
+                    }`}
+                  >
+                    <Card
+                      className={`p-4 shadow-sm border-0 ${
+                        message.role === "user"
+                          ? "bg-gradient-to-br from-violet-500 to-cyan-500 text-white"
+                          : "bg-white border border-slate-200/60"
+                      }`}
+                    >
                       <div className="prose prose-sm max-w-none">
-                        {message.content.split('\n').map((line, index) => {
+                        {message.content.split("\n").map((line, index) => {
                           const trimmedLine = line.trim();
-                          
+
                           // Handle main headers (## or ### format)
                           if (trimmedLine.match(/^#{2,3}\s+/)) {
                             return (
-                              <h3 key={index} className={`text-lg font-bold mb-3 mt-4 ${
-                                message.role === 'user' ? 'text-white' : 'text-slate-900'
-                              }`}>
-                                {trimmedLine.replace(/^#{2,3}\s+/, '')}
+                              <h3
+                                key={index}
+                                className={`text-lg font-bold mb-3 mt-4 ${
+                                  message.role === "user"
+                                    ? "text-white"
+                                    : "text-slate-900"
+                                }`}
+                              >
+                                {trimmedLine.replace(/^#{2,3}\s+/, "")}
                               </h3>
                             );
                           }
-                          
+
                           // Handle numbered lists with bold headers
                           if (trimmedLine.match(/^\d+\.\s?\*\*.*\*\*/)) {
                             const number = trimmedLine.match(/^(\d+)\./)?.[1];
-                            const content = trimmedLine.replace(/^\d+\.\s?\*\*/, '').replace(/\*\*$/, '');
+                            const content = trimmedLine
+                              .replace(/^\d+\.\s?\*\*/, "")
+                              .replace(/\*\*$/, "");
                             return (
                               <div key={index} className="mb-4">
-                                <div className={`flex items-start gap-3 font-semibold text-base ${
-                                  message.role === 'user' ? 'text-white' : 'text-violet-700'
-                                }`}>
-                                  <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold ${
-                                    message.role === 'user' ? 'bg-violet-200 text-violet-800' : 'bg-violet-100 text-violet-700'
-                                  }`}>
+                                <div
+                                  className={`flex items-start gap-3 font-semibold text-base ${
+                                    message.role === "user"
+                                      ? "text-white"
+                                      : "text-violet-700"
+                                  }`}
+                                >
+                                  <span
+                                    className={`flex-shrink-0 w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold ${
+                                      message.role === "user"
+                                        ? "bg-violet-200 text-violet-800"
+                                        : "bg-violet-100 text-violet-700"
+                                    }`}
+                                  >
                                     {number}
                                   </span>
                                   {content}
@@ -308,19 +354,27 @@ export default function OpenAIChat() {
                               </div>
                             );
                           }
-                          
+
                           // Handle simple numbered lists
                           if (trimmedLine.match(/^\d+\.\s/)) {
                             const number = trimmedLine.match(/^(\d+)\./)?.[1];
-                            const content = trimmedLine.replace(/^\d+\.\s/, '');
+                            const content = trimmedLine.replace(/^\d+\.\s/, "");
                             return (
                               <div key={index} className="mb-2">
-                                <div className={`flex items-start gap-3 ${
-                                  message.role === 'user' ? 'text-white' : 'text-slate-700'
-                                }`}>
-                                  <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold ${
-                                    message.role === 'user' ? 'bg-violet-200 text-violet-800' : 'bg-slate-200 text-slate-600'
-                                  }`}>
+                                <div
+                                  className={`flex items-start gap-3 ${
+                                    message.role === "user"
+                                      ? "text-white"
+                                      : "text-slate-700"
+                                  }`}
+                                >
+                                  <span
+                                    className={`flex-shrink-0 w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold ${
+                                      message.role === "user"
+                                        ? "bg-violet-200 text-violet-800"
+                                        : "bg-slate-200 text-slate-600"
+                                    }`}
+                                  >
                                     {number}
                                   </span>
                                   {content}
@@ -328,61 +382,93 @@ export default function OpenAIChat() {
                               </div>
                             );
                           }
-                          
+
                           // Handle sub-bullets with bold text
                           if (trimmedLine.match(/^-\s?\*\*.*\*\*/)) {
-                            const content = trimmedLine.replace(/^-\s?\*\*/, '').replace(/\*\*$/, '');
+                            const content = trimmedLine
+                              .replace(/^-\s?\*\*/, "")
+                              .replace(/\*\*$/, "");
                             return (
-                              <div key={index} className="ml-6 mb-2 flex items-start gap-2">
-                                <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${
-                                  message.role === 'user' ? 'bg-violet-200' : 'bg-violet-400'
-                                }`} />
-                                <span className={`font-medium ${
-                                  message.role === 'user' ? 'text-white' : 'text-slate-800'
-                                }`}>
+                              <div
+                                key={index}
+                                className="ml-6 mb-2 flex items-start gap-2"
+                              >
+                                <span
+                                  className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${
+                                    message.role === "user"
+                                      ? "bg-violet-200"
+                                      : "bg-violet-400"
+                                  }`}
+                                />
+                                <span
+                                  className={`font-medium ${
+                                    message.role === "user"
+                                      ? "text-white"
+                                      : "text-slate-800"
+                                  }`}
+                                >
                                   {content}
                                 </span>
                               </div>
                             );
                           }
-                          
+
                           // Handle regular bullets
                           if (trimmedLine.match(/^-\s/)) {
-                            const content = trimmedLine.replace(/^-\s/, '');
+                            const content = trimmedLine.replace(/^-\s/, "");
                             return (
-                              <div key={index} className="ml-6 mb-1 flex items-start gap-2">
-                                <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                                  message.role === 'user' ? 'bg-violet-200' : 'bg-slate-400'
-                                }`} />
-                                <span className={`${
-                                  message.role === 'user' ? 'text-white' : 'text-slate-600'
-                                }`}>
+                              <div
+                                key={index}
+                                className="ml-6 mb-1 flex items-start gap-2"
+                              >
+                                <span
+                                  className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                                    message.role === "user"
+                                      ? "bg-violet-200"
+                                      : "bg-slate-400"
+                                  }`}
+                                />
+                                <span
+                                  className={`${
+                                    message.role === "user"
+                                      ? "text-white"
+                                      : "text-slate-600"
+                                  }`}
+                                >
                                   {content}
                                 </span>
                               </div>
                             );
                           }
-                          
+
                           // Handle markdown links
-                          if (trimmedLine.includes('[') && trimmedLine.includes('](')) {
+                          if (
+                            trimmedLine.includes("[") &&
+                            trimmedLine.includes("](")
+                          ) {
                             const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
                             const parts = trimmedLine.split(linkRegex);
                             return (
-                              <p key={index} className={`mb-2 leading-relaxed ${
-                                message.role === 'user' ? 'text-white' : 'text-slate-700'
-                              }`}>
+                              <p
+                                key={index}
+                                className={`mb-2 leading-relaxed ${
+                                  message.role === "user"
+                                    ? "text-white"
+                                    : "text-slate-700"
+                                }`}
+                              >
                                 {parts.map((part, partIndex) => {
                                   if (partIndex % 3 === 1) {
                                     return (
-                                      <a 
-                                        key={partIndex} 
-                                        href={parts[partIndex + 1]} 
+                                      <a
+                                        key={partIndex}
+                                        href={parts[partIndex + 1]}
                                         className={`underline hover:no-underline font-medium ${
-                                          message.role === 'user' 
-                                            ? 'text-violet-100 hover:text-white' 
-                                            : 'text-violet-600 hover:text-violet-800'
+                                          message.role === "user"
+                                            ? "text-violet-100 hover:text-white"
+                                            : "text-violet-600 hover:text-violet-800"
                                         }`}
-                                        target="_blank" 
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                       >
                                         {part}
@@ -397,20 +483,31 @@ export default function OpenAIChat() {
                               </p>
                             );
                           }
-                          
+
                           // Handle bold text within paragraphs
-                          if (trimmedLine.includes('**')) {
+                          if (trimmedLine.includes("**")) {
                             const parts = trimmedLine.split(/(\*\*[^*]+\*\*)/);
                             return (
-                              <p key={index} className={`mb-2 leading-relaxed ${
-                                message.role === 'user' ? 'text-white' : 'text-slate-700'
-                              }`}>
-                                {parts.map((part, partIndex) => 
-                                  part.startsWith('**') && part.endsWith('**') ? (
-                                    <strong key={partIndex} className={`font-semibold ${
-                                      message.role === 'user' ? 'text-white' : 'text-slate-900'
-                                    }`}>
-                                      {part.replace(/\*\*/g, '')}
+                              <p
+                                key={index}
+                                className={`mb-2 leading-relaxed ${
+                                  message.role === "user"
+                                    ? "text-white"
+                                    : "text-slate-700"
+                                }`}
+                              >
+                                {parts.map((part, partIndex) =>
+                                  part.startsWith("**") &&
+                                  part.endsWith("**") ? (
+                                    <strong
+                                      key={partIndex}
+                                      className={`font-semibold ${
+                                        message.role === "user"
+                                          ? "text-white"
+                                          : "text-slate-900"
+                                      }`}
+                                    >
+                                      {part.replace(/\*\*/g, "")}
                                     </strong>
                                   ) : (
                                     <span key={partIndex}>{part}</span>
@@ -419,37 +516,79 @@ export default function OpenAIChat() {
                               </p>
                             );
                           }
-                          
+
                           // Handle empty lines (create spacing)
-                          if (trimmedLine === '') {
+                          if (trimmedLine === "") {
                             return <div key={index} className="mb-4" />;
                           }
-                          
+
                           // Handle regular paragraphs
                           if (trimmedLine.length > 0) {
                             return (
-                              <p key={index} className={`mb-3 leading-relaxed ${
-                                message.role === 'user' ? 'text-white' : 'text-slate-700'
-                              }`}>
+                              <p
+                                key={index}
+                                className={`mb-3 leading-relaxed ${
+                                  message.role === "user"
+                                    ? "text-white"
+                                    : "text-slate-700"
+                                }`}
+                              >
                                 {trimmedLine}
                               </p>
                             );
                           }
-                          
+
                           return null;
                         })}
                       </div>
                     </Card>
+
+                    {/* Sources display for assistant messages */}
+                    {message.role === "assistant" && message.sources && message.sources.length > 0 && (
+                      <div className="mt-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="w-4 h-4 text-violet-600" />
+                          <span className="text-sm font-medium text-slate-700">Sources</span>
+                        </div>
+                        <div className="space-y-2">
+                          {message.sources.map((source, sourceIndex) => (
+                            <div
+                              key={sourceIndex}
+                              className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200"
+                            >
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
+                                {sourceIndex + 1}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-sm font-medium text-slate-900 truncate">
+                                  {source.title || source.document_name || 'Document'}
+                                </h4>
+                                {source.relevance_score && (
+                                  <p className="text-xs text-slate-600 mt-1">
+                                    {Math.round(source.relevance_score * 100)}% relevant
+                                  </p>
+                                )}
+                                {source.content && (
+                                  <p className="text-xs text-slate-600 mt-2 truncate">
+                                    {source.content.substring(0, 150)}...
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {message.role === 'user' && (
+                  {message.role === "user" && (
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg order-2">
                       <User className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </div>
               ))}
-              
+
               {isLoading && (
                 <div className="flex justify-start gap-4">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg">
@@ -458,7 +597,9 @@ export default function OpenAIChat() {
                   <Card className="p-4 bg-white border border-slate-200/60">
                     <div className="flex items-center gap-3">
                       <Loader2 className="w-4 h-4 animate-spin text-violet-600" />
-                      <span className="text-sm text-slate-600">AI is thinking...</span>
+                      <span className="text-sm text-slate-600">
+                        AI is thinking...
+                      </span>
                     </div>
                   </Card>
                 </div>
@@ -486,8 +627,8 @@ export default function OpenAIChat() {
                     disabled={isLoading}
                     className="flex-1 border-0 bg-transparent placeholder:text-slate-400 focus:ring-0 focus:outline-none"
                   />
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isLoading || !input.trim()}
                     size="sm"
                     className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 border-0 rounded-xl px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
