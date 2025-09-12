@@ -68,12 +68,6 @@ interface Project {
   client_id?: number | null;
 }
 
-interface Service {
-  title: string;
-  description: string;
-  href: string;
-  price?: string | null;
-}
 
 const COLUMNS = [
   { id: "name", label: "Project Name", defaultVisible: true },
@@ -113,36 +107,16 @@ export default function DashboardHome() {
   const [selectedPhase, setSelectedPhase] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showOnlyActive, setShowOnlyActive] = useState(true);
-  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
-    new Set(COLUMNS.filter((col) => col.defaultVisible).map((col) => col.id))
-  );
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [meetings, setMeetings] = useState<any[]>([]);
+  const [insights, setInsights] = useState<any[]>([]);
+  const [meetingsLoading, setMeetingsLoading] = useState(true);
+  const [insightsLoading, setInsightsLoading] = useState(true);
 
   // Mobile responsive hooks
   const isMobile = useIsMobile();
   const isSmallMobile = useIsSmallMobile();
-
-  const services: Service[] = [
-    {
-      title: "FM Global Guru",
-      description: "AI Agent trained on all of your business documents.",
-      href: "/fm-global-expert",
-    },
-    {
-      title: "Project Maestro",
-      description:
-        "AI Agent trained on all the systems you use within your business.",
-      href: "/projects-dashboard",
-      price: null,
-    },
-    {
-      title: "Company Knowledge Base",
-      description: "Create and update content with your AI agent workflows.",
-      href: "/insights",
-      price: null,
-    },
-  ];
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -213,7 +187,72 @@ export default function DashboardHome() {
     };
 
     fetchProjects();
+    fetchMeetings();
+    fetchInsights();
   }, [showOnlyActive]);
+
+  // Fetch meetings
+  const fetchMeetings = async () => {
+    try {
+      setMeetingsLoading(true);
+      const supabase = createClient();
+      
+      const { data, error } = await supabase
+        .from('documents')
+        .select(`
+          id,
+          title,
+          date,
+          meeting_date,
+          created_at,
+          projects(id, name)
+        `)
+        .not('meeting_date', 'is', null)
+        .order('meeting_date', { ascending: false })
+        .limit(10);
+        
+      if (!error && data) {
+        setMeetings(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch meetings:', err);
+    } finally {
+      setMeetingsLoading(false);
+    }
+  };
+
+  // Fetch insights
+  const fetchInsights = async () => {
+    try {
+      setInsightsLoading(true);
+      const supabase = createClient();
+      
+      const { data, error } = await supabase
+        .from('ai_insights')
+        .select(`
+          id,
+          title,
+          insight_type,
+          severity,
+          created_at,
+          documents!inner(
+            id,
+            title,
+            projects(id, name)
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(8);
+        
+      if (!error && data) {
+        setInsights(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch insights:', err);
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
 
   // Get unique phases and types for filters
   const phases = useMemo(() => {
@@ -227,6 +266,53 @@ export default function DashboardHome() {
     );
     return ["all", ...Array.from(categorySet).sort()];
   }, [projects]);
+
+  // Group meetings by time periods
+  const groupedMeetings = useMemo(() => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const groups = {
+      today: [] as any[],
+      yesterday: [] as any[],
+      thisWeek: [] as any[],
+      older: [] as any[]
+    };
+    
+    meetings.forEach(meeting => {
+      const meetingDate = new Date(meeting.meeting_date || meeting.date);
+      const meetingDay = new Date(meetingDate.getFullYear(), meetingDate.getMonth(), meetingDate.getDate());
+      
+      if (meetingDay.getTime() === today.getTime()) {
+        groups.today.push(meeting);
+      } else if (meetingDay.getTime() === yesterday.getTime()) {
+        groups.yesterday.push(meeting);
+      } else if (meetingDay >= weekAgo) {
+        groups.thisWeek.push(meeting);
+      } else {
+        groups.older.push(meeting);
+      }
+    });
+    
+    return groups;
+  }, [meetings]);
+
+  // Group insights by project
+  const insightsByProject = useMemo(() => {
+    const grouped = {} as Record<string, any[]>;
+    
+    insights.forEach(insight => {
+      const projectName = insight.documents?.projects?.name || 'Unknown Project';
+      if (!grouped[projectName]) {
+        grouped[projectName] = [];
+      }
+      grouped[projectName].push(insight);
+    });
+    
+    return grouped;
+  }, [insights]);
 
   // Filter and sort projects
   const filteredProjects = useMemo(() => {
@@ -310,92 +396,239 @@ export default function DashboardHome() {
     sortDirection,
   ]);
 
-  const toggleColumn = (columnId: string) => {
-    const newVisible = new Set(visibleColumns);
-    if (newVisible.has(columnId)) {
-      newVisible.delete(columnId);
-    } else {
-      newVisible.add(columnId);
-    }
-    setVisibleColumns(newVisible);
-  };
-
-  const CardView = () => (
-    <div
-      className={cn(
-        "grid gap-4",
-        isSmallMobile
-          ? "grid-cols-1"
-          : isMobile
-          ? "grid-cols-1 sm:grid-cols-2"
-          : "md:grid-cols-2 lg:grid-cols-3"
-      )}
-    >
-      {filteredProjects.map((project) => (
-        <Card
+  // Modern sleek project cards
+  const ModernProjectCards = () => (
+    <div className="space-y-3">
+      {filteredProjects.slice(0, 6).map((project) => (
+        <div
           key={project.id}
-          className="group bg-white border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-200"
+          className="group relative"
         >
-          <CardContent className={cn(isMobile ? "p-4" : "p-5")}>
-            {/* Header */}
-            <div className="flex items-start justify-between text-brand-500 text-sm mb-3">
-              <div className="flex-1">
-                <Link
-                  href={`/projects/${project.id}`}
-                  className="font-medium text-base line-clamp-1 hover:text-brand-500 hover:underline cursor-pointer flex items-center gap-1"
-                >
+          <Link
+            href={`/projects/${project.id}`}
+            className="block p-4 hover:bg-gray-50 border border-transparent hover:border-gray-200 rounded-lg transition-all duration-150"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-gray-900 truncate group-hover:text-brand-600 transition-colors">
                   {project.name}
-                  <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </h3>
                 {project.clients?.name && (
-                  <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
-                    <Building className="h-3.5 w-3.5" />
-                    <span>{project.clients.name}</span>
-                  </div>
+                  <p className="text-xs text-gray-500 mt-1">{project.clients.name}</p>
                 )}
               </div>
-              <Badge className={cn("text-xs", getStatusColor(project.phase))}>
-                {project.phase}
-              </Badge>
-            </div>
-
-            {/* Metadata */}
-            <div className="space-y-2 mb-3">
-              {project.category && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Briefcase className="h-3.5 w-3.5" />
-                  <span>{project.category}</span>
-                </div>
-              )}
-              {project["est revenue"] && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <DollarSign className="h-3.5 w-3.5" />
-                  <span className="font-medium">
+              <div className="flex items-center gap-2 ml-4">
+                {project["est revenue"] && (
+                  <span className="text-xs font-medium text-gray-700">
                     {formatCurrency(project["est revenue"])}
                   </span>
-                </div>
+                )}
+                <Badge className={cn("text-xs", getStatusColor(project.phase))}>
+                  {project.phase}
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              {project.category && (
+                <span className="flex items-center gap-1">
+                  <Briefcase className="h-3 w-3" />
+                  {project.category}
+                </span>
               )}
               {(project.address || project.state) && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <MapPin className="h-3.5 w-3.5" />
-                  <span>
-                    {project.state
-                      ? `${project.address || ""} ${project.state}`.trim()
-                      : project.address}
-                  </span>
-                </div>
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {project.state ? project.state : project.address}
+                </span>
               )}
             </div>
-
-            {/* Description */}
-            {project.description && (
-              <p className="text-sm text-gray-600 line-clamp-2">
-                {project.description}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+          </Link>
+        </div>
       ))}
+      
+      {filteredProjects.length > 6 && (
+        <Link 
+          href="/projects-dashboard"
+          className="block p-4 text-center text-sm text-brand-600 hover:text-brand-700 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200 transition-all"
+        >
+          View all {filteredProjects.length} projects →
+        </Link>
+      )}
+    </div>
+  );
+
+  // Meetings component
+  const MeetingsSection = () => (
+    <div className="space-y-4">
+      <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        RECENT MEETINGS
+      </h2>
+      
+      {meetingsLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* Today */}
+          {groupedMeetings.today.length > 0 && (
+            <div>
+              <h3 className="text-xs font-medium text-gray-900 mb-2">Today</h3>
+              <div className="space-y-2">
+                {groupedMeetings.today.map((meeting) => (
+                  <Link
+                    key={meeting.id}
+                    href={`/meetings/${meeting.id}`}
+                    className="block p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200 transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {meeting.title || 'Untitled Meeting'}
+                        </p>
+                        {meeting.projects?.name && (
+                          <p className="text-xs text-gray-500">{meeting.projects.name}</p>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {format(new Date(meeting.meeting_date || meeting.date), 'h:mm a')}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Yesterday */}
+          {groupedMeetings.yesterday.length > 0 && (
+            <div>
+              <h3 className="text-xs font-medium text-gray-900 mb-2">Yesterday</h3>
+              <div className="space-y-2">
+                {groupedMeetings.yesterday.map((meeting) => (
+                  <Link
+                    key={meeting.id}
+                    href={`/meetings/${meeting.id}`}
+                    className="block p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200 transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {meeting.title || 'Untitled Meeting'}
+                        </p>
+                        {meeting.projects?.name && (
+                          <p className="text-xs text-gray-500">{meeting.projects.name}</p>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {format(new Date(meeting.meeting_date || meeting.date), 'h:mm a')}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* This Week */}
+          {groupedMeetings.thisWeek.length > 0 && (
+            <div>
+              <h3 className="text-xs font-medium text-gray-900 mb-2">This Week</h3>
+              <div className="space-y-2">
+                {groupedMeetings.thisWeek.slice(0, 3).map((meeting) => (
+                  <Link
+                    key={meeting.id}
+                    href={`/meetings/${meeting.id}`}
+                    className="block p-3 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200 transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {meeting.title || 'Untitled Meeting'}
+                        </p>
+                        {meeting.projects?.name && (
+                          <p className="text-xs text-gray-500">{meeting.projects.name}</p>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {format(new Date(meeting.meeting_date || meeting.date), 'MMM d')}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Link 
+            href="/meetings"
+            className="block p-3 text-center text-sm text-brand-600 hover:text-brand-700 hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200 transition-all"
+          >
+            View all meetings →
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+
+  // Insights component
+  const InsightsSection = () => (
+    <div className="space-y-4">
+      <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        RECENT INSIGHTS
+      </h2>
+      
+      {insightsLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-16 bg-gray-100 rounded animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(insightsByProject).slice(0, 3).map(([projectName, projectInsights]) => (
+            <div key={projectName}>
+              <h3 className="text-xs font-medium text-gray-900 mb-2">{projectName}</h3>
+              <div className="space-y-2">
+                {projectInsights.slice(0, 2).map((insight) => (
+                  <div
+                    key={insight.id}
+                    className="p-3 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex items-start justify-between mb-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {insight.title}
+                      </p>
+                      <span className={cn(
+                        "text-xs px-2 py-1 rounded",
+                        insight.severity === 'high' 
+                          ? 'bg-red-100 text-red-700'
+                          : insight.severity === 'medium'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-green-100 text-green-700'
+                      )}>
+                        {insight.severity}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 capitalize">
+                      {insight.insight_type.replace('_', ' ')} • {format(new Date(insight.created_at), 'MMM d')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          
+          {insights.length === 0 && !insightsLoading && (
+            <div className="text-center py-8 text-gray-500">
+              <p className="text-sm">No recent insights available</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 
