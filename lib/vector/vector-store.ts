@@ -39,7 +39,7 @@ export class VectorStore {
         .insert({
           content: document.content,
           embedding: JSON.stringify(embedding),
-          metadata: document.metadata || {}
+          metadata: JSON.stringify(document.metadata || {})
         })
         .select('id')
         .single();
@@ -74,7 +74,7 @@ export class VectorStore {
         return {
           content: doc.content,
           embedding: Array.isArray(embedding) ? JSON.stringify(embedding) : embedding,
-          metadata: doc.metadata || {}
+          metadata: JSON.stringify(doc.metadata || {})
         };
       });
 
@@ -107,6 +107,7 @@ export class VectorStore {
     } = {}
   ): Promise<{ success: boolean; results?: SearchResult[]; error?: string }> {
     try {
+      // Destructure options for future use when vector search is implemented
       const { matchThreshold = 0.7, matchCount = 10 } = options;
 
       // Generate embedding for the query
@@ -114,7 +115,11 @@ export class VectorStore {
 
       // TODO: Implement proper vector search function in database
       // For now, return empty results as the match_documents function doesn't exist
+      // When implemented, use: matchThreshold, matchCount, queryEmbedding
       const results: SearchResult[] = [];
+      
+      // Suppress unused variable warnings until vector search is implemented
+      console.debug(`Vector search TODO: threshold=${matchThreshold}, count=${matchCount}, embedding length=${queryEmbedding.length}`);
       
       return { success: true, results };
     } catch (error) {

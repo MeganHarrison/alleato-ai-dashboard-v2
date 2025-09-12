@@ -70,7 +70,7 @@ export function DocumentsTable({
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editedDocument, setEditedDocument] = useState<Partial<Document>>({});
-  const [deleteDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
     null
   );
@@ -94,7 +94,7 @@ export function DocumentsTable({
         throw new Error("Database connection not available");
       }
 
-      const updateData: unknown = {
+      const updateData: any = {
         title: editedDocument.title,
         date: editedDocument.date,
         project: editedDocument.project,

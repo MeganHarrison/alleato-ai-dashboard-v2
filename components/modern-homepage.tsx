@@ -321,34 +321,34 @@ export function ModernHomepage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Clean Tabs */}
-                <div className="flex border-b border-gray-200">
+                {/* macOS-style Tabs */}
+                <div className="flex gap-1 p-1 bg-gray-100 rounded-lg inline-flex">
                   <button
                     onClick={() => setActiveTab('today')}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
                       activeTab === 'today' 
-                        ? 'border-brand-500 text-brand-600' 
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
                     Today ({groupedMeetings.today.length})
                   </button>
                   <button
                     onClick={() => setActiveTab('yesterday')}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
                       activeTab === 'yesterday' 
-                        ? 'border-brand-500 text-brand-600' 
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
                     Yesterday ({groupedMeetings.yesterday.length})
                   </button>
                   <button
                     onClick={() => setActiveTab('thisWeek')}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
                       activeTab === 'thisWeek' 
-                        ? 'border-brand-500 text-brand-600' 
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
                     This Week ({groupedMeetings.thisWeek.length})

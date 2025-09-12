@@ -39,7 +39,7 @@ export default defineConfig({
         '**/.next/**',
         '**/build/**',
       ],
-      threshold: {
+      thresholds: {
         global: {
           branches: 80,
           functions: 80,

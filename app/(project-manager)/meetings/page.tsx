@@ -230,7 +230,7 @@ export default function MeetingsPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     setIsDeleting(id);
     try {
       if (!supabase) {
@@ -240,7 +240,7 @@ export default function MeetingsPage() {
       const { error } = await supabase
         .from('documents')
         .delete()
-        .eq('id', id);
+        .eq('id', parseInt(id));
       
       if (error) throw error;
       

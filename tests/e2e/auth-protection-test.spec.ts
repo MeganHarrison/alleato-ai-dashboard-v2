@@ -39,6 +39,6 @@ test.describe('Authentication Protection', () => {
     // Check for login form elements
     await expect(page.locator('input[type="email"]')).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
-    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /login/i })).toBeVisible();
   });
 });

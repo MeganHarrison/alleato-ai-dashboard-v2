@@ -141,7 +141,7 @@ export function generateSitemap(): SitemapCategory[] {
         : 'Home');
     
     // Determine category
-    const category = metadata.category || 'Other';
+    let category = metadata.category || 'Other';
     
     // Auto-categorize based on path patterns
     if (!metadata.category) {
