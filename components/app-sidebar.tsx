@@ -117,6 +117,10 @@ const data = {
           title: "Project Tasks",
           url: "/project-tasks",
         },
+        {
+          title: "Notion Projects",
+          url: "/notion-projects",
+        },
       ],
     },
   ],
