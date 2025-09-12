@@ -155,15 +155,17 @@ export default function DashboardHome() {
         // Check if required environment variables are set
         if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
           throw new Error(
-            "Missing Supabase configuration. Please check your .env.local file and ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set with valid values."
+            "Missing .env.local file. Please run: cp .env.example .env.local and add your Supabase credentials. See setup instructions below."
           );
         }
 
         // Check for placeholder values
         if (process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder") || 
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes("placeholder")) {
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes("placeholder") ||
+            process.env.NEXT_PUBLIC_SUPABASE_URL.includes("your-project") ||
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes("your-supabase")) {
           throw new Error(
-            "Supabase configuration uses placeholder values. Please update your .env.local file with actual Supabase project credentials."
+            ".env.local file exists but contains placeholder values. Please update it with your actual Supabase project credentials from your Supabase dashboard."
           );
         }
 
@@ -426,15 +428,35 @@ export default function DashboardHome() {
               </h1>
               <p className="text-gray-600 mb-4">{error}</p>
               
-              {(error.includes("Missing Supabase configuration") || error.includes("placeholder")) && (
+              {(error.includes("Missing .env.local") || error.includes("placeholder") || error.includes("configuration")) && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 text-left">
                   <h3 className="text-lg font-semibold text-blue-900 mb-2">Setup Instructions:</h3>
-                  <ol className="text-sm text-blue-800 space-y-2">
-                    <li>1. Copy <code className="bg-blue-100 px-1 rounded">.env.example</code> to <code className="bg-blue-100 px-1 rounded">.env.local</code></li>
-                    <li>2. Update the Supabase URL and keys with your actual project credentials</li>
-                    <li>3. Get your Supabase credentials from your <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer" className="underline">Supabase dashboard</a></li>
-                    <li>4. Restart the development server after updating the environment variables</li>
+                  <ol className="text-sm text-blue-800 space-y-3">
+                    <li className="flex items-start gap-2">
+                      <span className="font-medium">1.</span>
+                      <div>
+                        <div>Create your environment file:</div>
+                        <code className="bg-blue-100 px-2 py-1 rounded mt-1 block text-xs">cp .env.example .env.local</code>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-medium">2.</span>
+                      <div>Get your Supabase credentials from the <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer" className="underline font-medium">Supabase dashboard</a></div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-medium">3.</span>
+                      <div>Update <code className="bg-blue-100 px-1 rounded">.env.local</code> with your actual project URL and anon key</div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="font-medium">4.</span>
+                      <div>Restart the development server</div>
+                    </li>
                   </ol>
+                  <div className="mt-3 pt-3 border-t border-blue-200">
+                    <p className="text-xs text-blue-700">
+                      💡 The <code className="bg-blue-100 px-1 rounded">.env.local</code> file is ignored by git to keep your credentials secure.
+                    </p>
+                  </div>
                 </div>
               )}
               
