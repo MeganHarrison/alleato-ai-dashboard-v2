@@ -47,14 +47,10 @@ const data = {
         },
         {
           title: "Tables & Figures",
-          url: "/fm-global-tables",
+          url: "/asrs-tables",
         },
         {
           title: "FM-Global Form",
-          url: "/asrs-form",
-        },
-        {
-          title: "ASRS Form",
           url: "/asrs-form",
         },
         {
@@ -66,8 +62,8 @@ const data = {
           url: "/asrs-form-3",
         },
         {
-          title: "Alleato Intel",
-          url: "/insights8",
+          title: "File Upload",
+          url: "/file-upload",
         },
         {
           title: "FM Global Agent",

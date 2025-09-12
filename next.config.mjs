@@ -21,6 +21,21 @@ const nextConfig = {
   // Basic optimizations
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
+  // Redirect rules to prevent build failures
+  async redirects() {
+    return [
+      {
+        source: '/asrs3',
+        destination: '/',
+        permanent: false,
+      },
+      {
+        source: '/asrs3/:path*',
+        destination: '/',
+        permanent: false,
+      },
+    ];
+  },
 }
 
 export default nextConfig

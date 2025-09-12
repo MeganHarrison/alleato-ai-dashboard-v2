@@ -1,43 +1,37 @@
 "use client";
 
-import { AppSidebar } from "@/components/app-sidebar";
-import { DynamicBreadcrumbs } from "@/components/dynamic-breadcrumbs";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { Mic, Paperclip, Send, AlertCircle, CheckCircle } from "lucide-react";
-import dynamic from 'next/dynamic';
-import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle, Mic, Paperclip, Send } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 
 // Dynamically import ReactMarkdown to avoid SSR issues
-const ReactMarkdown = dynamic(() => import('react-markdown'), {
+const ReactMarkdown = dynamic(() => import("react-markdown"), {
   ssr: false,
-  loading: () => <p>Loading...</p>
+  loading: () => <p>Loading...</p>,
 });
 
 interface ConnectionStatus {
-  status: 'checking' | 'railway' | 'fallback' | 'error';
+  status: "checking" | "railway" | "fallback" | "error";
   message?: string;
 }
 
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 }
 
 export default function FMGlobalChat() {
   const [mounted, setMounted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({ status: 'checking' });
-  
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
+    status: "checking",
+  });
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -45,43 +39,43 @@ export default function FMGlobalChat() {
   const checkConnectionStatus = async () => {
     try {
       // First check FM Global Railway endpoint
-      const fmResponse = await fetch('/api/fm-global', { method: 'GET' });
+      const fmResponse = await fetch("/api/fm-global", { method: "GET" });
       if (fmResponse.ok) {
         const fmData = await fmResponse.json();
-        if (fmData.status === 'healthy') {
-          setConnectionStatus({ 
-            status: 'railway', 
-            message: 'Connected to Railway RAG' 
+        if (fmData.status === "healthy") {
+          setConnectionStatus({
+            status: "railway",
+            message: "Connected to Railway RAG",
           });
           return;
         }
       }
-      
+
       // Check PM RAG fallback
-      const pmResponse = await fetch('/api/pm-rag-fallback', { method: 'GET' });
+      const pmResponse = await fetch("/api/pm-rag-fallback", { method: "GET" });
       if (pmResponse.ok) {
         const pmData = await pmResponse.json();
-        if (pmData.status === 'healthy') {
-          setConnectionStatus({ 
-            status: 'fallback', 
-            message: 'Using PM RAG (database search)' 
+        if (pmData.status === "healthy") {
+          setConnectionStatus({
+            status: "fallback",
+            message: "Using PM RAG (database search)",
           });
         } else {
-          setConnectionStatus({ 
-            status: 'fallback', 
-            message: 'Using OpenAI fallback' 
+          setConnectionStatus({
+            status: "fallback",
+            message: "Using OpenAI fallback",
           });
         }
       } else {
-        setConnectionStatus({ 
-          status: 'fallback', 
-          message: 'Using OpenAI fallback' 
+        setConnectionStatus({
+          status: "fallback",
+          message: "Using OpenAI fallback",
         });
       }
     } catch (error) {
-      setConnectionStatus({ 
-        status: 'error', 
-        message: 'Connection check failed - using basic AI' 
+      setConnectionStatus({
+        status: "error",
+        message: "Connection check failed - using basic AI",
       });
     }
   };
@@ -109,12 +103,12 @@ export default function FMGlobalChat() {
     const userMessage = input.trim();
     const newUserMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
-      content: userMessage
+      role: "user",
+      content: userMessage,
     };
-    
-    setInput('');
-    setMessages(prev => [...prev, newUserMessage]);
+
+    setInput("");
+    setMessages((prev) => [...prev, newUserMessage]);
     setIsLoading(true);
     setError(null);
 
@@ -122,68 +116,72 @@ export default function FMGlobalChat() {
       // Try the FM Global API first, then fallback to PM RAG
       let response;
       let data;
-      
+
       try {
-        response = await fetch('/api/fm-global', {
-          method: 'POST',
+        response = await fetch("/api/fm-global", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            messages: [...messages, { role: 'user', content: userMessage }]
+            messages: [...messages, { role: "user", content: userMessage }],
           }),
         });
 
         if (response.ok) {
           data = await response.json();
-          
+
           // Extract the response text from the JSON
-          const assistantMessage = data.response || data.message || 'Sorry, I received an empty response.';
-          
+          const assistantMessage =
+            data.response ||
+            data.message ||
+            "Sorry, I received an empty response.";
+
           const newAssistantMessage: Message = {
             id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: assistantMessage
+            role: "assistant",
+            content: assistantMessage,
           };
-          
-          setMessages(prev => [...prev, newAssistantMessage]);
+
+          setMessages((prev) => [...prev, newAssistantMessage]);
           return;
         }
       } catch (fmError) {
-        console.log('FM Global API failed, trying PM RAG fallback...');
+        console.log("FM Global API failed, trying PM RAG fallback...");
       }
 
       // Fallback to PM RAG endpoint
-      response = await fetch('/api/pm-rag-fallback', {
-        method: 'POST',
+      response = await fetch("/api/pm-rag-fallback", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           message: userMessage,
-          conversationHistory: messages
+          conversationHistory: messages,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Both FM Global and PM RAG endpoints failed');
+        throw new Error("Both FM Global and PM RAG endpoints failed");
       }
 
       data = await response.json();
-      
+
       // Extract the response from PM RAG format
-      const assistantMessage = data.message || 'Sorry, I received an empty response.';
-      
+      const assistantMessage =
+        data.message || "Sorry, I received an empty response.";
+
       const newAssistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: assistantMessage
+        role: "assistant",
+        content: assistantMessage,
       };
-      
-      setMessages(prev => [...prev, newAssistantMessage]);
+
+      setMessages((prev) => [...prev, newAssistantMessage]);
     } catch (error) {
-      console.error('Error:', error);
-      setError(error instanceof Error ? error.message : 'Something went wrong');
+      console.error("Error:", error);
+      setError(error instanceof Error ? error.message : "Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -215,56 +213,67 @@ export default function FMGlobalChat() {
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <DynamicBreadcrumbs />
+    <div className="flex flex-col h-[calc(90vh-4rem)] p-4 pt-0 mx-[5%] sm:ml-6 sm:mr-6">
+      {/* Connection Status Alert */}
+      {connectionStatus.status !== "checking" && (
+        <Alert
+          className={`mb-4 ${
+            connectionStatus.status === "railway"
+              ? "border-green-500 bg-green-50"
+              : ""
+          }
+              ${
+                connectionStatus.status === "fallback"
+                  ? "border-orange-500 bg-orange-50"
+                  : ""
+              }
+              ${
+                connectionStatus.status === "error"
+                  ? "border-red-500 bg-red-50"
+                  : ""
+              }
+            `}
+        >
+          <div className="flex items-center gap-2">
+            {connectionStatus.status === "railway" && (
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            )}
+            {connectionStatus.status === "fallback" && (
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+            )}
+            {connectionStatus.status === "error" && (
+              <AlertCircle className="h-4 w-4 text-red-600" />
+            )}
+            <AlertDescription
+              className={`
+                  ${
+                    connectionStatus.status === "railway"
+                      ? "text-green-700"
+                      : ""
+                  }
+                  ${
+                    connectionStatus.status === "fallback"
+                      ? "text-orange-700"
+                      : ""
+                  }
+                  ${connectionStatus.status === "error" ? "text-red-700" : ""}
+                `}
+            >
+              <strong>FM Global Expert Status:</strong>{" "}
+              {connectionStatus.message}
+              {connectionStatus.status === "fallback" && (
+                <span className="block text-sm mt-1">
+                  {connectionStatus.message?.includes("PM RAG")
+                    ? "Using local database search with AI analysis for project management queries."
+                    : "Railway endpoint is not responding. Using OpenAI GPT-4 Turbo for FM Global expertise."}
+                </span>
+              )}
+            </AlertDescription>
           </div>
-        </header>
-        <div className="flex flex-col h-[calc(100vh-4rem)] p-4 pt-0 mx-[5%] sm:ml-6 sm:mr-6">
-          {/* Connection Status Alert */}
-          {connectionStatus.status !== 'checking' && (
-            <Alert className={`mb-4 ${connectionStatus.status === 'railway' ? 'border-green-500 bg-green-50' : ''}
-              ${connectionStatus.status === 'fallback' ? 'border-orange-500 bg-orange-50' : ''}
-              ${connectionStatus.status === 'error' ? 'border-red-500 bg-red-50' : ''}
-            `}>
-              <div className="flex items-center gap-2">
-                {connectionStatus.status === 'railway' && (
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                )}
-                {connectionStatus.status === 'fallback' && (
-                  <AlertCircle className="h-4 w-4 text-orange-600" />
-                )}
-                {connectionStatus.status === 'error' && (
-                  <AlertCircle className="h-4 w-4 text-red-600" />
-                )}
-                <AlertDescription className={`
-                  ${connectionStatus.status === 'railway' ? 'text-green-700' : ''}
-                  ${connectionStatus.status === 'fallback' ? 'text-orange-700' : ''}
-                  ${connectionStatus.status === 'error' ? 'text-red-700' : ''}
-                `}>
-                  <strong>FM Global Expert Status:</strong> {connectionStatus.message}
-                  {connectionStatus.status === 'fallback' && (
-                    <span className="block text-sm mt-1">
-                      {connectionStatus.message?.includes('PM RAG') 
-                        ? 'Using local database search with AI analysis for project management queries.'
-                        : 'Railway endpoint is not responding. Using OpenAI GPT-4 Turbo for FM Global expertise.'
-                      }
-                    </span>
-                  )}
-                </AlertDescription>
-              </div>
-            </Alert>
-          )}
-          
-          <div className="flex flex-col flex-1 bg-white overflow-hidden rounded-lg border">
+        </Alert>
+      )}
+
+      <div className="flex flex-col flex-1 bg-white overflow-hidden rounded-lg border">
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto">
           {messages.length === 0 ? (
@@ -421,9 +430,7 @@ export default function FMGlobalChat() {
                 {error && (
                   <div className="flex justify-center">
                     <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
-                      <p className="text-sm">
-                        Error: {error}
-                      </p>
+                      <p className="text-sm">Error: {error}</p>
                     </div>
                   </div>
                 )}
@@ -435,11 +442,11 @@ export default function FMGlobalChat() {
         </div>
 
         {/* Input Area - Fixed at bottom */}
-        <div className="border-t border-gray-200 bg-white flex-shrink-0">
+        <div className="rounded-lg m-8 border border-gray-200 bg-white flex-shrink-0">
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="flex items-center gap-2 px-8 py-4"
+            className="flex items-center gap-1 px-8 py-4"
           >
             <button
               type="button"
@@ -488,7 +495,7 @@ export default function FMGlobalChat() {
 
             <button
               type="submit"
-              disabled={isLoading || !input || input.trim() === ''}
+              disabled={isLoading || !input || input.trim() === ""}
               className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               aria-label="Send message"
             >
@@ -496,9 +503,7 @@ export default function FMGlobalChat() {
             </button>
           </form>
         </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+      </div>
+    </div>
   );
 }

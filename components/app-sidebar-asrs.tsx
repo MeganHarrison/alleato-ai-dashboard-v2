@@ -24,25 +24,25 @@ const data = {
       items: [
         {
           title: "1.1 Changes",
-          url: "/fm-global-8-34/changes",
-        },
-        {
-          title: "1.2 How to Use",
-          url: "/fm-global-8-34/how-to-use",
+          url: "/fm-global-pdf",
         },
       ],
     },
     {
       title: "1.0 Scope",
-      url: "/fm-global-8-34/scope",
+      url: "/fm-global-pdf/table-1",
       items: [
         {
           title: "1.1 Purpose",
-          url: "/fm-global-8-34/scope/purpose",
+          url: "/fm-global-pdf/table-2",
         },
         {
           title: "1.2 Application",
-          url: "/fm-global-8-34/scope/application",
+          url: "/fm-global-pdf/asrs-table2",
+        },
+        {
+          title: "3",
+          url: "/fm-global-pdf/3",
         },
       ],
     },
