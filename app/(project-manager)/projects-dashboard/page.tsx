@@ -597,8 +597,8 @@ export default function ProjectsPage() {
                   <option value="all">All Status</option>
                   {phases
                     .filter((p) => p !== "all")
-                    .map((phase) => (
-                      <option key={phase} value={phase}>
+                    .map((phase, index) => (
+                      <option key={`phase-${index}-${phase}`} value={phase}>
                         {phase}
                       </option>
                     ))}
@@ -612,8 +612,8 @@ export default function ProjectsPage() {
                   <option value="all">All Categories</option>
                   {categories
                     .filter((c) => c !== "all")
-                    .map((category) => (
-                      <option key={category} value={category}>
+                    .map((category, index) => (
+                      <option key={`category-${index}-${category}`} value={category}>
                         {category}
                       </option>
                     ))}

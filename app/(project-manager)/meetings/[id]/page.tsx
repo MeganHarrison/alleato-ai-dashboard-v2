@@ -291,7 +291,7 @@ export default function MeetingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+      <div className="max-w-none mx-auto px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-4 sm:py-6 lg:py-8 space-y-8">
         {/* Back Button */}
         <div className="flex items-center justify-between">
           <Button onClick={() => router.back()} variant="ghost" size="sm" className="text-sm text-muted-foreground hover:text-foreground">
@@ -384,15 +384,11 @@ export default function MeetingPage() {
 
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 lg:gap-12">
           {/* Left Column - Insights, Summary, Action Items */}
-          <div className="space-y-6">
-            <Tabs defaultValue="insights" className="space-y-4">
+          <div className="xl:col-span-2 space-y-6">
+            <Tabs defaultValue="summary" className="space-y-4">
               <TabsList className="bg-transparent border-0 shadow-none p-0 h-auto">
-                <TabsTrigger value="insights" className="data-[state=active]:bg-slate-100 data-[state=active]:shadow-none border-0 rounded-md px-4 py-2 flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4" />
-                  Insights
-                </TabsTrigger>
                 <TabsTrigger value="summary" className="data-[state=active]:bg-slate-100 data-[state=active]:shadow-none border-0 rounded-md px-4 py-2 flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   Summary
@@ -402,72 +398,6 @@ export default function MeetingPage() {
                   Actions
                 </TabsTrigger>
               </TabsList>
-
-              {/* Insights Tab */}
-              <TabsContent value="insights" className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-semibold">Meeting Insights</h3>
-                  {insights.length > 0 && (
-                    <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-1 rounded">
-                      {insights.length}
-                    </span>
-                  )}
-                </div>
-                {insightsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                    <span className="text-sm">Loading insights...</span>
-                  </div>
-                ) : insights.length > 0 ? (
-                  <div className="max-h-[calc(100vh-300px)] overflow-y-auto space-y-3">
-                    {insights.map((insight) => (
-                      <div key={insight.id} className="bg-slate-50 rounded-lg p-4 hover:bg-slate-100 transition-colors">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className={
-                            `text-xs px-2 py-1 rounded capitalize ${
-                              insight.severity === 'critical' 
-                                ? 'bg-red-100 text-red-700' 
-                                : insight.severity === 'high' 
-                                ? 'bg-orange-100 text-orange-700' 
-                                : 'bg-slate-200 text-slate-700'
-                            }`
-                          }>
-                            {insight.insight_type.replace('_', ' ')}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(insight.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </span>
-                        </div>
-                        <h4 className="font-medium text-sm mb-2 leading-tight">{insight.title}</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                          {insight.description}
-                        </p>
-                        {insight.confidence_score && (
-                          <div className="mt-3 pt-2">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-muted-foreground">Confidence</span>
-                              <span className="text-xs font-medium">
-                                {(insight.confidence_score * 100).toFixed(0)}%
-                              </span>
-                            </div>
-                            <div className="w-full bg-slate-200 rounded-full h-1">
-                              <div 
-                                className="bg-slate-500 h-1 rounded-full transition-all" 
-                                style={{ width: `${insight.confidence_score * 100}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center text-muted-foreground py-8">
-                    <Lightbulb className="h-8 w-8 mx-auto mb-2 opacity-40" />
-                    <p className="text-sm">No insights available</p>
-                  </div>
-                )}
-              </TabsContent>
 
               {/* Summary Tab */}
               <TabsContent value="summary" className="space-y-4">
@@ -535,6 +465,72 @@ export default function MeetingPage() {
               </TabsContent>
             </Tabs>
 
+            {/* Meeting Insights - Outside of tabs */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-semibold">Meeting Insights</h3>
+                {insights.length > 0 && (
+                  <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-1 rounded">
+                    {insights.length}
+                  </span>
+                )}
+              </div>
+              {insightsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  <span className="text-sm">Loading insights...</span>
+                </div>
+              ) : insights.length > 0 ? (
+                <div className="max-h-[calc(100vh-300px)] overflow-y-auto space-y-3">
+                  {insights.map((insight) => (
+                    <div key={insight.id} className="bg-slate-50 rounded-lg p-4 hover:bg-slate-100 transition-colors">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={
+                          `text-xs px-2 py-1 rounded capitalize ${
+                            insight.severity === 'critical' 
+                              ? 'bg-red-100 text-red-700' 
+                              : insight.severity === 'high' 
+                              ? 'bg-orange-100 text-orange-700' 
+                              : 'bg-slate-200 text-slate-700'
+                          }`
+                        }>
+                          {insight.insight_type.replace('_', ' ')}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(insight.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                      <h4 className="font-medium text-sm mb-2 leading-tight">{insight.title}</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {insight.description}
+                      </p>
+                      {insight.confidence_score && (
+                        <div className="mt-3 pt-2">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-muted-foreground">Confidence</span>
+                            <span className="text-xs font-medium">
+                              {(insight.confidence_score * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-200 rounded-full h-1">
+                            <div 
+                              className="bg-slate-500 h-1 rounded-full transition-all" 
+                              style={{ width: `${insight.confidence_score * 100}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  <Lightbulb className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                  <p className="text-sm">No insights available</p>
+                </div>
+              )}
+            </div>
+
             {/* Related Meetings Section */}
             {relatedMeetings.length > 0 && (
               <div className="space-y-4">
@@ -562,7 +558,7 @@ export default function MeetingPage() {
           </div>
 
           {/* Right Column - Transcript */}
-          <div className="space-y-4">
+          <div className="xl:col-span-3 space-y-4">
             <h3 className="text-base font-semibold">Conversation Transcript</h3>
             {transcriptLoading ? (
               <div className="flex items-center justify-center py-12">

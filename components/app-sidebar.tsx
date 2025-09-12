@@ -38,28 +38,35 @@ const data = {
           url: "/",
         },
         {
+          title: "Projects Dashboard",
+          url: "/projects-dashboard",
+        },
+        {
           title: "Meetings",
           url: "/meetings",
         },
+        
         {
+          title: "File Upload",
+          url: "/file-upload",
+        },
+      ],
+    },
+        {
+      title: "Admin",
+      url: "#",
+      items: [
+                {
           title: "FM Global Dashboard",
           url: "/fm-global-dashboard",
         },
         {
-          title: "Tables & Figures",
-          url: "/asrs-tables",
-        },
-        {
-          title: "FM-Global Form",
-          url: "/asrs-form",
+          title: "FM-Global Design",
+          url: "/asrs-requirements-calculator",
         },
         {
           title: "ASRS Form 3",
           url: "/asrs-form-3",
-        },
-        {
-          title: "File Upload",
-          url: "/file-upload",
         },
         {
           title: "FM Global Agent",
@@ -76,20 +83,6 @@ const data = {
         {
           title: "FM Global PDF",
           url: "/fm-global-pdf",
-        },
-      ],
-    },
-    {
-      title: "Projects",
-      url: "#",
-      items: [
-        {
-          title: "Project Insights",
-          url: "/insights",
-        },
-        {
-          title: "Projects Dashboard",
-          url: "/projects-dashboard",
         },
       ],
     },

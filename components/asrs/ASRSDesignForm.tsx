@@ -410,7 +410,9 @@ const ASRSDesignForm: React.FC = () => {
                 </div>
               </div>
               {index < steps.length - 1 && (
-                <div className="w-12 h-0.5 bg-gray-200 mx-6" />
+                <div className="flex items-center mx-6">
+                  <div className="w-12 h-0.5 bg-gray-200" />
+                </div>
               )}
             </div>
           ))}
