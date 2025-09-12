@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
     const text = formData.get("text") as string | null
     const title = formData.get("title") as string || "Manual Upload"
     const date = formData.get("date") as string || new Date().toISOString()
+    const metadataStr = formData.get("metadata") as string | null
     
     if (!file && !text) {
       return NextResponse.json(
@@ -21,26 +22,44 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const content = ""
-    const fileName = ""
+    let content = ""
+    let fileName = ""
     
     if (file) {
       // Read file content
       content = await file.text()
       fileName = file.name
+      // Use the file name as title if not provided
+      if (title === "Manual Upload") {
+        title = file.name
+      }
     } else if (text) {
       content = text
       fileName = `manual-upload-${Date.now()}.txt`
+    }
+    
+    // Parse metadata if provided
+    let parsedMetadata = {}
+    if (metadataStr) {
+      try {
+        parsedMetadata = JSON.parse(metadataStr)
+      } catch (e) {
+        console.warn("Failed to parse metadata:", e)
+      }
     }
     
     // Generate document ID
     const documentId = crypto.randomUUID()
     
     // Upload to Supabase Storage
-    const storagePath = `manual-uploads/${documentId}/${fileName}`
+    const storagePath = `documents/${documentId}/${fileName}`
+    
+    // Upload file bytes directly for binary files, or text content for text files
+    const uploadContent = file ? new Blob([await file.arrayBuffer()]) : content
+    
     const { error: uploadError } = await supabase.storage
       .from("documents")
-      .upload(storagePath, content, {
+      .upload(storagePath, uploadContent, {
         contentType: file?.type || "text/plain",
         upsert: true
       })
@@ -58,26 +77,26 @@ export async function POST(request: NextRequest) {
       .from("documents")
       .getPublicUrl(storagePath)
     
+    // Prepare metadata with source field
+    const fullMetadata = {
+      ...parsedMetadata,
+      original_filename: fileName,
+      upload_type: "manual",
+      uploaded_at: new Date().toISOString(),
+      storage_path: storagePath,
+      public_url: publicUrl,
+      source: "document", // Set source field in metadata
+      file_type: file?.type || "text/plain",
+      file_size: file?.size || content.length
+    }
+    
     // Save to documents table
     const { data: savedDoc, error: dbError } = await supabase
       .from("documents")
       .insert({
-        id: documentId,
-        title: title,
-        source: publicUrl,
         content: content,
-        document_type: "manual",
-        processing_status: "pending",
-        summary: null,  // Will be populated during processing
-        action_items: [],  // Will be populated during processing
-        bullet_points: [],  // Will be populated during processing
-        metadata: {
-          original_filename: fileName,
-          upload_type: "manual",
-          uploaded_at: new Date().toISOString()
-        },
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        document_type: "document", // Set as "document" type
+        metadata: fullMetadata
       })
       .select()
       .single()
@@ -88,7 +107,7 @@ export async function POST(request: NextRequest) {
       await supabase.storage.from("documents").remove([storagePath])
       
       return NextResponse.json(
-        { error: "Failed to save document to database" },
+        { error: { message: "Failed to save document to database" } },
         { status: 500 }
       )
     }
@@ -96,9 +115,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Document uploaded successfully",
-      documentId: savedDoc.id,
-      title: savedDoc.title,
-      status: savedDoc.processing_status
+      document: {
+        id: savedDoc.id,
+        content: savedDoc.content,
+        document_type: savedDoc.document_type,
+        metadata: savedDoc.metadata
+      }
     })
     
   } catch (error) {

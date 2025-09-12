@@ -23,13 +23,20 @@ type Document = Database["public"]["Tables"]["documents"]["Row"]
 type DocumentInsert = Database["public"]["Tables"]["documents"]["Insert"]
 type DocumentUpdate = Database["public"]["Tables"]["documents"]["Update"]
 
-export async function getDocuments() {
+export async function getDocuments(filterBySource?: string) {
   // Use service client to bypass RLS for development
   const supabase = createServiceClient()
   
-  const { data: documents, error } = await supabase
-    .from("documents")
-    .select("*")
+  let query = supabase.from("documents").select("*")
+  
+  // If filterBySource is provided, filter documents where metadata contains the source
+  if (filterBySource) {
+    // We need to filter by metadata->source = filterBySource
+    // Note: This requires proper indexing in the database for performance
+    query = query.filter('metadata->>source', 'eq', filterBySource)
+  }
+  
+  const { data: documents, error } = await query
 
   if (error) {
     console.error("Error fetching documents:", error)

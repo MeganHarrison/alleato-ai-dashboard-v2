@@ -26,15 +26,20 @@ import { createDocument } from "@/app/actions/documents-full-actions";
 import { toast } from "sonner";
 
 export function AddDocumentButton() {
-  const [open] = useState(false);
-  const [isLoading] = useState(false);
-  const [formData] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    content: "",
+    document_type: "text",
+    metadata: "",
+  });
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const metadata = null;
+      let metadata = null;
       if (formData.metadata) {
         try {
           metadata = JSON.parse(formData.metadata);
@@ -45,10 +50,16 @@ export function AddDocumentButton() {
         }
       }
 
+      // Add source field to metadata
+      const fullMetadata = {
+        ...metadata,
+        source: "document"
+      };
+
       const { data, error } = await createDocument({
         content: formData.content || null,
         document_type: formData.document_type || null,
-        metadata,
+        metadata: fullMetadata,
       });
 
       if (error) {

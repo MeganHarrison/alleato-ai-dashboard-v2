@@ -6,7 +6,8 @@ import { PageHeader } from "@/components/page-header";
 export const dynamic = "force-dynamic";
 
 export default async function DocumentsPage() {
-  const { documents, error } = await getDocuments();
+  // Filter to only show documents with source="document"
+  const { documents, error } = await getDocuments("document");
 
   return (
     <div className="space-y-4 p-2 sm:p-4 md:p-6 w-[95%] sm:w-full mx-auto">

@@ -79,7 +79,7 @@ export default function RagSystemUploadPage() {
     formData.append("metadata", JSON.stringify(metadata));
 
     try {
-      const response = await fetch("/api/rag/documents/upload", {
+      const response = await fetch("/api/documents/upload", {
         method: "POST",
         body: formData,
       });
@@ -90,43 +90,22 @@ export default function RagSystemUploadPage() {
         throw new Error(result.error?.message || "Upload failed");
       }
 
-      // Update status to processing
+      // Since we don't have vectorization endpoints yet, just mark as completed
+      // In the future, you can implement vectorization here
       setFiles((prev) =>
         prev.map((f, i) =>
           i === index
             ? {
                 ...f,
-                status: "processing",
-                progress: 60,
+                status: "completed",
+                progress: 100,
                 documentId: result.document.id,
               }
             : f
         )
       );
 
-      // Start vectorization
-      const vectorResponse = await fetch(
-        `/api/rag/vectorize/${result.document.id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            chunk_size: 1000,
-            chunk_overlap: 200,
-          }),
-        }
-      );
-
-      if (!vectorResponse.ok) {
-        throw new Error("Failed to start vectorization");
-      }
-
-      const vectorResult = await vectorResponse.json();
-
-      // Poll for completion
-      await pollVectorizationStatus(vectorResult.job_id, index);
+      toast.success(`Successfully uploaded ${fileData.file.name}`);
     } catch (error) {
       console.error("Upload error:", error);
       setFiles((prev) =>
@@ -144,63 +123,6 @@ export default function RagSystemUploadPage() {
     }
   };
 
-  const pollVectorizationStatus = async (jobId: string, fileIndex: number) => {
-    const maxAttempts = 60; // 60 seconds timeout
-    let attempts = 0;
-
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch(`/api/rag/vectorize/status/${jobId}`);
-        const status = await response.json();
-
-        setFiles((prev) =>
-          prev.map((f, i) =>
-            i === fileIndex
-              ? {
-                  ...f,
-                  progress: 60 + status.progress * 0.4,
-                }
-              : f
-          )
-        );
-
-        if (status.status === "completed") {
-          clearInterval(interval);
-          setFiles((prev) =>
-            prev.map((f, i) =>
-              i === fileIndex
-                ? {
-                    ...f,
-                    status: "completed",
-                    progress: 100,
-                  }
-                : f
-            )
-          );
-          toast.success(`Successfully processed ${files[fileIndex].file.name}`);
-        } else if (status.status === "failed" || attempts >= maxAttempts) {
-          clearInterval(interval);
-          setFiles((prev) =>
-            prev.map((f, i) =>
-              i === fileIndex
-                ? {
-                    ...f,
-                    status: "failed",
-                    error: status.error || "Processing timeout",
-                  }
-                : f
-            )
-          );
-          toast.error(`Failed to process ${files[fileIndex].file.name}`);
-        }
-
-        attempts++;
-      } catch (error) {
-        clearInterval(interval);
-        console.error("Polling error:", error);
-      }
-    }, 1000);
-  };
 
   const uploadAllFiles = async () => {
     setIsUploading(true);
