@@ -41,9 +41,7 @@ export async function updateSession(request: NextRequest) {
   // Check if user is authenticated
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/(pages)/auth') &&
     !request.nextUrl.pathname.startsWith('/api/auth') &&
     !request.nextUrl.pathname.startsWith('/api/health')
   ) {
