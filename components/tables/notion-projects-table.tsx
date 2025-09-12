@@ -23,11 +23,19 @@ interface NotionProjectsTableProps {
  * Table component to display Notion projects with proper formatting and styling
  */
 export function NotionProjectsTable({ projects }: NotionProjectsTableProps): ReactElement {
+  // Pre-compute timestamps for better performance
+  const projectsWithTimestamps = useMemo(() => 
+    projects.map(project => ({
+      ...project,
+      lastEditedTimestamp: new Date(project.lastEditedTime).getTime(),
+    })), [projects]
+  );
+
   const sortedProjects = useMemo(() => {
-    return [...projects].sort((a, b) => 
-      new Date(b.lastEditedTime).getTime() - new Date(a.lastEditedTime).getTime()
+    return [...projectsWithTimestamps].sort((a, b) => 
+      b.lastEditedTimestamp - a.lastEditedTimestamp
     );
-  }, [projects]);
+  }, [projectsWithTimestamps]);
 
   const getStatusBadgeVariant = (status: string | null): "default" | "secondary" | "destructive" | "outline" => {
     if (!status) return "outline";
@@ -150,7 +158,14 @@ export function NotionProjectsTable({ projects }: NotionProjectsTableProps): Rea
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => window.open(project.url, "_blank")}
+                  onClick={() => {
+                    if (project.url) {
+                      const newWindow = window.open(project.url, "_blank", "noopener,noreferrer");
+                      if (newWindow) {
+                        newWindow.opener = null;
+                      }
+                    }
+                  }}
                   className="h-8 w-8 p-0"
                 >
                   <ExternalLink className="h-4 w-4" />

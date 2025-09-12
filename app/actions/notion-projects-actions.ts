@@ -1,39 +1,73 @@
 "use server";
 
-import { getNotionProjects, type ProjectData } from "@/utils/notion/projects";
+import { getNotionProjects } from "@/utils/notion/projects";
+import { 
+  NotionEnvSchema, 
+  NotionProjectsResponseSchema,
+  type NotionProjectsResponse 
+} from "@/utils/notion/schemas";
 
-export interface NotionProjectsResponse {
-  projects: ProjectData[];
-  error?: string;
-}
+// Re-export type for backward compatibility
+export type { NotionProjectsResponse };
 
 /**
- * Server action to fetch Notion projects
- * Uses NOTION_DATABASE_ID from environment variables
+ * Server action to fetch Notion projects with comprehensive validation.
+ * 
+ * Validates environment variables and provides secure error handling.
+ * Uses NOTION_DATABASE_ID or NOTION_PROJECTS_DATABASE_ID from environment.
+ * 
+ * @returns Promise resolving to validated NotionProjectsResponse
  */
 export async function fetchNotionProjects(): Promise<NotionProjectsResponse> {
   try {
-    // Get database ID from environment variables
-    const databaseId = process.env.NOTION_DATABASE_ID || process.env.NOTION_PROJECTS_DATABASE_ID;
+    // Validate environment variables using Zod schema
+    const env = NotionEnvSchema.parse({
+      NOTION_TOKEN: process.env.NOTION_TOKEN,
+      NOTION_DATABASE_ID: process.env.NOTION_DATABASE_ID,
+      NOTION_PROJECTS_DATABASE_ID: process.env.NOTION_PROJECTS_DATABASE_ID,
+    });
+
+    // Get the appropriate database ID
+    const databaseId = env.NOTION_DATABASE_ID || env.NOTION_PROJECTS_DATABASE_ID;
     
     if (!databaseId) {
-      return {
+      return NotionProjectsResponseSchema.parse({
         projects: [],
-        error: "NOTION_DATABASE_ID or NOTION_PROJECTS_DATABASE_ID environment variable is not set. Please add it to your .env file.",
-      };
+        error: "Database ID configuration error. Please check your environment variables.",
+      });
     }
 
+    // Fetch and validate projects
     const projects = await getNotionProjects(databaseId);
     
-    return {
+    // Validate response structure
+    const response = NotionProjectsResponseSchema.parse({
       projects,
-    };
+    });
+    
+    return response;
   } catch (error) {
     console.error("Error in fetchNotionProjects:", error);
     
-    return {
+    // Provide safe, generic error messages for security
+    let userFriendlyMessage = "Unable to fetch Notion projects.";
+    
+    if (error instanceof Error) {
+      // Handle specific error types
+      if (error.name === "ZodError") {
+        userFriendlyMessage = "Configuration error. Please check environment variables.";
+      } else if (error.message.includes("NOTION_TOKEN")) {
+        userFriendlyMessage = "Authentication error. Please check NOTION_TOKEN.";
+      } else if (error.message.includes("database")) {
+        userFriendlyMessage = "Database configuration error. Please check NOTION_DATABASE_ID.";
+      } else if (error.message.includes("Invalid data format")) {
+        userFriendlyMessage = "Data validation error. Please check your Notion database structure.";
+      }
+    }
+    
+    return NotionProjectsResponseSchema.parse({
       projects: [],
-      error: error instanceof Error ? error.message : "Failed to fetch Notion projects",
-    };
+      error: userFriendlyMessage,
+    });
   }
 }
