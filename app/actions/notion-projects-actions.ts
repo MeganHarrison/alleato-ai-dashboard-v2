@@ -47,27 +47,13 @@ export async function fetchNotionProjects(): Promise<NotionProjectsResponse> {
     
     return response;
   } catch (error) {
+    // Log detailed error information server-side for debugging
     console.error("Error in fetchNotionProjects:", error);
     
-    // Provide safe, generic error messages for security
-    let userFriendlyMessage = "Unable to fetch Notion projects.";
-    
-    if (error instanceof Error) {
-      // Handle specific error types
-      if (error.name === "ZodError") {
-        userFriendlyMessage = "Configuration error. Please check environment variables.";
-      } else if (error.message.includes("NOTION_TOKEN")) {
-        userFriendlyMessage = "Authentication error. Please check NOTION_TOKEN.";
-      } else if (error.message.includes("database")) {
-        userFriendlyMessage = "Database configuration error. Please check NOTION_DATABASE_ID.";
-      } else if (error.message.includes("Invalid data format")) {
-        userFriendlyMessage = "Data validation error. Please check your Notion database structure.";
-      }
-    }
-    
+    // Return only generic error message to prevent information leakage
     return NotionProjectsResponseSchema.parse({
       projects: [],
-      error: userFriendlyMessage,
+      error: "Failed to fetch Notion projects. Please check your configuration.",
     });
   }
 }
