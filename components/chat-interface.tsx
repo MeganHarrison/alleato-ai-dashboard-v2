@@ -8,10 +8,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { LiquidMetal, PulsingBorder } from "@paper-design/shaders-react";
 import { motion } from "framer-motion";
 import { Brain, Folder, Link, Mic } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import Paper Shaders components to avoid SSR issues
+const LiquidMetal = dynamic(
+  () => import("@paper-design/shaders-react").then((mod) => ({ default: mod.LiquidMetal })),
+  { ssr: false }
+);
+
+const PulsingBorder = dynamic(
+  () => import("@paper-design/shaders-react").then((mod) => ({ default: mod.PulsingBorder })),
+  { ssr: false }
+);
 
 interface Message {
   id: string;
@@ -22,6 +33,12 @@ interface Message {
 
 export function ChatInterface() {
   const [isFocused] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-4xl relative">
@@ -50,45 +67,49 @@ export function ChatInterface() {
               <div className="h-[2px] w-[2px] bg-white rounded-full absolute top-5 left-9 blur-[0.8px]" />
               <div className="h-[2px] w-[2px] bg-white rounded-full absolute top-7 left-7  blur-[1px]" />
             </div>
-            <LiquidMetal
-              style={{
-                height: 80,
-                width: 80,
-                filter: "blur(14px)",
-                position: "absolute",
-              }}
-              colorBack="hsl(0, 0%, 0%, 0)"
-              colorTint="hsl(29, 77%, 49%)"
-              repetition={4}
-              softness={0.5}
-              shiftRed={0.3}
-              shiftBlue={0.3}
-              distortion={0.1}
-              contour={1}
-              shape="circle"
-              offsetX={0}
-              offsetY={0}
-              scale={0.58}
-              rotation={50}
-              speed={5}
-            />
-            <LiquidMetal
-              style={{ height: 80, width: 80 }}
-              colorBack="hsl(0, 0%, 0%, 0)"
-              colorTint="hsl(29, 77%, 49%)"
-              repetition={4}
-              softness={0.5}
-              shiftRed={0.3}
-              shiftBlue={0.3}
-              distortion={0.1}
-              contour={1}
-              shape="circle"
-              offsetX={0}
-              offsetY={0}
-              scale={0.58}
-              rotation={50}
-              speed={5}
-            />
+            {mounted && (
+              <>
+                <LiquidMetal
+                  style={{
+                    height: 80,
+                    width: 80,
+                    filter: "blur(14px)",
+                    position: "absolute",
+                  }}
+                  colorBack="hsl(0, 0%, 0%, 0)"
+                  colorTint="hsl(29, 77%, 49%)"
+                  repetition={4}
+                  softness={0.5}
+                  shiftRed={0.3}
+                  shiftBlue={0.3}
+                  distortion={0.1}
+                  contour={1}
+                  shape="circle"
+                  offsetX={0}
+                  offsetY={0}
+                  scale={0.58}
+                  rotation={50}
+                  speed={5}
+                />
+                <LiquidMetal
+                  style={{ height: 80, width: 80 }}
+                  colorBack="hsl(0, 0%, 0%, 0)"
+                  colorTint="hsl(29, 77%, 49%)"
+                  repetition={4}
+                  softness={0.5}
+                  shiftRed={0.3}
+                  shiftBlue={0.3}
+                  distortion={0.1}
+                  contour={1}
+                  shape="circle"
+                  offsetX={0}
+                  offsetY={0}
+                  scale={0.58}
+                  rotation={50}
+                  speed={5}
+                />
+              </>
+            )}
           </motion.div>
 
           {/* Greeting Text */}
@@ -119,32 +140,34 @@ export function ChatInterface() {
               duration: 0.8,
             }}
           >
-            <PulsingBorder
-              style={{ height: "146.5%", minWidth: "143%" }}
-              colorBack="hsl(0, 0%, 0%)"
-              roundness={0.18}
-              thickness={0}
-              softness={0}
-              intensity={0.3}
-              bloom={2}
-              spots={2}
-              spotSize={0.25}
-              pulse={0}
-              smoke={0.35}
-              smokeSize={0.4}
-              scale={0.7}
-              rotation={0}
-              offsetX={0}
-              offsetY={0}
-              speed={1}
-              colors={[
-                "hsl(29, 70%, 37%)",
-                "hsl(32, 100%, 83%)",
-                "hsl(4, 32%, 30%)",
-                "hsl(25, 60%, 50%)",
-                "hsl(0, 100%, 10%)",
-              ]}
-            />
+            {mounted && (
+              <PulsingBorder
+                style={{ height: "146.5%", minWidth: "143%" }}
+                colorBack="hsl(0, 0%, 0%)"
+                roundness={0.18}
+                thickness={0}
+                softness={0}
+                intensity={0.3}
+                bloom={2}
+                spots={2}
+                spotSize={0.25}
+                pulse={0}
+                smoke={0.35}
+                smokeSize={0.4}
+                scale={0.7}
+                rotation={0}
+                offsetX={0}
+                offsetY={0}
+                speed={1}
+                colors={[
+                  "hsl(29, 70%, 37%)",
+                  "hsl(32, 100%, 83%)",
+                  "hsl(4, 32%, 30%)",
+                  "hsl(25, 60%, 50%)",
+                  "hsl(0, 100%, 10%)",
+                ]}
+              />
+            )}
           </motion.div>
 
           <motion.div
