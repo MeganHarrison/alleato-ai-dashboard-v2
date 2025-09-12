@@ -26,14 +26,14 @@ test.describe('Complete Login Flow and Homepage Redirection', () => {
     await expect(page.getByText('Alleato Group')).toBeVisible();
     console.log('✓ Alleato Group branding visible');
     
-    // Check for login form title
-    await expect(page.getByText('Login to your account')).toBeVisible();
+    // Check for login form title (use more specific selector)
+    await expect(page.getByRole('heading', { name: 'Login to your account' })).toBeVisible();
     console.log('✓ Login form title visible');
     
     // Check for form elements
     const emailInput = page.locator('input[type="email"]');
     const passwordInput = page.locator('input[type="password"]');
-    const loginButton = page.getByRole('button', { name: /login/i });
+    const loginButton = page.getByRole('button', { name: 'Login', exact: true });
     
     await expect(emailInput).toBeVisible();
     await expect(passwordInput).toBeVisible();
