@@ -19,11 +19,24 @@ export default defineConfig({
   /* Limit workers to prevent multiple browser instances */
   workers: 1, // Limited to 1 worker to prevent multiple browser tabs
 
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  // CHANGED: keep html locally; use JUnit on CI so GH Actions can consume it
+  /* Global test timeout */
+  timeout: 60000,
+
+  /* Test file timeout */
+  globalTimeout: 300000,
+
+  /* Expect timeout for assertions */
+  expect: {
+    timeout: 10000,
+  },
+
+  /* Reporter to use - MINIMAL OUTPUT */
   reporter: process.env.CI
     ? [["junit", { outputFile: "playwright-junit.xml" }]]
-    : "html",
+    : [
+        ["list"], // Simple console output instead of HTML
+        ["html", { open: "never" }], // Generate HTML but don't auto-open
+      ],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -37,7 +50,7 @@ export default defineConfig({
     /* Take screenshot on failure */
     screenshot: "only-on-failure",
 
-    /* Run in headless mode to avoid browser popup */
+    /* ALWAYS run headless to prevent browser pop-ups */
     headless: true,
 
     /* Viewport size */
@@ -49,6 +62,25 @@ export default defineConfig({
     /* Reduce timeout for faster failures */
     navigationTimeout: 30000,
     actionTimeout: 10000,
+
+    /* Disable video recording to speed up tests */
+    video: "off",
+
+    /* Disable browser launcher arguments that might cause issues */
+    launchOptions: {
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox", 
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--no-first-run",
+        "--disable-default-browser-check",
+        "--disable-infobars",
+        "--disable-background-timer-throttling",
+        "--disable-backgrounding-occluded-windows",
+        "--disable-renderer-backgrounding"
+      ],
+    },
   },
 
   /* Configure projects for major browsers */

@@ -218,10 +218,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <CollapsibleContent>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {item.items.map((item) => (
-                      <SidebarMenuItem key={item.title}>
+                    {item.items.map((subItem) => (
+                      <SidebarMenuItem key={subItem.title}>
                         <SidebarMenuButton asChild>
-                          <a href={item.url}>{item.title}</a>
+                          <a href={subItem.url}>{subItem.title}</a>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}

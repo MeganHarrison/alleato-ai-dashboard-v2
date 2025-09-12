@@ -72,7 +72,7 @@ export default function FMGlobalChat() {
           message: "Using OpenAI fallback",
         });
       }
-    } catch (error) {
+    } catch {
       setConnectionStatus({
         status: "error",
         message: "Connection check failed - using basic AI",
@@ -146,7 +146,7 @@ export default function FMGlobalChat() {
           setMessages((prev) => [...prev, newAssistantMessage]);
           return;
         }
-      } catch (fmError) {
+      } catch {
         console.log("FM Global API failed, trying PM RAG fallback...");
       }
 

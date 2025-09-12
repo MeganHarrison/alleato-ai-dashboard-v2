@@ -16,8 +16,8 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Loader2, CheckCircle, AlertTriangle, FileText, Calculator, 
-  Building2, Mail, Phone, MapPin, Calendar, DollarSign,
-  Download, Send, Star, Target
+  Building2, Mail, Phone,
+  Download, Send, Target
 } from 'lucide-react';
 
 interface LeadData {
@@ -100,7 +100,7 @@ export default function ASRSLeadGenerationSystem() {
   const [leadScore, setLeadScore] = useState(0);
   const [quoteGenerated, setQuoteGenerated] = useState(false);
 
-  const updateLeadData = (field: keyof LeadData, value: any) => {
+  const updateLeadData = (field: keyof LeadData, value: string | number | undefined) => {
     setLeadData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -120,8 +120,8 @@ export default function ASRSLeadGenerationSystem() {
     else if (data.projectTimeline === '3-6 months') score += 15;
     
     // System complexity (more sprinklers = higher value)
-    if (reqs?.specifications.sprinklerCount > 6) score += 15;
-    else if (reqs?.specifications.sprinklerCount > 4) score += 10;
+    if (reqs?.specifications?.sprinklerCount && reqs.specifications.sprinklerCount > 6) score += 15;
+    else if (reqs?.specifications?.sprinklerCount && reqs.specifications.sprinklerCount > 4) score += 10;
     
     // Contact quality
     if (data.email.includes('@') && data.phone) score += 10;
@@ -182,7 +182,12 @@ export default function ASRSLeadGenerationSystem() {
     }
   };
 
-  const submitLead = async (fullLeadData: any) => {
+  const submitLead = async (fullLeadData: LeadData & { 
+    requirements: ASRSRequirements; 
+    leadScore: number; 
+    estimatedSprinklerCost: number; 
+    submittedAt: string; 
+  }) => {
     try {
       const response = await fetch('/api/leads/submit', {
         method: 'POST',

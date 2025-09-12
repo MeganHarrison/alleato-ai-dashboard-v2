@@ -3,20 +3,17 @@ import type { NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export function middleware(request: NextRequest) {
-  // Only allow access without authentication for auth-related pages
+  // Only allow access without authentication for auth-related pages and essential API endpoints
   const publicPaths = [
-    '/login',
     '/auth/login',
-    '/auth/signup',
+    '/auth/sign-up',
     '/auth/forgot-password',
-    '/auth/reset-password',
-    '/auth/verify-email',
-    '/auth/callback',
+    '/auth/update-password',
+    '/auth/sign-up-success',
+    '/auth/error',
+    '/auth/confirm',
     '/api/auth',
     '/api/health',  // Health check endpoint for deployment validation
-    '/',  // Temporarily allow public access for testing
-    '/meetings',  // Temporarily allow public access for testing
-    '/rag-admin',  // Temporarily allow public access for testing
   ]
   
   const pathname = request.nextUrl.pathname

@@ -50,8 +50,8 @@ export const upsertMessage = async ({
 
   // Insert new parts
   if (message.parts && message.parts.length > 0) {
-    const partsToInsert = message.parts.map((part: UIMessagePart, index: number) => {
-      const base: unknown = {
+    const partsToInsert = message.parts.map((part: any, index: number) => {
+      const base: any = {
         id: generateId(),
         messageId: id,
         type: part.type,
@@ -60,27 +60,27 @@ export const upsertMessage = async ({
 
       switch (part.type) {
         case 'text':
-          base.text_text = (part as any).text;
+          base.text_text = part.text;
           break;
         case 'reasoning':
-          base.reasoning_text = (part as any).text;
+          base.reasoning_text = part.text;
           break;
         case 'file': {
-          const p: unknown = part;
+          const p = part;
           base.file_mediaType = p.mediaType;
           base.file_filename = p.filename ?? null;
           base.file_url = p.url;
           break;
         }
         case 'source_url': {
-          const p: unknown = part;
+          const p: any = part;
           base.source_url_sourceId = p.sourceId;
           base.source_url_url = p.url;
           base.source_url_title = p.title ?? null;
           break;
         }
         case 'source_document': {
-          const p: unknown = part;
+          const p: any = part;
           base.source_document_sourceId = p.sourceId;
           base.source_document_mediaType = p.mediaType;
           base.source_document_title = p.title;
@@ -88,7 +88,7 @@ export const upsertMessage = async ({
           break;
         }
         case 'tool-getWeatherInformation': {
-          const p: unknown = part;
+          const p: any = part;
           base.tool_toolCallId = p.toolCallId;
           base.tool_state = p.state;
           base.tool_errorText = p.errorText ?? null;
@@ -97,7 +97,7 @@ export const upsertMessage = async ({
           break;
         }
         case 'tool-getLocation': {
-          const p: unknown = part;
+          const p: any = part;
           base.tool_toolCallId = p.toolCallId;
           base.tool_state = p.state;
           base.tool_errorText = p.errorText ?? null;

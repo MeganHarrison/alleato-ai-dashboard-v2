@@ -1,11 +1,7 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
-import {
-  ChevronRightIcon,
-  ArrowDownTrayIcon,
-  CheckIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, CheckIcon } from "@heroicons/react/24/outline";
+import React, { useCallback, useState } from "react";
 
 // Types
 interface FormData {
@@ -95,11 +91,10 @@ interface Results {
 }
 
 const ASRSDesignForm: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
   const [hasResults, setHasResults] = useState(false);
   const steps: Step[] = [
-    { title: "Project Info", description: "Basic project details" },
     { title: "ASRS Config", description: "System configuration" },
     { title: "Containers", description: "Container & commodity" },
     { title: "Requirements", description: "System requirements" },
@@ -218,9 +213,12 @@ const ASRSDesignForm: React.FC = () => {
     { value: "high_value_items", name: "High-Value Items" },
   ];
 
-  const updateFormData = useCallback((field: keyof FormData, value: unknown) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }, []);
+  const updateFormData = useCallback(
+    (field: keyof FormData, value: unknown) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
 
   const toggleSpecialHazard = useCallback((hazard: string) => {
     setFormData((prev) => ({
@@ -233,21 +231,15 @@ const ASRSDesignForm: React.FC = () => {
 
   const canProceed = useCallback((): boolean => {
     switch (currentStep) {
-      case 0: // Project Info
-        return !!(
-          formData.project_name &&
-          formData.company_name &&
-          formData.contact_email
-        );
-      case 1: // ASRS Config
+      case 0: // ASRS Config
         return !!(
           formData.asrs_type &&
           formData.storage_height_ft &&
           formData.ceiling_height_ft
         );
-      case 2: // Containers
+      case 1: // Containers
         return !!(formData.container_type && formData.commodity_class);
-      case 3: // Requirements
+      case 2: // Requirements
         return !!formData.system_type;
       default:
         return true;
@@ -342,7 +334,7 @@ const ASRSDesignForm: React.FC = () => {
   );
 
   const nextStep = useCallback(async () => {
-    if (currentStep === 3) {
+    if (currentStep === 2) {
       await calculateRequirements();
     }
     if (currentStep < steps.length - 1) {
@@ -390,9 +382,9 @@ const ASRSDesignForm: React.FC = () => {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
                     currentStep === index
-                      ? "bg-brand-500 text-white"
+                      ? "bg-brand-500 text-brand"
                       : currentStep > index
-                      ? "bg-green-600 text-white"
+                      ? "bg-brand-200 text-brand-700"
                       : "bg-gray-200 text-gray-600"
                   }`}
                 >
@@ -420,87 +412,9 @@ const ASRSDesignForm: React.FC = () => {
 
         {/* Form Container */}
         <div className="bg-gray-50 rounded-lg p-8">
-          {/* Step 1: ASRS Configuration - Shows ASRS Config Fields */}
-          {currentStep === 0 && (
-            <div className="animate-in fade-in duration-500">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                ASRS System Configuration
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.project_name}
-                    onChange={(e) =>
-                      updateFormData("project_name", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    placeholder="e.g., Warehouse Expansion Phase 2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Company Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.company_name}
-                    onChange={(e) =>
-                      updateFormData("company_name", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    placeholder="Your company name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Contact Email *
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.contact_email}
-                    onChange={(e) =>
-                      updateFormData("contact_email", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    placeholder="your.email@company.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Location
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => updateFormData("location", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    placeholder="City, State"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Description
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      updateFormData("description", e.target.value)
-                    }
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    placeholder="Brief description of your ASRS warehouse project..."
-                  />
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* Step 2: Container & Commodity - Shows Container Fields */}
-          {currentStep === 1 && (
+          {/* Step 1: ASRS Configuration */}
+          {currentStep === 0 && (
             <div className="animate-in fade-in duration-500">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 ASRS System Configuration
@@ -656,8 +570,8 @@ const ASRSDesignForm: React.FC = () => {
             </div>
           )}
 
-          {/* Step 3: System Requirements - Shows System Fields */}
-          {currentStep === 2 && (
+          {/* Step 2: Container & Commodity */}
+          {currentStep === 1 && (
             <div className="animate-in fade-in duration-500">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Container & Commodity Information
@@ -804,8 +718,8 @@ const ASRSDesignForm: React.FC = () => {
             </div>
           )}
 
-          {/* Step 4: Project Information - Shows Project Fields */}
-          {currentStep === 3 && (
+          {/* Step 3: System Requirements */}
+          {currentStep === 2 && (
             <div className="animate-in fade-in duration-500">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 System Requirements
@@ -968,8 +882,8 @@ const ASRSDesignForm: React.FC = () => {
             </div>
           )}
 
-          {/* Step 5: Results & Recommendations */}
-          {currentStep === 4 && (
+          {/* Step 4: Results & Recommendations */}
+          {currentStep === 3 && (
             <div className="animate-in fade-in duration-500">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Design Requirements & Recommendations

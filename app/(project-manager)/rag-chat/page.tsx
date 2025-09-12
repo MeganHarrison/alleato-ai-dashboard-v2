@@ -68,7 +68,7 @@ export default function RAGChatPage(): ReactElement {
           error: data.error || 'Service unavailable',
         });
       }
-    } catch (error) {
+    } catch {
       setHealthStatus({
         status: 'unhealthy',
         error: 'Failed to check service status',

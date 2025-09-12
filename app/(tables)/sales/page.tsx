@@ -1,4 +1,3 @@
-import { getTableData } from "@/app/actions/ai-actions";
 import { DataTable } from "@/components/tables/database-table";
 import { PageHeader } from "@/components/page-header";
 

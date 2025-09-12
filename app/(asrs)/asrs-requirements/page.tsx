@@ -95,7 +95,7 @@ const ASRSRequirementsForm: React.FC = () => {
   // Cost optimization logic
   useEffect(() => {
     const newRecommendations: string[] = [];
-    const savings = 0;
+    let savings = 0;
 
     // Open-top to closed-top analysis
     if (
@@ -157,7 +157,7 @@ const ASRSRequirementsForm: React.FC = () => {
     setFormData((prev) => ({
       ...prev,
       [parent]: {
-        ...((prev[parent as keyof FormData] as Record<string, any>) || {}),
+        ...((prev[parent as keyof FormData] as Record<string, unknown>) || {}),
         [field]: value,
       },
     }));

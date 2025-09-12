@@ -52,14 +52,14 @@ export default async function InsightsPage() {
   const insights = allInsights?.map(insight => {
     // Parse description if it's a JSON string
     let parsedDescription = insight.description;
-    let metadata: any = {};
+    let metadata: Record<string, unknown> = {};
     
     if (typeof insight.description === 'string' && insight.description.startsWith('{')) {
       try {
         const parsed = JSON.parse(insight.description);
         parsedDescription = parsed.item || parsed.description || parsed.content || insight.description;
         metadata = parsed;
-      } catch (e) {
+      } catch {
         // Keep original if parsing fails
         parsedDescription = insight.description;
       }

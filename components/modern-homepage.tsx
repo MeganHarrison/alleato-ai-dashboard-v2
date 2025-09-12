@@ -64,6 +64,7 @@ export function ModernHomepage() {
   const [showOnlyActive, setShowOnlyActive] = useState(true);
   const [meetingsLoading, setMeetingsLoading] = useState(true);
   const [insightsLoading, setInsightsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'today' | 'yesterday' | 'thisWeek'>('today');
 
   useEffect(() => {
     fetchData();
@@ -100,15 +101,11 @@ export function ModernHomepage() {
         .order('date', { ascending: false })
         .limit(8);
 
-      // Fetch insights - using document_id field for join
+      // Fetch insights with project information
       const { data: insightData } = await supabase
         .from('ai_insights')
         .select(`
           id, title, insight_type, severity, created_at, project_id,
-          documents:document_id(
-            id, title,
-            projects(id, name)
-          ),
           projects:project_id(id, name)
         `)
         .order('created_at', { ascending: false })
@@ -167,22 +164,33 @@ export function ModernHomepage() {
     return groups;
   }, [meetings]);
 
-  // Group insights by project
-  const insightsByProject = useMemo(() => {
-    const grouped = {} as Record<string, any[]>;
+  // Group insights by time periods (same as meetings)
+  const groupedInsights = useMemo(() => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const groups = {
+      today: [] as any[],
+      yesterday: [] as any[],
+      thisWeek: [] as any[]
+    };
     
     insights.forEach(insight => {
-      // Try to get project name from documents relation or direct project relation
-      const projectName = insight.documents?.projects?.name || 
-                         insight.projects?.name || 
-                         'Unknown Project';
-      if (!grouped[projectName]) {
-        grouped[projectName] = [];
+      const insightDate = new Date(insight.created_at);
+      const insightDay = new Date(insightDate.getFullYear(), insightDate.getMonth(), insightDate.getDate());
+      
+      if (insightDay.getTime() === today.getTime()) {
+        groups.today.push(insight);
+      } else if (insightDay.getTime() === yesterday.getTime()) {
+        groups.yesterday.push(insight);
+      } else if (insightDay >= weekAgo) {
+        groups.thisWeek.push(insight);
       }
-      grouped[projectName].push(insight);
     });
     
-    return grouped;
+    return groups;
   }, [insights]);
 
   if (loading) {
@@ -305,7 +313,7 @@ export function ModernHomepage() {
               RECENT MEETINGS
             </h2>
             
-            {meetingsLoading ? (
+{meetingsLoading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map(i => (
                   <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
@@ -313,95 +321,138 @@ export function ModernHomepage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Today */}
-                {groupedMeetings.today.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Today</h3>
-                    <div className="space-y-1">
-                      {groupedMeetings.today.map((meeting) => (
-                        <Link
-                          key={meeting.id}
-                          href={`/meetings/${meeting.id}`}
-                          className="block p-3 hover:bg-gray-50 rounded-lg transition-all duration-150 group"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate group-hover:text-brand-600 transition-colors">
-                                {meeting.title || 'Untitled Meeting'}
-                              </p>
-                              {meeting.projects?.name && (
-                                <p className="text-xs text-gray-500 mt-0.5">{meeting.projects.name}</p>
-                              )}
-                            </div>
-                            <div className="text-xs text-gray-500 font-medium ml-3">
-                              {format(new Date(meeting.date), 'h:mm a')}
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {/* Clean Tabs */}
+                <div className="flex border-b border-gray-200">
+                  <button
+                    onClick={() => setActiveTab('today')}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === 'today' 
+                        ? 'border-brand-500 text-brand-600' 
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    Today ({groupedMeetings.today.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('yesterday')}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === 'yesterday' 
+                        ? 'border-brand-500 text-brand-600' 
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    Yesterday ({groupedMeetings.yesterday.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('thisWeek')}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === 'thisWeek' 
+                        ? 'border-brand-500 text-brand-600' 
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    This Week ({groupedMeetings.thisWeek.length})
+                  </button>
+                </div>
 
-                {/* Yesterday */}
-                {groupedMeetings.yesterday.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Yesterday</h3>
+                {/* Tab Content */}
+                <div className="min-h-[200px]">
+                  {activeTab === 'today' && (
                     <div className="space-y-1">
-                      {groupedMeetings.yesterday.map((meeting) => (
-                        <Link
-                          key={meeting.id}
-                          href={`/meetings/${meeting.id}`}
-                          className="block p-3 hover:bg-gray-50 rounded-lg transition-all duration-150 group"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate group-hover:text-brand-600 transition-colors">
-                                {meeting.title || 'Untitled Meeting'}
-                              </p>
-                              {meeting.projects?.name && (
-                                <p className="text-xs text-gray-500 mt-0.5">{meeting.projects.name}</p>
-                              )}
+                      {groupedMeetings.today.length > 0 ? (
+                        groupedMeetings.today.map((meeting) => (
+                          <Link
+                            key={meeting.id}
+                            href={`/meetings/${meeting.id}`}
+                            className="block p-3 hover:bg-gray-50 rounded-lg transition-all duration-150 group"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-brand-600 transition-colors">
+                                  {meeting.title || 'Untitled Meeting'}
+                                </p>
+                                {meeting.projects?.name && (
+                                  <p className="text-xs text-gray-500 mt-0.5">{meeting.projects.name}</p>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500 font-medium ml-3">
+                                {format(new Date(meeting.date), 'h:mm a')}
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500 font-medium ml-3">
-                              {format(new Date(meeting.date), 'h:mm a')}
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <p className="text-sm">No meetings today</p>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* This Week */}
-                {groupedMeetings.thisWeek.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">This Week</h3>
+                  {activeTab === 'yesterday' && (
                     <div className="space-y-1">
-                      {groupedMeetings.thisWeek.slice(0, 3).map((meeting) => (
-                        <Link
-                          key={meeting.id}
-                          href={`/meetings/${meeting.id}`}
-                          className="block p-3 hover:bg-gray-50 rounded-lg transition-all duration-150 group"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate group-hover:text-brand-600 transition-colors">
-                                {meeting.title || 'Untitled Meeting'}
-                              </p>
-                              {meeting.projects?.name && (
-                                <p className="text-xs text-gray-500 mt-0.5">{meeting.projects.name}</p>
-                              )}
+                      {groupedMeetings.yesterday.length > 0 ? (
+                        groupedMeetings.yesterday.map((meeting) => (
+                          <Link
+                            key={meeting.id}
+                            href={`/meetings/${meeting.id}`}
+                            className="block p-3 hover:bg-gray-50 rounded-lg transition-all duration-150 group"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-brand-600 transition-colors">
+                                  {meeting.title || 'Untitled Meeting'}
+                                </p>
+                                {meeting.projects?.name && (
+                                  <p className="text-xs text-gray-500 mt-0.5">{meeting.projects.name}</p>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500 font-medium ml-3">
+                                {format(new Date(meeting.date), 'h:mm a')}
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500 font-medium ml-3">
-                              {format(new Date(meeting.date), 'MMM d')}
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <p className="text-sm">No meetings yesterday</p>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {activeTab === 'thisWeek' && (
+                    <div className="space-y-1">
+                      {groupedMeetings.thisWeek.length > 0 ? (
+                        groupedMeetings.thisWeek.map((meeting) => (
+                          <Link
+                            key={meeting.id}
+                            href={`/meetings/${meeting.id}`}
+                            className="block p-3 hover:bg-gray-50 rounded-lg transition-all duration-150 group"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-brand-600 transition-colors">
+                                  {meeting.title || 'Untitled Meeting'}
+                                </p>
+                                {meeting.projects?.name && (
+                                  <p className="text-xs text-gray-500 mt-0.5">{meeting.projects.name}</p>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500 font-medium ml-3">
+                                {format(new Date(meeting.date), 'MMM d')}
+                              </div>
+                            </div>
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <p className="text-sm">No meetings this week</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {meetings.length > 0 && (
                   <Link 
@@ -434,12 +485,13 @@ export function ModernHomepage() {
                 ))}
               </div>
             ) : (
-              <div className="space-y-6">
-                {Object.entries(insightsByProject).slice(0, 2).map(([projectName, projectInsights]) => (
-                  <div key={projectName}>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">{projectName}</h3>
-                    <div className="space-y-2">
-                      {projectInsights.slice(0, 2).map((insight) => (
+              <div className="space-y-4">
+                {/* Today */}
+                {groupedInsights.today.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Today</h3>
+                    <div className="space-y-1">
+                      {groupedInsights.today.map((insight) => (
                         <div
                           key={insight.id}
                           className="p-3 bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
@@ -460,14 +512,82 @@ export function ModernHomepage() {
                             </span>
                           </div>
                           <p className="text-xs text-gray-500 capitalize">
-                            {insight.insight_type.replace('_', ' ')} • {format(new Date(insight.created_at), 'MMM d')}
+                            {insight.insight_type?.replace('_', ' ')} • {insight.projects?.name || 'Unknown Project'} • {format(new Date(insight.created_at), 'h:mm a')}
                           </p>
                         </div>
                       ))}
                     </div>
                   </div>
-                ))}
-                
+                )}
+
+                {/* Yesterday */}
+                {groupedInsights.yesterday.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Yesterday</h3>
+                    <div className="space-y-1">
+                      {groupedInsights.yesterday.map((insight) => (
+                        <div
+                          key={insight.id}
+                          className="p-3 bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <p className="text-sm font-medium text-gray-900 leading-snug pr-2">
+                              {insight.title}
+                            </p>
+                            <span className={cn(
+                              "text-xs px-2 py-1 rounded-full font-medium flex-shrink-0",
+                              insight.severity === 'high' 
+                                ? 'bg-red-100 text-red-700'
+                                : insight.severity === 'medium'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-green-100 text-green-700'
+                            )}>
+                              {insight.severity}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 capitalize">
+                            {insight.insight_type?.replace('_', ' ')} • {insight.projects?.name || 'Unknown Project'} • {format(new Date(insight.created_at), 'h:mm a')}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* This Week */}
+                {groupedInsights.thisWeek.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">This Week</h3>
+                    <div className="space-y-1">
+                      {groupedInsights.thisWeek.slice(0, 3).map((insight) => (
+                        <div
+                          key={insight.id}
+                          className="p-3 bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-150"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <p className="text-sm font-medium text-gray-900 leading-snug pr-2">
+                              {insight.title}
+                            </p>
+                            <span className={cn(
+                              "text-xs px-2 py-1 rounded-full font-medium flex-shrink-0",
+                              insight.severity === 'high' 
+                                ? 'bg-red-100 text-red-700'
+                                : insight.severity === 'medium'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-green-100 text-green-700'
+                            )}>
+                              {insight.severity}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 capitalize">
+                            {insight.insight_type?.replace('_', ' ')} • {insight.projects?.name || 'Unknown Project'} • {format(new Date(insight.created_at), 'MMM d')}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {insights.length === 0 && !insightsLoading && (
                   <div className="text-center py-8 text-gray-500">
                     <p className="text-sm">No recent insights available</p>

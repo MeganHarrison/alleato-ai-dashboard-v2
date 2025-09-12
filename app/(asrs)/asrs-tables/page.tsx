@@ -3,7 +3,6 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -158,8 +157,8 @@ export default function FMGlobalTablesPage() {
   }, []);
 
   // Get unique ASRS types and protection schemes for filters
-  const asrsTypes = Array.from(new Set(tables.map((t) => t.asrs_type).filter(Boolean))).sort();
-  const protectionSchemes = Array.from(new Set(tables.map((t) => t.protection_scheme).filter(Boolean))).sort();
+  const asrsTypes = Array.from(new Set(tables.map((t) => t.asrs_type).filter((type): type is string => Boolean(type)))).sort();
+  const protectionSchemes = Array.from(new Set(tables.map((t) => t.protection_scheme).filter((scheme): scheme is string => Boolean(scheme)))).sort();
 
   const filteredFigures = figures.filter(
     (figure) =>

@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  // REMOVED: Stop ignoring errors - this was masking real issues!
+  // eslint: { ignoreDuringBuilds: true },
+  // typescript: { ignoreBuildErrors: true },
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -15,9 +12,11 @@ const nextConfig = {
       },
     ],
   },
-  // Minimal experimental features to reduce conflicts
+  // Stability-focused experimental features
   experimental: {
-    // Disable turbo for now to avoid potential issues
+    // Enable better error reporting
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    // Note: turbo disabled by not including it (Next.js 15.0.3 issue)
   },
   // Force dynamic rendering for all pages
   output: 'standalone',
@@ -34,7 +33,43 @@ const nextConfig = {
   transpilePackages: [
     '@tanstack/react-table',
     '@tanstack/table-core',
+    '@ai-sdk/react',
+    '@supabase/ssr',
   ],
+
+  // Webpack optimization to prevent memory issues
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      // Optimize bundle splitting
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+            chunks: 'all',
+          },
+        },
+      };
+    }
+
+    // Prevent memory leaks in development
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+        ignored: /node_modules/,
+      };
+    }
+
+    return config;
+  },
 
   // Add redirects for deleted routes
   async redirects() {

@@ -5,7 +5,6 @@ import { getProjectInsights } from "@/lib/actions/project-documents-actions";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/types/database.types";
 import { createServerClient } from "@supabase/ssr";
-import { AlertCircle, CheckCircle2, XCircle } from "lucide-react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { DocumentsTable } from "./DocumentsTable";
@@ -13,21 +12,6 @@ import { InsightsSection } from "./InsightsSection";
 
 export const dynamic = "force-dynamic";
 
-interface Insight {
-  type: "risk" | "action_item" | "decision" | "question" | "highlight";
-  status?: "pending" | "completed";
-  insight_id?: string;
-  title?: string;
-  description?: string;
-  category?: string;
-  priority?: string;
-  action_required?: boolean;
-  content?: string;
-  meeting_title?: string;
-  meeting_date?: string;
-  assigned_to?: string;
-  [key: string]: unknown;
-}
 
 async function getProjectDetails(id: string) {
   const cookieStore = await cookies();
@@ -123,22 +107,6 @@ export default async function ProjectDetailPage({
 
   // Calculate insight summary from meeting insights
   const safeInsights = meetingInsights || [];
-  const insightStats = {
-    total: safeInsights.length + projectInsights.length + aiInsights.length,
-    risks:
-      safeInsights.filter((i: Insight) => i.type === "risk").length +
-      aiInsights.filter((i) => i.insight_type === "risk").length,
-    actions: safeInsights.filter((i: Insight) => i.type === "action_item")
-      .length,
-    decisions: safeInsights.filter((i: Insight) => i.type === "decision")
-      .length,
-    pendingActions: safeInsights.filter(
-      (i: Insight) =>
-        i.type === "action_item" && (!i.status || i.status === "pending")
-    ).length,
-    projectInsights: projectInsights.length,
-    aiInsights: aiInsights.length,
-  };
 
   const formatCurrency = (amount: number | null) => {
     if (!amount) return "—";
@@ -177,19 +145,6 @@ export default async function ProjectDetailPage({
     return "bg-gray-100 text-gray-700";
   };
 
-  const getStatusIcon = (status: string) => {
-    if (status === "completed")
-      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-    if (status === "in-progress")
-      return <AlertCircle className="h-4 w-4 text-blue-500" />;
-    return <XCircle className="h-4 w-4 text-gray-400" />;
-  };
-
-  const getRiskColor = (level: string) => {
-    if (level === "high") return "text-red-600 bg-red-50";
-    if (level === "medium") return "text-yellow-600 bg-yellow-50";
-    return "text-green-600 bg-green-50";
-  };
 
   return (
     <div className="min-h-screen px-8 lg:px-12 py-6">

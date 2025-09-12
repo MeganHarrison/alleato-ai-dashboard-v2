@@ -1,12 +1,6 @@
 // RAG System Layout Component
 
-import {
-  BarChart3,
-  FileText,
-  MessageSquare,
-  Settings,
-  Upload,
-} from "lucide-react";
+import { BarChart3, FileText, Settings, Upload } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -41,13 +35,6 @@ export default function RagSystemLayout({
                 >
                   <FileText className="h-4 w-4" />
                   <span>Documents</span>
-                </Link>
-                <Link
-                  href="/file-upload/chat"
-                  className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  <span>Chat</span>
                 </Link>
                 <Link
                   href="/file-upload/stats"

@@ -72,7 +72,7 @@ export async function askAI(question: string, history: Message[]) {
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
-      messages: messages as any,
+      messages: messages as OpenAI.ChatCompletionMessageParam[],
       temperature: 0.7,
       max_tokens: 500,
     })
@@ -85,8 +85,6 @@ export async function askAI(question: string, history: Message[]) {
 }
 
 export async function getProductsData() {
-  const supabase = await createClient()
-
   try {
     // Temporarily disabled due to missing products table
     const data: unknown[] = [];
@@ -103,8 +101,6 @@ export async function getProductsData() {
 }
 
 export async function getProductById(id: number) {
-  const supabase = await createClient()
-
   try {
     // Temporarily disabled due to missing products table
     const data: unknown = null;

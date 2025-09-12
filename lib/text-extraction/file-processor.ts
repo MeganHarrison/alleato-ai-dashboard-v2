@@ -29,7 +29,7 @@ export class FileTextExtractor {
     };
 
     try {
-      const content = '';
+      let content = '';
 
       switch (file.type) {
         case 'text/plain':
@@ -177,7 +177,7 @@ export class FileTextExtractor {
     if (preserveStructure) {
       // Try to split on paragraph boundaries first
       const paragraphs = text.split(/\n\s*\n/);
-      const currentChunk = '';
+      let currentChunk = '';
       
       for (const paragraph of paragraphs) {
         if ((currentChunk + paragraph).length <= maxChunkSize) {
@@ -190,7 +190,7 @@ export class FileTextExtractor {
           if (paragraph.length > maxChunkSize) {
             // Split long paragraphs at sentence boundaries
             const sentences = paragraph.split(/[.!?]+\s+/);
-            const sentenceChunk = '';
+            let sentenceChunk = '';
             
             for (const sentence of sentences) {
               if ((sentenceChunk + sentence).length <= maxChunkSize) {
@@ -216,7 +216,7 @@ export class FileTextExtractor {
       }
     } else {
       // Simple character-based chunking with overlap
-      for (const i = 0; i < text.length; i += maxChunkSize - overlapSize) {
+      for (let i = 0; i < text.length; i += maxChunkSize - overlapSize) {
         const chunk = text.slice(i, i + maxChunkSize);
         chunks.push(chunk.trim());
         

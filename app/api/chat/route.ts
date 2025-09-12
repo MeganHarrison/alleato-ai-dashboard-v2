@@ -68,22 +68,47 @@ export async function POST(req: NextRequest) {
       
       // Extract the response from Railway API
       let responseText = '';
+      let sources = [];
+      
       if (railwayResponse) {
         // Handle AgentRunResult format
         let rawResponse = railwayResponse.response || railwayResponse.answer || railwayResponse.message || '';
         
-        // Parse AgentRunResult if present
-        if (typeof rawResponse === 'string' && rawResponse.includes('AgentRunResult(output=')) {
-          const match = rawResponse.match(/AgentRunResult\(output='(.*)'\)$/);
-          if (match) {
-            rawResponse = match[1];
+        // Parse AgentRunResult if present - improved regex to handle various formats
+        if (typeof rawResponse === 'string' && rawResponse.includes('AgentRunResult')) {
+          // Try multiple patterns to extract the output
+          const patterns = [
+            /AgentRunResult\(output='([^']*)'\)/,
+            /AgentRunResult\(output="([^"]*)"\)/,
+            /AgentRunResult\(output=([^,)]*)\)/,
+            /output='([^']*)'/,
+            /output="([^"]*)"/
+          ];
+          
+          for (const pattern of patterns) {
+            const match = rawResponse.match(pattern);
+            if (match && match[1]) {
+              rawResponse = match[1];
+              break;
+            }
+          }
+          
+          // If no pattern matched but still contains AgentRunResult, try to extract manually
+          if (rawResponse.includes('AgentRunResult') && !patterns.some(p => p.test(rawResponse))) {
+            console.log('🔧 Fallback parsing for AgentRunResult:', rawResponse);
+            // Remove AgentRunResult wrapper and common prefixes/suffixes
+            rawResponse = rawResponse
+              .replace(/^AgentRunResult\([^'"]*(["'])/, '$1')
+              .replace(/(["'])\)$/, '$1')
+              .replace(/^["']/, '')
+              .replace(/["']$/, '');
           }
         }
         
         responseText = rawResponse || 'No response generated';
         
         // Extract sources separately
-        const sources = railwayResponse.sources || railwayResponse.documents || [];
+        sources = railwayResponse.sources || railwayResponse.documents || [];
       }
 
       return NextResponse.json({ 

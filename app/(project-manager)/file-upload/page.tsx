@@ -204,7 +204,6 @@ export default function RagSystemUploadPage() {
 
   const uploadAllFiles = async () => {
     setIsUploading(true);
-    const pendingFiles = files.filter((f) => f.status === "pending");
 
     for (let i = 0; i < files.length; i++) {
       if (files[i].status === "pending") {

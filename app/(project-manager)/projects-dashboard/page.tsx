@@ -118,7 +118,7 @@ export default function ProjectsPage() {
 
         const supabase = createClient();
 
-        const query = supabase.from("projects").select(`
+        let query = supabase.from("projects").select(`
             *,
             clients (
               id,
@@ -202,8 +202,8 @@ export default function ProjectsPage() {
     // Apply sorting
     if (sortColumn) {
       filtered.sort((a, b) => {
-        let aValue: unknown;
-        let bValue: unknown;
+        let aValue: string | number;
+        let bValue: string | number;
 
         switch (sortColumn) {
           case "name":
@@ -287,16 +287,6 @@ export default function ProjectsPage() {
     );
   };
 
-  // Calculate stats
-  const statusCounts = projects.reduce((acc, project) => {
-    acc[project.phase] = (acc[project.phase] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const totalRevenue = projects.reduce(
-    (sum, project) => sum + (project["est revenue"] || 0),
-    0
-  );
 
   if (loading) {
     return (

@@ -29,7 +29,7 @@ export class VectorStore {
   async storeDocument(document: Document): Promise<{ success: boolean; id?: number; error?: string }> {
     try {
       // Generate embedding if not provided
-      const embedding = document.embedding;
+      let embedding = document.embedding;
       if (!embedding) {
         embedding = await this.embeddingService.generateEmbedding(document.content);
       }
@@ -68,7 +68,7 @@ export class VectorStore {
         ? await this.embeddingService.generateEmbeddings(textsToEmbed)
         : [];
 
-      const embeddingIndex = 0;
+      let embeddingIndex = 0;
       const documentsWithEmbeddings = documents.map(doc => {
         const embedding = doc.embedding || embeddings[embeddingIndex++];
         return {

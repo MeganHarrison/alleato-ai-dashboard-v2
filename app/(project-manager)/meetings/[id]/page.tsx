@@ -50,13 +50,16 @@ interface MeetingDocument {
 
 interface AIInsight {
   id: number;
-  insight_type: string;
-  severity: string;
+  insight_type: string | null;
+  severity: string | null;
   title: string;
   description: string;
-  confidence_score: number;
-  status: string;
-  created_at: string;
+  confidence_score: number | null;
+  created_at: string | null;
+  meeting_id: string | null;
+  project_id: number | null;
+  resolved: number | null;
+  source_meetings: string | null;
 }
 
 export default function MeetingPage() {
@@ -79,7 +82,7 @@ export default function MeetingPage() {
       setTranscriptLoading(true);
       
       // Check if metadata contains storage_bucket_path
-      let metadata = meeting.metadata;
+      let metadata: any = meeting.metadata;
       if (typeof metadata === 'string') {
         metadata = JSON.parse(metadata);
       }
@@ -142,16 +145,16 @@ export default function MeetingPage() {
       
       const { data: relatedData, error: relatedError } = await supabase
         .from('documents')
-        .select('id, title, date, created_at')
+        .select('*')
         .eq('project_id', projectId)
-        .neq('id', currentMeetingId)
-        .order('date', { ascending: false })
+        .neq('id', currentMeetingId as any)
+        .order('created_at', { ascending: false })
         .limit(5);
       
       if (relatedError) {
         console.error('Error loading related meetings:', relatedError);
       } else {
-        setRelatedMeetings((relatedData || []) as MeetingDocument[]);
+        setRelatedMeetings((relatedData || []) as any);
         console.log('🔗 Loaded related meetings:', relatedData?.length || 0);
       }
     } catch (error) {
@@ -174,7 +177,7 @@ export default function MeetingPage() {
           *,
           project:projects(id, name)
         `)
-        .eq('id', meetingId)
+        .eq('id', meetingId as any)
         .single();
 
       if (meetingError) {
@@ -293,7 +296,7 @@ export default function MeetingPage() {
     
     // Check metadata for action items
     try {
-      let metadata = meeting.metadata;
+      let metadata: any = meeting.metadata;
       if (typeof metadata === 'string') {
         metadata = JSON.parse(metadata);
       }
@@ -483,7 +486,7 @@ export default function MeetingPage() {
                 {actionItems && actionItems.length > 0 ? (
                   <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
                     <div className="space-y-3">
-                      {actionItems.map((item, index) => (
+                      {actionItems.map((item: any, index: number) => (
                         <div key={index} className="flex items-start gap-3 bg-slate-50 rounded-lg p-3 hover:bg-slate-100 transition-colors">
                           <CheckSquare className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm leading-relaxed">{item}</span>
@@ -529,10 +532,10 @@ export default function MeetingPage() {
                               : 'bg-slate-200 text-slate-700'
                           }`
                         }>
-                          {insight.insight_type.replace('_', ' ')}
+                          {insight.insight_type?.replace('_', ' ') || 'Unknown'}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {new Date(insight.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {insight.created_at ? new Date(insight.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Unknown date'}
                         </span>
                       </div>
                       <h4 className="font-medium text-sm mb-2 leading-tight">{insight.title}</h4>

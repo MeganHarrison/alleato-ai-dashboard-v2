@@ -13,13 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Table,
   TableBody,
   TableCell,
@@ -27,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/utils/supabase/client";
 import { format } from "date-fns";
 import {
@@ -402,8 +394,8 @@ export function DocumentsTable({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete "
-              {documentToDelete?.title || `Document ${documentToDelete?.id}`}". This action
+              This will permanently delete &quot;
+              {documentToDelete?.title || `Document ${documentToDelete?.id}`}&quot;. This action
               cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

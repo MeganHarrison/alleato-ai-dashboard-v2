@@ -22,18 +22,18 @@ import {
 import { RagDocument } from "@/lib/rag/types";
 import { format } from "date-fns";
 import { FileText, RefreshCw, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function DocumentsManagementPage() {
   const [documents, setDocuments] = useState<RagDocument[]>([]);
-  const [loading] = useState(false);
-  const [searchQuery] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [currentPage] = useState(false);
-  const [totalPages] = useState(false);
-  const [totalDocuments] = useState(false);
-  const fetchDocuments = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalDocuments, setTotalDocuments] = useState(0);
+  const fetchDocuments = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -60,11 +60,11 @@ export default function DocumentsManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchQuery, statusFilter]);
 
   useEffect(() => {
     fetchDocuments();
-  }, [currentPage, statusFilter]);
+  }, [currentPage, statusFilter, fetchDocuments]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,61 +72,6 @@ export default function DocumentsManagementPage() {
     fetchDocuments();
   };
 
-  const handleDelete = async (documentId: string, documentTitle: string) => {
-    try {
-      const response = await fetch(`/api/rag/documents/${documentId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast.success(`Deleted "${documentTitle}"`);
-        fetchDocuments();
-      } else {
-        toast.error("Failed to delete document");
-      }
-    } catch (error) {
-      console.error("Error deleting document:", error);
-      toast.error("Failed to delete document");
-    }
-  };
-
-  const handleReprocess = async (documentId: string) => {
-    try {
-      const response = await fetch(`/api/rag/vectorize/${documentId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chunk_size: 1000,
-          chunk_overlap: 200,
-        }),
-      });
-
-      if (response.ok) {
-        toast.success("Started reprocessing document");
-        fetchDocuments();
-      } else {
-        toast.error("Failed to reprocess document");
-      }
-    } catch (error) {
-      console.error("Error reprocessing document:", error);
-      toast.error("Failed to reprocess document");
-    }
-  };
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "default";
-      case "processing":
-        return "secondary";
-      case "failed":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
 
   return (
     <div className="px-4 py-8">

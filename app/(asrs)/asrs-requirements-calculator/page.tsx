@@ -87,7 +87,7 @@ export default function ASRSRequirementsCalculator() {
     }
   }, [input]);
 
-  const updateInput = (field: keyof ASRSInput, value: any) => {
+  const updateInput = (field: keyof ASRSInput, value: string | number | undefined) => {
     setInput(prev => ({ ...prev, [field]: value }));
   };
 
@@ -321,7 +321,7 @@ export default function ASRSRequirementsCalculator() {
             {!result && !error && (
               <div className="text-center py-8 text-muted-foreground">
                 <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Configure your system parameters and click "Get Requirements" to see results</p>
+                <p>Configure your system parameters and click &quot;Get Requirements&quot; to see results</p>
               </div>
             )}
           </CardContent>

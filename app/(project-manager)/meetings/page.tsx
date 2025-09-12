@@ -102,59 +102,66 @@ export default function MeetingsPage() {
   });
 
   useEffect(() => {
-    loadData();
-  }, []);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        if (!supabase) {
+          throw new Error("Database connection not available. Please check your configuration.");
+        }
+        
+        // Load documents
+        const { data: documentsData, error: documentsError } = await supabase
+          .from('documents')
+          .select('*')
+          .order('date', { ascending: false });
+        
+        if (documentsError) {
+          console.error("Error loading documents:", documentsError);
+          throw new Error(documentsError.message || "Failed to load documents");
+        }
+        
+        // Load projects for the dropdown
+        const { data: projectsData, error: projectsError } = await supabase
+          .from('projects')
+          .select('*')
+          .order('name', { ascending: true });
+        
+        if (projectsError) {
+          console.error("Error loading projects:", projectsError);
+          throw new Error(projectsError.message || "Failed to load projects");
+        }
+        
+        // Load meetings
+        const { data: meetingsData, error: meetingsError } = await supabase
+          .from('meetings')
+          .select(`
+            *,
+            projects(name)
+          `)
+          .order('date', { ascending: false });
+        
+        if (meetingsError) {
+          console.error("Error loading meetings:", meetingsError);
+          throw new Error(meetingsError.message || "Failed to load meetings");
+        }
+        
+        // Set the data
+        setDocuments((documentsData || []) as any);
+        setProjects(projectsData || []);
+        
+      } catch (error) {
+        console.error("Error in loadData:", error);
+        setError(error instanceof Error ? error.message : "An unexpected error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      if (!supabase) {
-        throw new Error("Database connection not available. Please check your configuration.");
-      }
-      
-      // Load documents
-      const { data: documentsData, error: documentsError } = await supabase
-        .from('documents')
-        .select('*')
-        .order('date', { ascending: false });
-      
-      if (documentsError) {
-        console.error("Error loading documents:", documentsError);
-        throw new Error(documentsError.message || "Failed to load documents");
-      }
-      
-      // Load projects for the dropdown
-      const { data: projectsData, error: projectsError } = await supabase
-        .from('projects')
-        .select('id, name')
-        .order('name');
-      
-      if (projectsError) {
-        console.error("Error loading projects:", projectsError);
-        throw new Error(projectsError.message || "Failed to load projects");
-      }
-      
-      setDocuments((documentsData || []).map(doc => ({
-        ...doc,
-        id: String(doc.id) // Ensure ID is string
-      })) as Document[]);
-      setProjects((projectsData || []).map(proj => ({
-        id: proj.id,
-        name: proj.name || 'Unnamed Project'
-      })));
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error("Error in loadData:", error);
-      setError(errorMessage || "Failed to load data. Please try refreshing the page.");
-      toast.error("Failed to load data", {
-        description: errorMessage
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadData();
+  }, [supabase]);
+
 
 
   // Filter documents
@@ -194,14 +201,14 @@ export default function MeetingsPage() {
         .update({
           content: editData.title || editData.content,
           metadata: {
-            ...editingDocument.metadata,
+            ...(editingDocument.metadata || {}),
             title: editData.title,
             date: editData.date,
             project_id: editData.project_id,
             project: editData.project
           }
         })
-        .eq('id', editingDocument.id);
+        .eq('id', editingDocument.id as any);
       
       if (error) throw error;
       

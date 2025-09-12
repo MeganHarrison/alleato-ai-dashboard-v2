@@ -1,4 +1,5 @@
 import { LoginForm } from '@/components/login-form'
+import { GalleryVerticalEnd } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 

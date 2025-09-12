@@ -7,6 +7,7 @@
  */
 
 import '@testing-library/jest-dom';
+import React from 'react';
 
 // Mock Next.js modules that are not available in test environment
 import { vi } from 'vitest';
@@ -32,14 +33,14 @@ vi.mock('next/navigation', () => ({
 vi.mock('next/image', () => ({
   default: ({ src, alt, ...props }: any) => {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} {...props} />;
+    return React.createElement('img', { src, alt, ...props });
   },
 }));
 
 // Mock Next.js link component
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: any) => {
-    return <a href={href} {...props}>{children}</a>;
+    return React.createElement('a', { href, ...props }, children);
   },
 }));
 
