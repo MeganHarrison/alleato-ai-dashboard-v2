@@ -20,6 +20,21 @@ export type { NotionProjectsResponse };
  */
 export async function fetchNotionProjects(): Promise<NotionProjectsResponse> {
   try {
+    // Check if required environment variables exist before validation
+    if (!process.env.NOTION_TOKEN) {
+      return NotionProjectsResponseSchema.parse({
+        projects: [],
+        error: "Notion integration not configured. Please add NOTION_TOKEN to your environment variables.",
+      });
+    }
+
+    if (!process.env.NOTION_DATABASE_ID && !process.env.NOTION_PROJECTS_DATABASE_ID) {
+      return NotionProjectsResponseSchema.parse({
+        projects: [],
+        error: "Notion database not configured. Please add NOTION_DATABASE_ID to your environment variables.",
+      });
+    }
+
     // Validate environment variables using Zod schema
     const env = NotionEnvSchema.parse({
       NOTION_TOKEN: process.env.NOTION_TOKEN,
