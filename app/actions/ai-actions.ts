@@ -72,7 +72,7 @@ export async function askAI(question: string, history: Message[]) {
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
-      messages: messages as any,
+      messages: messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
       temperature: 0.7,
       max_tokens: 500,
     })

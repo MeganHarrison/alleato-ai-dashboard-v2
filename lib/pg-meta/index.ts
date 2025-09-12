@@ -1,5 +1,5 @@
+// Types are not available for common-tags, but we can use it as a function that takes template strings
 import { stripIndent } from 'common-tags'
-// @ts-ignore - no types available for common-tags
 
 import { columnsSql, extensionsSql, tablesSql } from './sql'
 

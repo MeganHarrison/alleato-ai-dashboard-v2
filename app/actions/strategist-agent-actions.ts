@@ -7,12 +7,19 @@ export type ChatMessage = { role: "user" | "assistant"; content: string }
 export async function askStrategistAgent(question: string, history: ChatMessage[]) {
   try {
     // Use full-text search instead of OpenAI embeddings since API key is not working
-    const search = await searchMeetingChunksFullText() as any
+    const search = await searchMeetingChunksFullText()
     
-    const contextText = search.success && search.data && search.data.length > 0
-      ? search.data.map((chunk: unknown) => {
-          const meetingInfo = chunk.meeting_title ? `[Meeting: ${chunk.meeting_title}]\n` : ""
-          return meetingInfo + chunk.content
+    // Since the function currently returns empty array, create proper structure
+    const searchResult = {
+      success: Array.isArray(search),
+      data: search || []
+    }
+    
+    const contextText = searchResult.success && searchResult.data && searchResult.data.length > 0
+      ? searchResult.data.map((chunk: unknown) => {
+          const chunkObj = chunk as { meeting_title?: string; content?: string }
+          const meetingInfo = chunkObj.meeting_title ? `[Meeting: ${chunkObj.meeting_title}]\n` : ""
+          return meetingInfo + (chunkObj.content || '')
         }).join("\n---\n")
       : ""
 

@@ -1,13 +1,14 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { InsightsView } from '@/components/insights/insights-view';
+import type { ReactElement } from 'react';
 
 export const metadata: Metadata = {
   title: 'AI Insights | Dashboard',
   description: 'View AI-generated insights from documents and meetings',
 };
 
-export default async function InsightsPage() {
+export default async function InsightsPage(): Promise<ReactElement> {
   const supabase = await createClient();
 
   // Fetch all insights with project information
@@ -52,7 +53,7 @@ export default async function InsightsPage() {
   const insights = allInsights?.map(insight => {
     // Parse description if it's a JSON string
     let parsedDescription = insight.description;
-    let metadata: any = {};
+    let metadata: Record<string, unknown> = {};
     
     if (typeof insight.description === 'string' && insight.description.startsWith('{')) {
       try {

@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface Source {
+  title?: string;
+  document_name?: string;
+  relevance_score?: number;
+}
+
 // Railway API endpoint
 const RAILWAY_API_URL = process.env.RAILWAY_PM_RAG;
 
@@ -85,7 +91,7 @@ export async function POST(req: NextRequest) {
         const sources = railwayResponse.sources || railwayResponse.documents || [];
         if (sources.length > 0) {
           responseText += '\n\n**Sources:**\n';
-          responseText += sources.map((source: any, index: number) => 
+          responseText += sources.map((source: Source, index: number) => 
             `${index + 1}. ${source.title || source.document_name || 'Document'} ${source.relevance_score ? `(${Math.round(source.relevance_score * 100)}% relevant)` : ''}`
           ).join('\n');
         }

@@ -17,7 +17,7 @@
 
 import { createServiceClient } from "@/utils/supabase/service"
 import { revalidatePath } from "next/cache"
-import type { Database } from "@/types/database.types"
+import type { Database, Json } from "@/types/database.types"
 
 type Document = Database["public"]["Tables"]["documents"]["Row"]
 type DocumentInsert = Database["public"]["Tables"]["documents"]["Insert"]
@@ -39,8 +39,10 @@ export async function getDocuments() {
   // Sort documents by date (extracted from metadata) in descending order
   const sortedDocuments = (documents || []).sort((a, b) => {
     // Extract dates from metadata with proper type checking
-    const metadataA = a.metadata && typeof a.metadata === 'object' && !Array.isArray(a.metadata) ? a.metadata as any : {}
-    const metadataB = b.metadata && typeof b.metadata === 'object' && !Array.isArray(b.metadata) ? b.metadata as any : {}
+    const metadataA = a.metadata && typeof a.metadata === 'object' && !Array.isArray(a.metadata) ? 
+      a.metadata as Record<string, Json | undefined> : {}
+    const metadataB = b.metadata && typeof b.metadata === 'object' && !Array.isArray(b.metadata) ? 
+      b.metadata as Record<string, Json | undefined> : {}
     
     const dateA = metadataA.date || metadataA.created_at || metadataA.updated_at || null
     const dateB = metadataB.date || metadataB.created_at || metadataB.updated_at || null

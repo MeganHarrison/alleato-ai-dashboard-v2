@@ -43,12 +43,11 @@ export const CodeBlock = ({
       {...props}
     >
       <div className="relative">
-        {/* @ts-ignore */}
         <SyntaxHighlighter
           className="overflow-hidden dark:hidden"
           codeTagProps={{
             className: 'font-mono text-sm',
-          }}
+          } as ComponentProps<'code'>}
           customStyle={{
             margin: 0,
             padding: '1rem',
@@ -67,12 +66,11 @@ export const CodeBlock = ({
         >
           {code}
         </SyntaxHighlighter>
-        {/* @ts-ignore */}
         <SyntaxHighlighter
           className="hidden overflow-hidden dark:block"
           codeTagProps={{
             className: 'font-mono text-sm',
-          }}
+          } as ComponentProps<'code'>}
           customStyle={{
             margin: 0,
             padding: '1rem',

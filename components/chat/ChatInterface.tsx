@@ -99,7 +99,9 @@ export function ChatInterface({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as any);
+      // Create a synthetic form event for handleSubmit
+      const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
+      handleSubmit(syntheticEvent);
     }
   };
 
@@ -144,7 +146,7 @@ export function ChatInterface({
                 <label className="text-sm font-medium">Reasoning:</label>
                 <select
                   value={reasoningEffort}
-                  onChange={(e) => setReasoningEffort(e.target.value as any)}
+                  onChange={(e) => setReasoningEffort(e.target.value as 'minimal' | 'medium' | 'high')}
                   className="px-3 py-1 border rounded-md text-sm"
                 >
                   <option value="minimal">Minimal</option>

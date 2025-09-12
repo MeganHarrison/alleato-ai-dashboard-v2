@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import OpenAI from 'openai';
-// @ts-ignore - PDF.js types issue
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,

@@ -9,7 +9,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { MyDataPart, MyUIMessage, MyProviderMetadata } from "../message-type";
 import { generateId } from "ai";
-// @ts-ignore - ToolUIPart not available in this version
 import { sql } from "drizzle-orm";
 import {
   getLocationInput,

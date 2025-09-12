@@ -30,9 +30,9 @@ export const useGetBuckets = (projectRef: string) => {
 
 // LIST Objects
 const listObjects = async ({ projectRef, bucketId }: { projectRef: string; bucketId: string }) => {
-  const { data, error } = await client.POST(
-    // TODO
-    // @ts-expect-error this endpoint is not yet implemented
+  // Note: This endpoint is not yet implemented in the API schema
+  // Using type assertion to handle the missing endpoint
+  const { data, error } = await (client.POST as (url: string, options: unknown) => Promise<{data?: unknown, error?: unknown}>)(
     '/v1/projects/{ref}/storage/buckets/{bucketId}/objects/list',
     {
       params: {

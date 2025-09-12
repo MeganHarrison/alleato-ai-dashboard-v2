@@ -57,7 +57,8 @@ export function Chat({ id, initialMessages = [] }: ChatProps) {
 
   const handleSuggestionClick = (suggestion: string) => {
     // Set input through the chat hook
-    handleInputChange({ target: { value: suggestion } } as any);
+    const syntheticEvent = { target: { value: suggestion } } as React.ChangeEvent<HTMLInputElement>;
+    handleInputChange(syntheticEvent);
     // Auto-submit after a brief delay
     setTimeout(() => {
       const form = document.querySelector('form') as HTMLFormElement;
