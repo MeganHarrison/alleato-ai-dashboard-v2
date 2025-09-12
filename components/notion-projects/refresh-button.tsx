@@ -35,7 +35,12 @@ export function RefreshButton(): ReactElement {
     setIsRefreshing(true);
     
     startTransition(() => {
-      router.refresh();
+      try {
+        router.refresh();
+      } catch (error) {
+        // Log error but don't throw to prevent breaking user experience
+        console.error('Refresh failed:', error);
+      }
     });
 
     // Reset state after a brief UI feedback period
