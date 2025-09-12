@@ -5,9 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ArrowLeft,
   Calendar,
@@ -15,7 +13,6 @@ import {
   Users,
   FileText,
   CheckSquare,
-  Tags,
   MessageSquare,
   ExternalLink,
   Download,
@@ -192,7 +189,10 @@ export default function MeetingPage() {
       const meeting = meetingData as unknown as MeetingDocument;
       console.log('📄 Meeting data loaded:', {
         participants: meeting.participants,
-        participantCount: meeting.participants?.length
+        participantCount: meeting.participants?.length,
+        action_items: meeting.action_items,
+        metadata: meeting.metadata,
+        hasActionItems: meeting.action_items?.length || 0
       });
       setMeeting(meeting);
       
@@ -283,11 +283,38 @@ export default function MeetingPage() {
     );
   }
 
-  const sentimentData = meeting.sentiment_scores ? {
-    positive: meeting.sentiment_scores.positive_pct || 0,
-    negative: meeting.sentiment_scores.negative_pct || 0,
-    neutral: meeting.sentiment_scores.neutral_pct || 0,
-  } : null;
+
+  // Extract action items from multiple sources
+  const getActionItems = () => {
+    // First check direct action_items field
+    if (meeting.action_items && Array.isArray(meeting.action_items) && meeting.action_items.length > 0) {
+      return meeting.action_items;
+    }
+    
+    // Check metadata for action items
+    try {
+      let metadata = meeting.metadata;
+      if (typeof metadata === 'string') {
+        metadata = JSON.parse(metadata);
+      }
+      
+      // Check full_summary.action_items in metadata
+      if (metadata?.full_summary?.action_items && Array.isArray(metadata.full_summary.action_items)) {
+        return metadata.full_summary.action_items;
+      }
+      
+      // Check direct action_items in metadata
+      if (metadata?.action_items && Array.isArray(metadata.action_items)) {
+        return metadata.action_items;
+      }
+    } catch (error) {
+      console.error('Error parsing metadata for action items:', error);
+    }
+    
+    return [];
+  };
+
+  const actionItems = getActionItems();
 
   return (
     <div className="min-h-screen bg-white">
@@ -348,18 +375,18 @@ export default function MeetingPage() {
               </div>
             )}
             
-            {meeting.participants && meeting.participants.length > 0 && (
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span>{meeting.participants.length} participants</span>
-              </div>
-            )}
           </div>
           
           {/* Participants */}
           {meeting.participants && meeting.participants.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Participants</h3>
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs font-normal text-muted-foreground uppercase tracking-wider">Participants</span>
+                <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium">
+                  {meeting.participants.length}
+                </span>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {meeting.participants.slice(0, 8).map((participant, index) => {
                   // Clean up participant email/name
@@ -367,13 +394,13 @@ export default function MeetingPage() {
                     ? participant.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
                     : participant;
                   return (
-                    <span key={index} className="text-sm bg-slate-100 text-slate-700 px-2 py-1 rounded-md">
+                    <span key={index} className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-md">
                       {cleanParticipant}
                     </span>
                   );
                 })}
                 {meeting.participants.length > 8 && (
-                  <span className="text-sm text-muted-foreground px-2 py-1">
+                  <span className="text-xs text-muted-foreground px-2 py-1">
                     +{meeting.participants.length - 8} more
                   </span>
                 )}
@@ -389,11 +416,11 @@ export default function MeetingPage() {
           <div className="xl:col-span-2 space-y-6">
             <Tabs defaultValue="summary" className="space-y-4">
               <TabsList className="bg-transparent border-0 shadow-none p-0 h-auto">
-                <TabsTrigger value="summary" className="data-[state=active]:bg-slate-100 data-[state=active]:shadow-none border-0 rounded-md px-4 py-2 flex items-center gap-2">
+                <TabsTrigger value="summary" className="data-[state=active]:bg-transparent data-[state=active]:text-brand-500 data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-brand-500 border-0 rounded-none px-4 py-2 flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   Summary
                 </TabsTrigger>
-                <TabsTrigger value="actions" className="data-[state=active]:bg-slate-100 data-[state=active]:shadow-none border-0 rounded-md px-4 py-2 flex items-center gap-2">
+                <TabsTrigger value="actions" className="data-[state=active]:bg-transparent data-[state=active]:text-brand-500 data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-brand-500 border-0 rounded-none px-4 py-2 flex items-center gap-2">
                   <ListTodo className="h-4 w-4" />
                   Actions
                 </TabsTrigger>
@@ -401,17 +428,26 @@ export default function MeetingPage() {
 
               {/* Summary Tab */}
               <TabsContent value="summary" className="space-y-4">
-                <h3 className="text-base font-semibold">Meeting Summary</h3>
                 {meeting.summary ? (
                   <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
                     <div className="text-sm leading-relaxed space-y-3 bg-slate-50 rounded-lg p-4">
                       {meeting.summary.split('\n').filter(line => line.trim()).map((line, index) => {
                         // Handle bullet points
                         if (line.trim().startsWith('- ')) {
+                          const content = line.replace(/^- /, '');
+                          // Bold project names (look for patterns like "ProjectName:", "Project Name", etc.)
+                          const processedContent = content.replace(
+                            /\b([A-Z][a-zA-Z\s]*(?:Project|project|consulting|Consulting|skates|Skates|Ulta|ULTA|Siva|SIVA))(\s*:?\s*)/g,
+                            '<strong class="text-brand-500">$1$2</strong>'
+                          );
+                          
                           return (
                             <div key={index} className="flex items-start gap-3">
-                              <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-2 flex-shrink-0" />
-                              <span className="text-foreground/90">{line.replace(/^- /, '')}</span>
+                              <div className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-2 flex-shrink-0" />
+                              <span 
+                                className="text-foreground/90" 
+                                dangerouslySetInnerHTML={{ __html: processedContent }}
+                              />
                             </div>
                           );
                         }
@@ -444,11 +480,10 @@ export default function MeetingPage() {
 
               {/* Action Items Tab */}
               <TabsContent value="actions" className="space-y-4">
-                <h3 className="text-base font-semibold">Action Items</h3>
-                {meeting.action_items && Array.isArray(meeting.action_items) && meeting.action_items.length > 0 ? (
+                {actionItems && actionItems.length > 0 ? (
                   <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
                     <div className="space-y-3">
-                      {meeting.action_items.map((item, index) => (
+                      {actionItems.map((item, index) => (
                         <div key={index} className="flex items-start gap-3 bg-slate-50 rounded-lg p-3 hover:bg-slate-100 transition-colors">
                           <CheckSquare className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm leading-relaxed">{item}</span>
@@ -468,7 +503,7 @@ export default function MeetingPage() {
             {/* Meeting Insights - Outside of tabs */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold">Meeting Insights</h3>
+                <h3 className="text-xs font-normal text-muted-foreground uppercase tracking-wider">MEETING INSIGHTS</h3>
                 {insights.length > 0 && (
                   <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-1 rounded">
                     {insights.length}
@@ -534,7 +569,7 @@ export default function MeetingPage() {
             {/* Related Meetings Section */}
             {relatedMeetings.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-base font-semibold">Related Meetings</h3>
+                <h3 className="text-xs font-normal text-muted-foreground uppercase tracking-wider">RELATED MEETINGS</h3>
                 <div className="space-y-2">
                   {relatedMeetings.map((relatedMeeting) => (
                     <a
@@ -559,7 +594,7 @@ export default function MeetingPage() {
 
           {/* Right Column - Transcript */}
           <div className="xl:col-span-3 space-y-4">
-            <h3 className="text-base font-semibold">Conversation Transcript</h3>
+            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">TRANSCRIPT</h3>
             {transcriptLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-5 w-5 animate-spin mr-2" />
@@ -567,8 +602,18 @@ export default function MeetingPage() {
               </div>
             ) : actualTranscript ? (
               <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-                <div className="whitespace-pre-wrap text-sm leading-relaxed font-mono bg-slate-50 rounded-lg p-4">
-                  {actualTranscript}
+                <div className="whitespace-pre-wrap text-sm leading-relaxed bg-slate-50 rounded-lg p-4">
+                  {actualTranscript.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').split('\n').map((line, index) => {
+                    // Process markdown bold formatting
+                    const processedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    return (
+                      <div 
+                        key={index} 
+                        className="text-foreground/90"
+                        dangerouslySetInnerHTML={{ __html: processedLine }}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             ) : meeting.content ? (
