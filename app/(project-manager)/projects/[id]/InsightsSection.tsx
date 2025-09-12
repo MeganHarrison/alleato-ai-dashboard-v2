@@ -125,7 +125,7 @@ export function InsightsSection({
             {currentInsights.map((insight, index) => (
               <div 
                 key={insight.id || insight.insight_id || index}
-                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                className="border border-gray-100 rounded-lg p-3 hover:border-gray-200 transition-colors bg-white"
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
@@ -133,15 +133,6 @@ export function InsightsSection({
                       <h4 className="font-medium text-sm text-gray-900">
                         {insight.title || "Untitled Insight"}
                       </h4>
-                      <span className={cn(
-                        "px-2 py-0.5 text-xs rounded-full border",
-                        getSourceBadge(insight.source)
-                      )}>
-                        {insight.source === 'ai' ? 'AI' : insight.source}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 mt-1">
                       {(insight.type || insight.insight_type) && (
                         <span className={cn(
                           "px-2 py-0.5 text-xs rounded capitalize",
@@ -150,50 +141,34 @@ export function InsightsSection({
                           {(insight.type || insight.insight_type || '').replace('_', ' ')}
                         </span>
                       )}
-                      
-                      {insight.severity && (
-                        <span className={cn(
-                          "px-2 py-0.5 text-xs rounded capitalize",
-                          getSeverityColor(insight.severity)
-                        )}>
-                          {insight.severity}
-                        </span>
-                      )}
-                      
-                      {insight.status && (
-                        <span className={cn(
-                          "px-2 py-0.5 text-xs rounded capitalize",
-                          insight.status === "completed" 
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        )}>
-                          {insight.status}
-                        </span>
-                      )}
                     </div>
                   </div>
                   
-                  {insight.sortDate && (
-                    <span className="text-xs text-gray-500">
-                      {format(new Date(insight.sortDate), "MMM d, yyyy")}
-                    </span>
-                  )}
+                  {/* Show meeting date prominently */}
+                  <div className="flex flex-col items-end text-right">
+                    {insight.meeting_date && (
+                      <span className="text-xs font-medium text-gray-700">
+                        {format(new Date(insight.meeting_date), "MMM d, yyyy")}
+                      </span>
+                    )}
+                    {insight.meeting_title && (
+                      <span className="text-xs text-gray-500 mt-1">
+                        {insight.meeting_title}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-gray-600 leading-relaxed">
                   {insight.description || insight.content || "No description available"}
                 </p>
                 
                 {insight.assigned_to && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    Assigned to: <span className="font-medium">{insight.assigned_to}</span>
-                  </p>
-                )}
-                
-                {insight.meeting_title && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    From meeting: <span className="font-medium">{insight.meeting_title}</span>
-                  </p>
+                  <div className="mt-2 pt-2 border-t border-gray-50">
+                    <span className="text-xs text-gray-500">
+                      Assigned to: <span className="font-medium text-gray-700">{insight.assigned_to}</span>
+                    </span>
+                  </div>
                 )}
               </div>
             ))}
