@@ -164,7 +164,7 @@ export function ModernHomepage() {
     return groups;
   }, [meetings]);
 
-  // Group insights by time periods (same as meetings)
+  // Group insights by time periods and sort by most recent first
   const groupedInsights = useMemo(() => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -189,6 +189,11 @@ export function ModernHomepage() {
         groups.thisWeek.push(insight);
       }
     });
+    
+    // Sort each group by most recent first
+    groups.today.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    groups.yesterday.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    groups.thisWeek.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     
     return groups;
   }, [insights]);
