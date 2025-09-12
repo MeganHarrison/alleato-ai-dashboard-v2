@@ -125,7 +125,7 @@ const data = {
       ],
     },
     {
-      title: "Admin",
+      title: "System Admin",
       url: "#",
       items: [
         {
