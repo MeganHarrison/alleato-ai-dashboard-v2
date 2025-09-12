@@ -1,10 +1,9 @@
 "use client";
 
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, FileText, Loader2, Send, Sparkles, User } from "lucide-react";
+import { Bot, Send, User, ArrowUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface Source {
@@ -22,45 +21,19 @@ interface Message {
   sources?: Source[];
 }
 
-export default function OpenAIChat() {
+export default function ChatGPTStyleChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [apiStatus, setApiStatus] = useState<
-    "checking" | "connected" | "disconnected"
-  >("checking");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Check API status on component mount
-  useEffect(() => {
-    const checkApiStatus = async () => {
-      try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: [{ role: "user", content: "test" }],
-          }),
-        });
-        setApiStatus(response.ok ? "connected" : "disconnected");
-      } catch (error) {
-        setApiStatus("disconnected");
-      }
-    };
-    checkApiStatus();
-  }, []);
-
-  // Check if conversation has started (has user messages)
-  const hasConversation = messages.some((msg) => msg.role === "user");
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
@@ -76,9 +49,7 @@ export default function OpenAIChat() {
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [...messages, userMessage].map((msg) => ({
             role: msg.role,
@@ -87,12 +58,9 @@ export default function OpenAIChat() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to get response");
-      }
+      if (!response.ok) throw new Error("Failed to get response");
 
       const data = await response.json();
-
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -114,535 +82,255 @@ export default function OpenAIChat() {
     }
   };
 
-  if (!hasConversation) {
-    // Centered input design when no conversation
+  // Welcome screen when no messages
+  if (messages.length === 0) {
     return (
-      <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
+      <div className="flex h-screen flex-col bg-white">
         {/* Header */}
-        <div className="flex-none p-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <div className="relative">
-                <Sparkles className="w-8 h-8 text-violet-600" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-              </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-600 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                Alleato AI Agent
-              </h1>
-            </div>
-            <p className="text-center text-slate-600 text-lg">
-              Your strategic ally - Connecting every project, initiative, and
-              insight
-            </p>
+        <div className="border-b border-gray-100 px-4 py-3">
+          <div className="mx-auto max-w-3xl">
+            <h1 className="text-lg font-semibold text-gray-900">ChatGPT</h1>
+          </div>
+        </div>
 
-            {/* API Status Indicator */}
-            <div className="flex justify-center mt-4">
-              <div
-                className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
-                  apiStatus === "connected"
-                    ? "bg-emerald-100 text-emerald-700"
-                    : apiStatus === "disconnected"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-yellow-100 text-yellow-700"
-                }`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    apiStatus === "connected"
-                      ? "bg-emerald-500"
-                      : apiStatus === "disconnected"
-                      ? "bg-red-500"
-                      : "bg-yellow-500 animate-pulse"
-                  }`}
-                />
-                {apiStatus === "checking" && "Checking API..."}
-                {apiStatus === "connected" && "Railway API Connected"}
-                {apiStatus === "disconnected" && "API Disconnected"}
+        {/* Welcome Content */}
+        <div className="flex flex-1 flex-col items-center justify-center px-4">
+          <div className="mx-auto max-w-2xl text-center">
+            {/* ChatGPT Logo */}
+            <div className="mb-8 flex justify-center">
+              <div className="rounded-full bg-green-500 p-4">
+                <Bot className="h-8 w-8 text-white" />
               </div>
+            </div>
+
+            {/* Welcome Text */}
+            <h2 className="mb-8 text-3xl font-semibold text-gray-900">
+              How can I help you today?
+            </h2>
+
+            {/* Suggestion Cards */}
+            <div className="mb-8 grid grid-cols-1 gap-3 md:grid-cols-2">
+              {[
+                "Show me recent meeting insights",
+                "What decisions need to be made?", 
+                "Give me the weekly summary",
+                "What's happening with our projects?",
+              ].map((suggestion, index) => (
+                <button
+                  key={index}
+                  onClick={() => setInput(suggestion)}
+                  className="rounded-xl border border-gray-200 p-4 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  {suggestion}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Suggestion cards */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            {
-              title: "Show me recent meeting insights",
-            },
-            {
-              title: "What decisions need to be made?",
-            },
-            {
-              title: "Give me the weekly summary",
-            },
-            {
-              title: "What's happening with our projects?",
-            },
-          ].map((suggestion, index) => (
-            <Card
-              key={index}
-              className="p-4 hover:shadow-lg transition-all duration-200 cursor-pointer border-slate-200/60 hover:border-violet-300 group"
-              onClick={() => setInput(suggestion.desc)}
-            >
-              <div className="flex items-start gap-3">
-                <div>
-                  <h3 className="font-semibold text-slate-800 group-hover:text-violet-600 transition-colors">
-                    {suggestion.title}
-                  </h3>
-                </div>
+        {/* Input Area */}
+        <div className="border-t border-gray-100 px-4 py-6">
+          <div className="mx-auto max-w-3xl">
+            <form onSubmit={sendMessage} className="relative">
+              <div className="flex items-center rounded-3xl border border-gray-300 bg-white px-4 py-3 shadow-sm">
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Message ChatGPT"
+                  className="flex-1 border-0 bg-transparent px-0 text-base placeholder-gray-500 focus:ring-0 focus-visible:ring-0"
+                />
+                <Button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  size="sm"
+                  className="ml-2 rounded-full bg-gray-200 p-2 text-gray-400 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-300"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
               </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Centered input area */}
-        <div className="flex-1 flex items-center justify-center px-6">
-          <div className="w-full max-w-2xl">
-            <div className="relative">
-              <form onSubmit={sendMessage} className="relative">
-                <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-cyan-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
-                  <div className="relative bg-white rounded-2xl shadow-xl border border-slate-200/50 p-1.5">
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      <Input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Start a conversation..."
-                        disabled={isLoading}
-                        className="flex-1 border-0 bg-transparent text-lg placeholder:text-slate-400 focus:ring-0 focus:outline-none"
-                        autoFocus
-                      />
-                      <Button
-                        type="submit"
-                        disabled={isLoading || !input.trim()}
-                        size="sm"
-                        className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 border-0 rounded-xl px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Send className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
+            </form>
+            <p className="mt-2 text-center text-xs text-gray-500">
+              ChatGPT can make mistakes. Check important info.
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Chat interface when conversation exists
+  // Chat interface with messages
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
-      {/* Compact header */}
-      <div className="flex-none border-b border-slate-200/60 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Sparkles className="w-6 h-6 text-violet-600" />
-              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-            </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-cyan-500 bg-clip-text text-transparent">
-              Alleato AI Agent
-            </h1>
-            <div
-              className={`ml-4 flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium ${
-                apiStatus === "connected"
-                  ? "bg-emerald-100 text-emerald-700"
-                  : apiStatus === "disconnected"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-yellow-100 text-yellow-700"
-              }`}
-            >
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  apiStatus === "connected"
-                    ? "bg-emerald-500"
-                    : apiStatus === "disconnected"
-                    ? "bg-red-500"
-                    : "bg-yellow-500 animate-pulse"
-                }`}
-              />
-              {apiStatus === "checking" && "Checking..."}
-              {apiStatus === "connected" && "Connected"}
-              {apiStatus === "disconnected" && "Disconnected"}
+    <div className="flex h-screen flex-col bg-white">
+      {/* Header */}
+      <div className="border-b border-gray-100 px-4 py-3">
+        <div className="mx-auto max-w-3xl">
+          <h1 className="text-lg font-semibold text-gray-900">ChatGPT</h1>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          <div className="mx-auto max-w-3xl px-4 py-6">
+            <div className="space-y-6">
+              {messages.map((message) => (
+                <div key={message.id} className="group">
+                  <div className="flex gap-4">
+                    {/* Avatar */}
+                    <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full">
+                      {message.role === "user" ? (
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white">
+                          <User className="h-4 w-4" />
+                        </div>
+                      ) : (
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white">
+                          <Bot className="h-4 w-4" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Message Content */}
+                    <div className="flex-1 overflow-hidden">
+                      <div className="prose prose-sm max-w-none">
+                        <div className="text-gray-900">
+                          {message.content.split("\n").map((line, index) => {
+                            if (line.trim() === "") {
+                              return <br key={index} />;
+                            }
+                            
+                            // Handle headers
+                            if (line.match(/^#{1,3}\s+/)) {
+                              const level = line.match(/^(#{1,3})/)?.[1].length || 1;
+                              const text = line.replace(/^#{1,3}\s+/, "");
+                              const HeadingTag = `h${Math.min(level + 1, 6)}` as keyof React.JSX.IntrinsicElements;
+                              return (
+                                <HeadingTag key={index} className="font-semibold text-gray-900 mt-4 mb-2">
+                                  {text}
+                                </HeadingTag>
+                              );
+                            }
+                            
+                            // Handle bold text
+                            if (line.includes("**")) {
+                              const parts = line.split(/(\*\*[^*]+\*\*)/);
+                              return (
+                                <p key={index} className="mb-2">
+                                  {parts.map((part, partIndex) =>
+                                    part.startsWith("**") && part.endsWith("**") ? (
+                                      <strong key={partIndex} className="font-semibold">
+                                        {part.replace(/\*\*/g, "")}
+                                      </strong>
+                                    ) : (
+                                      <span key={partIndex}>{part}</span>
+                                    )
+                                  )}
+                                </p>
+                              );
+                            }
+                            
+                            // Handle numbered lists
+                            if (line.match(/^\d+\.\s/)) {
+                              const content = line.replace(/^\d+\.\s/, "");
+                              return (
+                                <div key={index} className="mb-1 flex gap-2">
+                                  <span className="text-gray-500">•</span>
+                                  <span>{content}</span>
+                                </div>
+                              );
+                            }
+                            
+                            // Handle bullet points
+                            if (line.match(/^-\s/)) {
+                              const content = line.replace(/^-\s/, "");
+                              return (
+                                <div key={index} className="mb-1 ml-4 flex gap-2">
+                                  <span className="text-gray-500">•</span>
+                                  <span>{content}</span>
+                                </div>
+                              );
+                            }
+                            
+                            // Regular paragraphs
+                            return (
+                              <p key={index} className="mb-2">
+                                {line}
+                              </p>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Sources */}
+                      {message.sources && message.sources.length > 0 && (
+                        <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
+                          <h4 className="mb-2 text-sm font-medium text-gray-900">Sources</h4>
+                          <div className="space-y-1">
+                            {message.sources.map((source, index) => (
+                              <div key={index} className="text-sm text-gray-600">
+                                {source.title || source.document_name || `Source ${index + 1}`}
+                                {source.relevance_score && (
+                                  <span className="ml-2 text-xs text-gray-500">
+                                    ({Math.round(source.relevance_score * 100)}% relevant)
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Loading indicator */}
+              {isLoading && (
+                <div className="group">
+                  <div className="flex gap-4">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white">
+                      <Bot className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-1">
+                        <div className="h-2 w-2 animate-pulse rounded-full bg-gray-400"></div>
+                        <div className="h-2 w-2 animate-pulse rounded-full bg-gray-400" style={{ animationDelay: "0.1s" }}></div>
+                        <div className="h-2 w-2 animate-pulse rounded-full bg-gray-400" style={{ animationDelay: "0.2s" }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Messages area with auto-scroll */}
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea ref={scrollAreaRef} className="h-full">
-          <div className="max-w-4xl mx-auto px-6 py-6">
-            <div className="space-y-6">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex gap-4 ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {message.role === "assistant" && (
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg">
-                      <Bot className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-
-                  <div
-                    className={`max-w-[85%] ${
-                      message.role === "user" ? "order-1" : ""
-                    }`}
-                  >
-                    <Card
-                      className={`p-4 shadow-sm border-0 ${
-                        message.role === "user"
-                          ? "bg-gradient-to-br from-violet-500 to-cyan-500 text-white"
-                          : "bg-white border border-slate-200/60"
-                      }`}
-                    >
-                      <div className="prose prose-sm max-w-none">
-                        {message.content.split("\n").map((line, index) => {
-                          const trimmedLine = line.trim();
-
-                          // Handle main headers (## or ### format)
-                          if (trimmedLine.match(/^#{2,3}\s+/)) {
-                            return (
-                              <h3
-                                key={index}
-                                className={`text-lg font-bold mb-3 mt-4 ${
-                                  message.role === "user"
-                                    ? "text-white"
-                                    : "text-slate-900"
-                                }`}
-                              >
-                                {trimmedLine.replace(/^#{2,3}\s+/, "")}
-                              </h3>
-                            );
-                          }
-
-                          // Handle numbered lists with bold headers
-                          if (trimmedLine.match(/^\d+\.\s?\*\*.*\*\*/)) {
-                            const number = trimmedLine.match(/^(\d+)\./)?.[1];
-                            const content = trimmedLine
-                              .replace(/^\d+\.\s?\*\*/, "")
-                              .replace(/\*\*$/, "");
-                            return (
-                              <div key={index} className="mb-4">
-                                <div
-                                  className={`flex items-start gap-3 font-semibold text-base ${
-                                    message.role === "user"
-                                      ? "text-white"
-                                      : "text-violet-700"
-                                  }`}
-                                >
-                                  <span
-                                    className={`flex-shrink-0 w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold ${
-                                      message.role === "user"
-                                        ? "bg-violet-200 text-violet-800"
-                                        : "bg-violet-100 text-violet-700"
-                                    }`}
-                                  >
-                                    {number}
-                                  </span>
-                                  {content}
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          // Handle simple numbered lists
-                          if (trimmedLine.match(/^\d+\.\s/)) {
-                            const number = trimmedLine.match(/^(\d+)\./)?.[1];
-                            const content = trimmedLine.replace(/^\d+\.\s/, "");
-                            return (
-                              <div key={index} className="mb-2">
-                                <div
-                                  className={`flex items-start gap-3 ${
-                                    message.role === "user"
-                                      ? "text-white"
-                                      : "text-slate-700"
-                                  }`}
-                                >
-                                  <span
-                                    className={`flex-shrink-0 w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold ${
-                                      message.role === "user"
-                                        ? "bg-violet-200 text-violet-800"
-                                        : "bg-slate-200 text-slate-600"
-                                    }`}
-                                  >
-                                    {number}
-                                  </span>
-                                  {content}
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          // Handle sub-bullets with bold text
-                          if (trimmedLine.match(/^-\s?\*\*.*\*\*/)) {
-                            const content = trimmedLine
-                              .replace(/^-\s?\*\*/, "")
-                              .replace(/\*\*$/, "");
-                            return (
-                              <div
-                                key={index}
-                                className="ml-6 mb-2 flex items-start gap-2"
-                              >
-                                <span
-                                  className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${
-                                    message.role === "user"
-                                      ? "bg-violet-200"
-                                      : "bg-violet-400"
-                                  }`}
-                                />
-                                <span
-                                  className={`font-medium ${
-                                    message.role === "user"
-                                      ? "text-white"
-                                      : "text-slate-800"
-                                  }`}
-                                >
-                                  {content}
-                                </span>
-                              </div>
-                            );
-                          }
-
-                          // Handle regular bullets
-                          if (trimmedLine.match(/^-\s/)) {
-                            const content = trimmedLine.replace(/^-\s/, "");
-                            return (
-                              <div
-                                key={index}
-                                className="ml-6 mb-1 flex items-start gap-2"
-                              >
-                                <span
-                                  className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                                    message.role === "user"
-                                      ? "bg-violet-200"
-                                      : "bg-slate-400"
-                                  }`}
-                                />
-                                <span
-                                  className={`${
-                                    message.role === "user"
-                                      ? "text-white"
-                                      : "text-slate-600"
-                                  }`}
-                                >
-                                  {content}
-                                </span>
-                              </div>
-                            );
-                          }
-
-                          // Handle markdown links
-                          if (
-                            trimmedLine.includes("[") &&
-                            trimmedLine.includes("](")
-                          ) {
-                            const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-                            const parts = trimmedLine.split(linkRegex);
-                            return (
-                              <p
-                                key={index}
-                                className={`mb-2 leading-relaxed ${
-                                  message.role === "user"
-                                    ? "text-white"
-                                    : "text-slate-700"
-                                }`}
-                              >
-                                {parts.map((part, partIndex) => {
-                                  if (partIndex % 3 === 1) {
-                                    return (
-                                      <a
-                                        key={partIndex}
-                                        href={parts[partIndex + 1]}
-                                        className={`underline hover:no-underline font-medium ${
-                                          message.role === "user"
-                                            ? "text-violet-100 hover:text-white"
-                                            : "text-violet-600 hover:text-violet-800"
-                                        }`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                      >
-                                        {part}
-                                      </a>
-                                    );
-                                  } else if (partIndex % 3 === 2) {
-                                    return null;
-                                  } else {
-                                    return <span key={partIndex}>{part}</span>;
-                                  }
-                                })}
-                              </p>
-                            );
-                          }
-
-                          // Handle bold text within paragraphs
-                          if (trimmedLine.includes("**")) {
-                            const parts = trimmedLine.split(/(\*\*[^*]+\*\*)/);
-                            return (
-                              <p
-                                key={index}
-                                className={`mb-2 leading-relaxed ${
-                                  message.role === "user"
-                                    ? "text-white"
-                                    : "text-slate-700"
-                                }`}
-                              >
-                                {parts.map((part, partIndex) =>
-                                  part.startsWith("**") &&
-                                  part.endsWith("**") ? (
-                                    <strong
-                                      key={partIndex}
-                                      className={`font-semibold ${
-                                        message.role === "user"
-                                          ? "text-white"
-                                          : "text-slate-900"
-                                      }`}
-                                    >
-                                      {part.replace(/\*\*/g, "")}
-                                    </strong>
-                                  ) : (
-                                    <span key={partIndex}>{part}</span>
-                                  )
-                                )}
-                              </p>
-                            );
-                          }
-
-                          // Handle empty lines (create spacing)
-                          if (trimmedLine === "") {
-                            return <div key={index} className="mb-4" />;
-                          }
-
-                          // Handle regular paragraphs
-                          if (trimmedLine.length > 0) {
-                            return (
-                              <p
-                                key={index}
-                                className={`mb-3 leading-relaxed ${
-                                  message.role === "user"
-                                    ? "text-white"
-                                    : "text-slate-700"
-                                }`}
-                              >
-                                {trimmedLine}
-                              </p>
-                            );
-                          }
-
-                          return null;
-                        })}
-                      </div>
-                    </Card>
-
-                    {/* Sources display for assistant messages */}
-                    {message.role === "assistant" && message.sources && message.sources.length > 0 && (
-                      <div className="mt-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <FileText className="w-4 h-4 text-violet-600" />
-                          <span className="text-sm font-medium text-slate-700">Sources</span>
-                        </div>
-                        <div className="space-y-2">
-                          {message.sources.map((source, sourceIndex) => (
-                            <div
-                              key={sourceIndex}
-                              className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200"
-                            >
-                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
-                                {sourceIndex + 1}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-sm font-medium text-slate-900 truncate">
-                                  {source.title || source.document_name || 'Document'}
-                                </h4>
-                                {source.relevance_score && (
-                                  <p className="text-xs text-slate-600 mt-1">
-                                    {Math.round(source.relevance_score * 100)}% relevant
-                                  </p>
-                                )}
-                                {source.content && (
-                                  <p className="text-xs text-slate-600 mt-2 truncate">
-                                    {source.content.substring(0, 150)}...
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {message.role === "user" && (
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg order-2">
-                      <User className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {isLoading && (
-                <div className="flex justify-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg">
-                    <Bot className="w-4 h-4 text-white" />
-                  </div>
-                  <Card className="p-4 bg-white border border-slate-200/60">
-                    <div className="flex items-center gap-3">
-                      <Loader2 className="w-4 h-4 animate-spin text-violet-600" />
-                      <span className="text-sm text-slate-600">
-                        AI is thinking...
-                      </span>
-                    </div>
-                  </Card>
-                </div>
-              )}
-
-              {/* Scroll anchor */}
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-
-      {/* Bottom input */}
-      <div className="flex-none border-t border-slate-200/60 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto p-6">
+      {/* Input Area */}
+      <div className="border-t border-gray-100 px-4 py-6">
+        <div className="mx-auto max-w-3xl">
           <form onSubmit={sendMessage} className="relative">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
-              <div className="relative bg-white rounded-2xl shadow-lg border border-slate-200/50 p-1.5">
-                <div className="flex items-center gap-3 px-4 py-2">
-                  <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type your message..."
-                    disabled={isLoading}
-                    className="flex-1 border-0 bg-transparent placeholder:text-slate-400 focus:ring-0 focus:outline-none"
-                  />
-                  <Button
-                    type="submit"
-                    disabled={isLoading || !input.trim()}
-                    size="sm"
-                    className="bg-gradient-to-r from-violet-500 to-cyan-500 hover:from-violet-600 hover:to-cyan-600 border-0 rounded-xl px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Send className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
+            <div className="flex items-center rounded-3xl border border-gray-300 bg-white px-4 py-3 shadow-sm">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Message ChatGPT"
+                className="flex-1 border-0 bg-transparent px-0 text-base placeholder-gray-500 focus:ring-0 focus-visible:ring-0"
+              />
+              <Button
+                type="submit"
+                disabled={!input.trim() || isLoading}
+                size="sm"
+                className="ml-2 rounded-full bg-gray-200 p-2 text-gray-400 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-300"
+              >
+                <ArrowUp className="h-4 w-4" />
+              </Button>
             </div>
           </form>
+          <p className="mt-2 text-center text-xs text-gray-500">
+            ChatGPT can make mistakes. Check important info.
+          </p>
         </div>
       </div>
     </div>
