@@ -1,35 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// Railway API endpoint
-const RAILWAY_API_URL = process.env.RAILWAY_PM_RAG;
+// Render API endpoint
+const RENDER_API_URL = process.env.RENDER_PM_RAG_URL || 'https://alleato-rag-chat-fastapi.onrender.com';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-if (!RAILWAY_API_URL) {
-  console.error('❌ RAILWAY_PM_RAG environment variable not set');
-}
+console.log('🔗 Using Render API:', RENDER_API_URL);
 
 const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 
-async function queryRailwayRAG(message: string, conversationHistory: unknown[] = []) {
-  if (!RAILWAY_API_URL) {
-    throw new Error('Railway API URL not configured');
-  }
-  
+async function queryRenderRAG(message: string, conversationHistory: unknown[] = []) {
   try {
     const payload = {
       message: message,
-      context: conversationHistory.slice(-5), // Last 5 messages for context
-      options: {
-        max_results: 10,
-        include_sources: true,
-        search_type: 'hybrid' // semantic + keyword search
-      }
+      conversation_history: conversationHistory.slice(-5), // Last 5 messages for context
+      session_id: `chat_session_${Date.now()}`
     };
 
-    console.log(`🚂 Querying Railway API: ${RAILWAY_API_URL}/chat`);
+    console.log(`🎯 Querying Render API: ${RENDER_API_URL}/chat`);
 
-    const response = await fetch(`${RAILWAY_API_URL}/chat`, {
+    const response = await fetch(`${RENDER_API_URL}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -40,15 +30,15 @@ async function queryRailwayRAG(message: string, conversationHistory: unknown[] =
     });
 
     if (!response.ok) {
-      throw new Error(`Railway API returned ${response.status}`);
+      throw new Error(`Render API returned ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('✅ Railway API Response received');
+    console.log('✅ Render API Response received');
 
     return data;
   } catch (error) {
-    console.error('🚨 Railway API Error:', error);
+    console.error('🚨 Render API Error:', error);
     throw error;
   }
 }
@@ -59,7 +49,7 @@ async function generateFallbackResponse(message: string, conversationHistory: un
   }
 
   const systemPrompt = `You are an AI assistant helping with project management and meeting analysis. 
-The user's Railway RAG system is temporarily unavailable, so provide helpful general guidance about:
+The user's Render RAG system is temporarily unavailable, so provide helpful general guidance about:
 - Project management best practices
 - Meeting analysis and action items
 - Risk assessment strategies  
@@ -99,17 +89,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Last message content is required' }, { status: 400 });
     }
 
-    // Query Railway RAG API with your meeting data
+    // Query Render RAG API with your meeting data
     try {
-      const railwayResponse = await queryRailwayRAG(lastMessage.content, messages);
+      const renderResponse = await queryRenderRAG(lastMessage.content, messages);
       
-      // Extract the response from Railway API
+      // Extract the response from Render API
       let responseText = '';
       let sources = [];
       
-      if (railwayResponse) {
-        // Handle AgentRunResult format
-        let rawResponse = railwayResponse.response || railwayResponse.answer || railwayResponse.message || '';
+      if (renderResponse) {
+        // Handle the standard Render API format
+        let rawResponse = renderResponse.response || renderResponse.answer || renderResponse.message || '';
         
         // Parse AgentRunResult if present - improved regex to handle various formats
         if (typeof rawResponse === 'string' && rawResponse.includes('AgentRunResult')) {
@@ -145,7 +135,7 @@ export async function POST(req: NextRequest) {
         responseText = rawResponse || 'No response generated';
         
         // Extract sources separately
-        sources = railwayResponse.sources || railwayResponse.documents || [];
+        sources = renderResponse.tool_calls || renderResponse.sources || renderResponse.documents || [];
       }
 
       return NextResponse.json({ 
@@ -153,8 +143,8 @@ export async function POST(req: NextRequest) {
         sources: sources || []
       });
 
-    } catch (railwayError) {
-      console.warn('⚠️ Railway API failed, attempting fallback...', railwayError);
+    } catch (renderError) {
+      console.warn('⚠️ Render API failed, attempting fallback...', renderError);
       
       // Enhanced fallback with basic AI response using OpenAI
       try {
@@ -168,11 +158,11 @@ export async function POST(req: NextRequest) {
         console.error('❌ Fallback also failed:', fallbackError);
         
         return NextResponse.json({ 
-          message: `I'm having trouble accessing your meeting data right now. The Railway RAG system appears to be unavailable. 
+          message: `I'm having trouble accessing your meeting data right now. The Render RAG system appears to be unavailable. 
 
 Please check:
-1. Is the Railway service running?
-2. Is the RAILWAY_PM_RAG environment variable set correctly?
+1. Is the Render service running?
+2. Is the RENDER_PM_RAG_URL environment variable set correctly?
 3. Are there any network connectivity issues?
 
 I'd normally be able to help you with:
@@ -181,7 +171,7 @@ I'd normally be able to help you with:
 - Action item tracking
 - Risk assessment from your meetings
 
-Please try again in a moment or check the Railway service status.`
+Please try again in a moment or check the Render service status.`
         });
       }
     }
