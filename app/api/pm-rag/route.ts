@@ -13,24 +13,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Try Railway API first, then fallback
-    const railwayResult = await tryRailwayAPI(message, conversationHistory);
+    // Try Render API first, then fallback
+    const renderResult = await tryRenderAPI(message, conversationHistory);
     
-    if (railwayResult.success && railwayResult.data) {
+    if (renderResult.success && renderResult.data) {
       return NextResponse.json({
-        message: railwayResult.data.response,
-        response: railwayResult.data.response,
-        sources: railwayResult.data.sources || [],
+        message: renderResult.data.response,
+        response: renderResult.data.response,
+        sources: renderResult.data.sources || [],
         metadata: {
-          ...railwayResult.data.metadata,
-          service: 'railway',
+          ...renderResult.data.metadata,
+          service: 'render',
           timestamp: new Date().toISOString()
         }
       });
     }
 
     // Fallback to local PM RAG processing
-    console.log('🔄 Railway unavailable, using enhanced local processing...');
+    console.log('🔄 Render API unavailable, using enhanced local processing...');
     return await enhancedLocalProcessing(message, conversationHistory);
 
   } catch (error) {
@@ -48,15 +48,10 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Try to connect to Railway API
+ * Try to connect to Render API
  */
-async function tryRailwayAPI(message: string, conversationHistory: unknown[]) {
-  const RAILWAY_RAG_API = process.env.RAILWAY_PM_RAG;
-  
-  if (!RAILWAY_RAG_API) {
-    console.warn('⚠️ RAILWAY_PM_RAG environment variable not set');
-    return { success: false, error: 'Railway API URL not configured' };
-  }
+async function tryRenderAPI(message: string, conversationHistory: unknown[]) {
+  const RENDER_RAG_API = process.env.RENDER_PM_RAG_URL || 'https://alleato-rag-chat-fastapi.onrender.com';
   
   try {
     const payload = {
@@ -66,9 +61,9 @@ async function tryRailwayAPI(message: string, conversationHistory: unknown[]) {
     };
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout for Render
 
-    const response = await fetch(`${RAILWAY_RAG_API}/chat`, {
+    const response = await fetch(`${RENDER_RAG_API}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +77,7 @@ async function tryRailwayAPI(message: string, conversationHistory: unknown[]) {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('✅ Railway API responded successfully');
+      console.log('✅ Render API responded successfully');
       
       return {
         success: true,
@@ -90,23 +85,23 @@ async function tryRailwayAPI(message: string, conversationHistory: unknown[]) {
           response: data.response,
           sources: data.tool_calls || [],
           metadata: { 
-            railway_session: data.session_id,
+            render_session: data.session_id,
             tool_calls: data.tool_calls?.length || 0
           }
         }
       };
     } else {
-      console.warn(`⚠️ Railway API returned ${response.status}`);
+      console.warn(`⚠️ Render API returned ${response.status}`);
       return { success: false, error: `HTTP ${response.status}` };
     }
 
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      console.warn('⏰ Railway API timeout');
+      console.warn('⏰ Render API timeout');
     } else if (error instanceof Error) {
-      console.warn('🚨 Railway API connection error:', error.message);
+      console.warn('🚨 Render API connection error:', error.message);
     } else {
-      console.warn('🚨 Railway API unknown error:', String(error));
+      console.warn('🚨 Render API unknown error:', String(error));
     }
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
@@ -452,16 +447,16 @@ function getResponseStrategy(message: string): string {
  */
 export async function GET() {
   try {
-    // Test Railway connection
-    const railwayStatus = await testRailwayConnection();
+    // Test Render connection
+    const renderStatus = await testRenderConnection();
     
     // Test local database
     const localStatus = await testLocalDatabase();
     
     return NextResponse.json({
-      status: railwayStatus.healthy || localStatus.healthy ? 'healthy' : 'degraded',
+      status: renderStatus.healthy || localStatus.healthy ? 'healthy' : 'degraded',
       services: {
-        railway_api: railwayStatus,
+        render_api: renderStatus,
         local_database: localStatus,
         enhanced_fallback: true
       },
@@ -474,7 +469,7 @@ export async function GET() {
         strategic_planning: true
       },
       configuration: {
-        railway_url: process.env.RAILWAY_PM_RAG || 'not_configured',
+        render_url: process.env.RENDER_PM_RAG_URL || 'https://alleato-rag-chat-fastapi.onrender.com',
         fallback_mode: 'enhanced_local_processing',
         data_sources: ['meetings', 'documents', 'insights', 'projects', 'tasks']
       },
@@ -491,35 +486,27 @@ export async function GET() {
   }
 }
 
-async function testRailwayConnection() {
+async function testRenderConnection() {
   try {
-    const RAILWAY_RAG_API = process.env.RAILWAY_PM_RAG;
+    const RENDER_RAG_API = process.env.RENDER_PM_RAG_URL || 'https://alleato-rag-chat-fastapi.onrender.com';
     
-    if (!RAILWAY_RAG_API) {
-      return {
-        healthy: false,
-        error: 'Railway API URL not configured',
-        url: 'not_configured'
-      };
-    }
-    
-    const response = await fetch(`${RAILWAY_RAG_API}/health`, {
+    const response = await fetch(`${RENDER_RAG_API}/health`, {
       method: 'GET',
       headers: { 'User-Agent': 'Alleato-Health-Check/1.0' },
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(10000)
     });
     
     return {
       healthy: response.ok,
       status: response.status,
-      url: RAILWAY_RAG_API,
-      response_time: 'fast'
+      url: RENDER_RAG_API,
+      response_time: 'normal'
     };
   } catch (error) {
     return {
       healthy: false,
       error: error instanceof Error ? error.message : 'Connection failed',
-      url: process.env.RAILWAY_PM_RAG || 'not_configured'
+      url: process.env.RENDER_PM_RAG_URL || 'https://alleato-rag-chat-fastapi.onrender.com'
     };
   }
 }

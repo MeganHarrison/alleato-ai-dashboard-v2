@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
 
 // Railway API endpoint
 const RAILWAY_API_URL = process.env.RAILWAY_PM_RAG;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 if (!RAILWAY_API_URL) {
   console.error('❌ RAILWAY_PM_RAG environment variable not set');
 }
+
+const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 
 async function queryRailwayRAG(message: string, conversationHistory: unknown[] = []) {
   if (!RAILWAY_API_URL) {
@@ -47,6 +51,39 @@ async function queryRailwayRAG(message: string, conversationHistory: unknown[] =
     console.error('🚨 Railway API Error:', error);
     throw error;
   }
+}
+
+async function generateFallbackResponse(message: string, conversationHistory: unknown[] = []) {
+  if (!openai) {
+    throw new Error('OpenAI not configured for fallback');
+  }
+
+  const systemPrompt = `You are an AI assistant helping with project management and meeting analysis. 
+The user's Railway RAG system is temporarily unavailable, so provide helpful general guidance about:
+- Project management best practices
+- Meeting analysis and action items
+- Risk assessment strategies  
+- Team collaboration insights
+
+Be conversational and helpful, but acknowledge that you don't have access to their specific meeting data right now.`;
+
+  const messages: any[] = [
+    { role: 'system', content: systemPrompt },
+    ...conversationHistory.slice(-4).map((msg: any) => ({
+      role: msg.role || 'user',
+      content: msg.content || msg.message || String(msg)
+    })),
+    { role: 'user', content: message }
+  ];
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages,
+    max_tokens: 500,
+    temperature: 0.7
+  });
+
+  return completion.choices[0]?.message?.content || 'I apologize, but I cannot generate a response at the moment.';
 }
 
 export async function POST(req: NextRequest) {
@@ -117,10 +154,21 @@ export async function POST(req: NextRequest) {
       });
 
     } catch (railwayError) {
-      console.warn('⚠️ Railway API failed, providing helpful message:', railwayError);
+      console.warn('⚠️ Railway API failed, attempting fallback...', railwayError);
       
-      return NextResponse.json({ 
-        message: `I'm having trouble accessing your meeting data right now. The Railway RAG system appears to be unavailable. 
+      // Enhanced fallback with basic AI response using OpenAI
+      try {
+        const fallbackResponse = await generateFallbackResponse(lastMessage.content, messages);
+        return NextResponse.json({ 
+          message: fallbackResponse,
+          sources: [],
+          fallback: true
+        });
+      } catch (fallbackError) {
+        console.error('❌ Fallback also failed:', fallbackError);
+        
+        return NextResponse.json({ 
+          message: `I'm having trouble accessing your meeting data right now. The Railway RAG system appears to be unavailable. 
 
 Please check:
 1. Is the Railway service running?
@@ -134,7 +182,8 @@ I'd normally be able to help you with:
 - Risk assessment from your meetings
 
 Please try again in a moment or check the Railway service status.`
-      });
+        });
+      }
     }
 
   } catch (error) {

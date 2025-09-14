@@ -56,7 +56,9 @@ export function InsightsSection({
     ...aiInsights.map(insight => ({
       ...insight,
       source: 'ai',
-      sortDate: insight.created_at || ''
+      sortDate: insight.meeting?.date || insight.created_at || '',
+      meeting_date: insight.meeting?.date,
+      meeting_title: insight.meeting?.title
     }))
   ].sort((a, b) => {
     const dateA = new Date(a.sortDate || '').getTime();
@@ -125,7 +127,7 @@ export function InsightsSection({
             {currentInsights.map((insight, index) => (
               <div 
                 key={insight.id || insight.insight_id || index}
-                className="border border-gray-100 rounded-lg p-3 hover:border-gray-200 transition-colors bg-white"
+                className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
@@ -146,14 +148,20 @@ export function InsightsSection({
                   
                   {/* Show meeting date prominently */}
                   <div className="flex flex-col items-end text-right">
-                    {insight.meeting_date && (
-                      <span className="text-xs font-medium text-gray-700">
-                        {format(new Date(insight.meeting_date), "MMM d, yyyy")}
-                      </span>
-                    )}
-                    {insight.meeting_title && (
-                      <span className="text-xs text-gray-500 mt-1">
-                        {insight.meeting_title}
+                    {insight.meeting_date ? (
+                      <>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {format(new Date(insight.meeting_date), "MMM d, yyyy")}
+                        </span>
+                        {insight.meeting_title && (
+                          <span className="text-xs text-gray-600 mt-1">
+                            {insight.meeting_title}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-sm font-medium text-gray-700">
+                        {insight.created_at ? format(new Date(insight.created_at), "MMM d, yyyy") : ''}
                       </span>
                     )}
                   </div>
@@ -164,7 +172,7 @@ export function InsightsSection({
                 </p>
                 
                 {insight.assigned_to && (
-                  <div className="mt-2 pt-2 border-t border-gray-50">
+                  <div className="mt-3 pt-2 border-t border-gray-200">
                     <span className="text-xs text-gray-500">
                       Assigned to: <span className="font-medium text-gray-700">{insight.assigned_to}</span>
                     </span>

@@ -112,10 +112,17 @@ export async function getProjectInsights(projectId: number): Promise<{
       console.error('Error fetching project insights:', projectError)
     }
 
-    // Fetch AI insights
+    // Fetch AI insights with meeting information
     const { data: aiInsights, error: aiError } = await supabase
       .from('ai_insights')
-      .select('*')
+      .select(`
+        *,
+        meeting:meeting_id (
+          id,
+          title,
+          date
+        )
+      `)
       .eq('project_id', projectId)
       .order('created_at', { ascending: false })
 

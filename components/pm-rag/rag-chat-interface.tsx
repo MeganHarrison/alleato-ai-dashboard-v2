@@ -32,8 +32,8 @@ export default function RAGChatInterface() {
       timestamp: new Date(),
     }
   ]);
-  const [input] = useState(false);
-  const [loading] = useState(false);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -71,8 +71,8 @@ export default function RAGChatInterface() {
     setLoading(true);
 
     try {
-      // Try the fallback endpoint that doesn't require vector functions
-      const response = await fetch('/api/pm-rag-fallback', {
+      // Use the pm-rag endpoint which now connects to Render API
+      const response = await fetch('/api/pm-rag', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

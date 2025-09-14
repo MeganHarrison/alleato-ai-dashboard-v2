@@ -528,7 +528,7 @@ export function ModernHomepage() {
                       ))}
                     </div>
                   </div>
-                ))
+                ))}
 
                 {insights.length === 0 && !insightsLoading && (
                   <div className="text-center py-8 text-gray-500">
