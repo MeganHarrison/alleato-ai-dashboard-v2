@@ -1,9 +1,17 @@
 frontend:
-  - 'app/**'
-  - 'components/**'
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'app/**'
+          - 'components/**'
 workers:
-  - 'workers/**'
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'workers/**'
 tests:
-  - 'tests/**'
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/**'
 docs:
-  - '**/*.md'
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.md'
