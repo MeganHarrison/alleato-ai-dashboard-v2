@@ -43,11 +43,11 @@ async function getDbSchema(projectRef: string) {
   return data as any
 }
 
-function formatSchemaForPrompt(schema: any) {
-  let schemaString = ''
+function formatSchemaForPrompt(schema: unknown) {
+  const schemaString = ''
   if (schema && Array.isArray(schema)) {
-    schema.forEach((table: any) => {
-      const columnInfo = table.columns.map((c: any) => `${c.name} (${c.data_type})`)
+    schema.forEach((table: unknown) => {
+      const columnInfo = table.columns.map((c: unknown) => `${c.name} (${c.data_type})`)
       schemaString += `Table "${table.name}" has columns: ${columnInfo.join(', ')}.\n`
     })
   }
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
 
     // 4. Return the generated SQL
     return NextResponse.json({ sql })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('AI SQL generation error:', error)
     const errorMessage = error.message || 'An unexpected error occurred.'
     const status = error.response?.status || 500

@@ -76,7 +76,7 @@ export const documentOperations = {
     const { page = 1, limit = 20, status, search, user_id } = params;
     const offset = (page - 1) * limit;
 
-    let query = supabase.from('rag_documents').select(`
+    const query = supabase.from('rag_documents').select(`
       *,
       project:projects(id, name)
     `, { count: 'exact' });
@@ -134,7 +134,7 @@ export const chunkOperations = {
     threshold: number = 0.7,
     documentIds?: string[]
   ): Promise<SearchResult[]> {
-    let query = supabase.rpc('match_document_chunks', {
+    const query = supabase.rpc('match_document_chunks', {
       query_embedding: embedding,
       match_threshold: threshold,
       match_count: limit,
@@ -224,7 +224,7 @@ export const queueOperations = {
     status: ProcessingJob['status'],
     error_message?: string
   ): Promise<void> {
-    const updates: any = { status };
+    const updates: unknown = { status };
     if (status === 'processing') updates.started_at = new Date().toISOString();
     if (status === 'completed' || status === 'failed') {
       updates.completed_at = new Date().toISOString();

@@ -71,7 +71,7 @@ class FMGlobal834Agent implements FMGlobalRAGAgent {
   }
 
   private async searchFigureVectors(embedding: number[], config?: ASRSConfiguration): Promise<FigureResult[]> {
-    let query = this.supabase
+    const query = this.supabase
       .from('fm_global_figures')
       .select(`
         *,
@@ -215,7 +215,7 @@ class FMGlobal834Agent implements FMGlobalRAGAgent {
       .from('fm_cost_factors')
       .select('*');
 
-    let totalCost = 0;
+    const totalCost = 0;
     const breakdown: CostBreakdown = { items: [], subtotal: 0, labor: 0, total: 0 };
 
     for (const item of equipment.items) {

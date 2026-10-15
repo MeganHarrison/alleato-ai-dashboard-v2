@@ -1,0 +1,60 @@
+name: Slash Command /autonomous
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  handle:
+    if: github.event.issue.pull_request != null
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Determine command + permissions
+        id: cmd
+        env:
+          BODY: ${{ github.event.comment.body }}
+          COMMENTER: ${{ github.event.comment.user.login }}
+          ALLOWED: ${{ vars.CLAUDE_ALLOWED_LOGINS }}
+        run: |
+          # Normalize body
+          BODY_LC=$(echo "$BODY" | tr '[:upper:]' '[:lower:]' | tr -d '\r')
+          # Extract basic command tokens
+          if echo "$BODY_LC" | grep -q "^/autonomous"; then
+            # Permission check: commenter must be repo member with write or in allowed list
+            IN_ALLOWED=false
+            if [ -n "$ALLOWED" ] && echo ",$ALLOWED," | grep -qi ",$COMMENTER," ; then
+              IN_ALLOWED=true
+            fi
+            echo "in_allowed=$IN_ALLOWED" >> $GITHUB_OUTPUT
+
+            # Decide mode
+            MODE="toggle"
+            if echo "$BODY_LC" | grep -q "/autonomous on"; then MODE="on"; fi
+            if echo "$BODY_LC" | grep -q "/autonomous off"; then MODE="off"; fi
+            echo "mode=$MODE" >> $GITHUB_OUTPUT
+            echo "ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "ok=false" >> $GITHUB_OUTPUT
+
+      - name: Get current labels
+        if: steps.cmd.outputs.ok == 'true' && steps.cmd.outputs.in_allowed == 'true'
+        id: labels
+        uses: actions-ecosystem/action-get-labeled@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add label
+        if: steps.cmd.outputs.ok == 'true' && steps.cmd.outputs.in_allowed == 'true' && (steps.cmd.outputs.mode == 'on' || (steps.cmd.outputs.mode == 'toggle' && !contains(steps.labels.outputs.labels, 'autonomous')))
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: autonomous
+
+      - name: Remove label
+        if: steps.cmd.outputs.ok == 'true' && steps.cmd.outputs.in_allowed == 'true' && (steps.cmd.outputs.mode == 'off' || (steps.cmd.outputs.mode == 'toggle' && contains(steps.labels.outputs.labels, 'autonomous')))
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: autonomous

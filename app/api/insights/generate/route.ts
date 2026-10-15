@@ -27,7 +27,7 @@ interface InsightData {
   confidence?: number;
 }
 
-async function generateInsightsForDocument(doc: any): Promise<InsightData> {
+async function generateInsightsForDocument(doc: unknown): Promise<InsightData> {
   try {
     const systemPrompt = `You are an AI assistant specialized in analyzing documents and extracting actionable insights. 
     Analyze the provided document content and extract:
@@ -215,7 +215,7 @@ export async function GET(request: NextRequest) {
     
     // First try to get from ai_insights table if it exists
     try {
-      let query = supabase
+      const query = supabase
         .from('ai_insights')
         .select(`
           *,
@@ -244,7 +244,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fallback to getting insights from document metadata
-    let query = supabase
+    const query = supabase
       .from('documents')
       .select('*')
       .not('metadata->ai_insights', 'is', null)

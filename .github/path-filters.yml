@@ -1,0 +1,20 @@
+safe:
+  - 'app/**'
+  - 'components/**'
+  - 'lib/**'
+  - 'public/**'
+  - 'styles/**'
+  - 'tests/**'
+  - 'workers/**'
+  - '!workers/production/**'   # production worker code is protected
+  - '!infra/**'                # infra is protected
+  - '!database/migrations/**'  # migrations are protected
+
+protected:
+  - 'infra/**'
+  - 'workers/production/**'
+  - 'database/migrations/**'
+  - '.github/workflows/**'
+  - 'package.json'
+  - 'package-lock.json'
+  - 'pnpm-lock.yaml'

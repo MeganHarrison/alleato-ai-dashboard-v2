@@ -51,7 +51,7 @@ export function ProjectsViewWrapper({
 
   // Filter projects based on search and filters
   const filteredProjects = React.useMemo(() => {
-    let filtered = [...projects]
+    const filtered = [...projects]
 
     // Apply search filter
     if (searchQuery) {

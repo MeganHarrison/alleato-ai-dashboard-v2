@@ -15,7 +15,7 @@ export function SuggestionsManager({ projectRef }: { projectRef: string }) {
   const sortedSuggestions = useMemo(() => {
     if (!suggestions) return []
     const levelOrder = { ERROR: 1, WARN: 2, INFO: 3 }
-    return [...suggestions].sort((a: any, b: any) => {
+    return [...suggestions].sort((a: unknown, b: unknown) => {
       const levelA = levelOrder[a.level as keyof typeof levelOrder] || 99
       const levelB = levelOrder[b.level as keyof typeof levelOrder] || 99
       return levelA - levelB
@@ -60,7 +60,7 @@ export function SuggestionsManager({ projectRef }: { projectRef: string }) {
         <div>
           {sortedSuggestions.length > 0 ? (
             <div>
-              {sortedSuggestions.map((suggestion: any) => (
+              {sortedSuggestions.map((suggestion: unknown) => (
                 <div
                   key={suggestion.cache_key}
                   className="py-4 border-b last:border-b-0 group relative"
@@ -85,7 +85,7 @@ export function SuggestionsManager({ projectRef }: { projectRef: string }) {
                     <div className="text-sm text-muted-foreground mt-2 prose prose-sm max-w-none">
                       <ReactMarkdown
                         components={{
-                          code({ inline, children, ...props }: any) {
+                          code({ inline, children, ...props }: unknown) {
                             return inline ? (
                               <code className="bg-muted px-1 rounded" {...props}>
                                 {children}

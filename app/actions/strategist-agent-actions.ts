@@ -10,7 +10,7 @@ export async function askStrategistAgent(question: string, history: ChatMessage[
     const search = await searchMeetingChunksFullText() as any
     
     const contextText = search.success && search.data && search.data.length > 0
-      ? search.data.map((chunk: any) => {
+      ? search.data.map((chunk: unknown) => {
           const meetingInfo = chunk.meeting_title ? `[Meeting: ${chunk.meeting_title}]\n` : ""
           return meetingInfo + chunk.content
         }).join("\n---\n")
@@ -29,8 +29,8 @@ export async function askStrategistAgent(question: string, history: ChatMessage[
     }
 
     // Format a response based on the retrieved context
-    const relevantChunks = (search.data || []).slice(0, 3).map((chunk: any) => chunk.content?.substring(0, 200) || '')
-    const answer = `Based on your meeting records:\n\n${relevantChunks.map((chunk: any, i: any) => `${i + 1}. ${chunk}...`).join("\n\n")}\n\nFound ${search.data?.length || 0} relevant meeting segments using ${search.method || 'text'} search.`
+    const relevantChunks = (search.data || []).slice(0, 3).map((chunk: unknown) => chunk.content?.substring(0, 200) || '')
+    const answer = `Based on your meeting records:\n\n${relevantChunks.map((chunk: unknown, i: unknown) => `${i + 1}. ${chunk}...`).join("\n\n")}\n\nFound ${search.data?.length || 0} relevant meeting segments using ${search.method || 'text'} search.`
 
     return {
       success: true,

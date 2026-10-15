@@ -30,30 +30,12 @@ import * as React from "react";
 const data = {
   navMain: [
     {
-      title: "FM Global",
+      title: "Menu",
       url: "#",
       items: [
         {
-          title: "FM Global Expert",
-          url: "/fm-global-expert",
-        },
-        {
-          title: "Tables & Figures",
-          url: "/fm-global-tables",
-        },
-        {
-          title: "FM-Global Form",
-          url: "/fm-global-form",
-        },
-      ],
-    },
-    {
-      title: "Project Management",
-      url: "#",
-      items: [
-        {
-          title: "Project Insights",
-          url: "/pm-rag",
+          title: "Dashboard",
+          url: "/",
         },
         {
           title: "Projects Dashboard",
@@ -63,9 +45,44 @@ const data = {
           title: "Meetings",
           url: "/meetings",
         },
+        
         {
-          title: "Alleato Intel",
-          url: "/rag-system",
+          title: "File Upload",
+          url: "/file-upload",
+        },
+      ],
+    },
+        {
+      title: "Admin",
+      url: "#",
+      items: [
+                {
+          title: "FM Global Dashboard",
+          url: "/fm-global-dashboard",
+        },
+        {
+          title: "FM-Global Design",
+          url: "/asrs-requirements-calculator",
+        },
+        {
+          title: "ASRS Form 3",
+          url: "/asrs-form-3",
+        },
+        {
+          title: "FM Global Agent",
+          url: "/asrs-chat",
+        },
+        {
+          title: "FM Global Chat",
+          url: "/asrs-chat2",
+        },
+        {
+          title: "ASRS Requirements",
+          url: "/asrs-requirements",
+        },
+        {
+          title: "FM Global PDF",
+          url: "/fm-global-pdf",
         },
       ],
     },
@@ -87,7 +104,7 @@ const data = {
         },
         {
           title: "Leads",
-          url: "/leads",
+          url: "/prospects",
         },
         {
           title: "Contacts",
@@ -100,6 +117,28 @@ const data = {
         {
           title: "Project Tasks",
           url: "/project-tasks",
+        },
+        {
+          title: "Notion Projects",
+          url: "/notion-projects",
+        },
+      ],
+    },
+    {
+      title: "System Admin",
+      url: "#",
+      items: [
+        {
+          title: "RAG Admin",
+          url: "/rag-admin",
+        },
+        {
+          title: "Sitemap",
+          url: "/sitemap",
+        },
+        {
+          title: "Trigger Vectorization",
+          url: "/trigger-vectorization",
         },
       ],
     },
@@ -179,10 +218,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <CollapsibleContent>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {item.items.map((item) => (
-                      <SidebarMenuItem key={item.title}>
+                    {item.items.map((subItem) => (
+                      <SidebarMenuItem key={subItem.title}>
                         <SidebarMenuButton asChild>
-                          <a href={item.url}>{item.title}</a>
+                          <a href={subItem.url}>{subItem.title}</a>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}

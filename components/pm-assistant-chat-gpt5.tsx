@@ -75,7 +75,7 @@ interface Message {
 interface ToolCall {
   name: string;
   status: 'calling' | 'completed' | 'failed';
-  result?: any;
+  result?: unknown;
 }
 
 interface MessageContext {
@@ -139,12 +139,12 @@ export default function PMAssistantChatGPT5({
   className?: string;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showQuickActions, setShowQuickActions] = useState(true);
-  const [selectedTab, setSelectedTab] = useState('chat');
+  const [input] = useState(false);
+  const [isLoading] = useState(false);
+  const [isListening] = useState(false);
+  const [isExpanded] = useState(false);
+  const [showQuickActions] = useState(false);
+  const [selectedTab] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);

@@ -1,0 +1,33 @@
+name: Path Guard
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changed paths
+      # dorny/paths-filter determines whether protected paths were changed
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: .github/path-filters.yml
+
+      - name: Label PR if protected paths changed
+        if: steps.changes.outputs.protected == 'true'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: human-review-required
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Remove 'autonomous' label if protected
+        if: steps.changes.outputs.protected == 'true'
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: autonomous
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

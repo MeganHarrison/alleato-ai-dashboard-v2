@@ -117,7 +117,7 @@ export class ChatClient {
 
       const decoder = new TextDecoder();
       let sources: string[] = [];
-      let confidence = 0;
+      const confidence = 0;
 
       try {
         while (true) {

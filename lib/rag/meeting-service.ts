@@ -13,8 +13,8 @@ export interface MeetingContext {
     meeting_date: string;
     chunk_type: string;
     similarity: number;
-    metadata: any;
-    speakers: any;
+    metadata: unknown;
+    speakers: unknown;
     meeting_id: string;
   }>;
   meetings: Map<string, Meeting>;
@@ -86,7 +86,7 @@ export class MeetingRAGService {
     }
 
     // Filter by date range if provided
-    let filteredChunks = searchResult.data;
+    const filteredChunks = searchResult.data;
     if (dateFrom || dateTo) {
       filteredChunks = filteredChunks.filter(chunk => {
         const chunkDate = new Date(chunk.meeting_date);
@@ -116,7 +116,7 @@ export class MeetingRAGService {
     const insights = await this.extractInsights(filteredChunks, query);
 
     return {
-      chunks: filteredChunks.map((chunk: any) => ({
+      chunks: filteredChunks.map((chunk: unknown) => ({
         ...chunk,
         meeting_id: chunk.metadata?.meeting_id || '',
       })),
@@ -128,7 +128,7 @@ export class MeetingRAGService {
   /**
    * Extract actionable insights from meeting chunks
    */
-  private async extractInsights(chunks: any[], query: string): Promise<string[]> {
+  private async extractInsights(chunks: unknown[], query: string): Promise<string[]> {
     const insights: string[] = [];
     
     // Group chunks by type
@@ -174,8 +174,8 @@ export class MeetingRAGService {
    */
   async getMeetingSummary(meetingId: string): Promise<{
     meeting: Meeting;
-    summary: any;
-    actionItems: any[];
+    summary: unknown;
+    actionItems: unknown[];
     participants: string[];
   } | null> {
     const { data: meeting } = await this.supabase
@@ -226,7 +226,7 @@ export class MeetingRAGService {
 
     const indicators: string[] = [];
     const recommendations: string[] = [];
-    let healthScore = 100;
+    const healthScore = 100;
 
     // Check meeting frequency
     const daysSinceLastMeeting = Math.floor(

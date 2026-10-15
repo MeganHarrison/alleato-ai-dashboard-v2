@@ -23,9 +23,9 @@ interface ChatCompletionResponse {
     index: number
     finish_reason: string
   }[]
-  retrieval?: any
-  functions?: any
-  guardrails?: any
+  retrieval?: unknown
+  functions?: unknown
+  guardrails?: unknown
 }
 
 export async function queryDocumentationAgent(messages: Message[], includeRetrieval = false) {

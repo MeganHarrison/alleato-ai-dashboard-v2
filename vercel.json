@@ -1,25 +1,35 @@
 {
   "framework": "nextjs",
-  "buildCommand": "(test -f scripts/fix-zod-imports.js && node scripts/fix-zod-imports.js || echo 'Skipping fix script') && pnpm next build",
+  "buildCommand": "NODE_OPTIONS='--max-old-space-size=8192' next build",
   "outputDirectory": ".next",
-  "installCommand": "pnpm install --production=false",
+  "installCommand": "pnpm install --frozen-lockfile --prefer-offline",
   "functions": {
     "app/api/**/*.ts": {
-      "maxDuration": 30,
+      "maxDuration": 60,
       "memory": 1024
-    },
-    "app/**/*.tsx": {
-      "maxDuration": 30
     }
   },
   "regions": ["iad1"],
   "build": {
     "env": {
-      "NODE_OPTIONS": "--max-old-space-size=7168",
+      "NODE_OPTIONS": "--max-old-space-size=8192 --max_semi_space_size=128",
       "NEXT_TELEMETRY_DISABLED": "1",
-      "NEXT_SHARP_PATH": "/tmp/node_modules/sharp"
+      "SKIP_ENV_VALIDATION": "1",
+      "NEXT_CACHE": "1",
+      "NODE_ENV": "production"
     }
   },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
   "github": {
     "silent": true
   }

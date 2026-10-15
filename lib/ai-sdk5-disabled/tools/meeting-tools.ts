@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { tool } from "ai";
 import { z } from "zod";
 import OpenAI from "openai";
@@ -39,7 +38,7 @@ export const searchMeetingsTool = tool({
       }
       
       // Format results with context
-      const results = searchResult.data.map((chunk: any) => ({
+      const results = searchResult.data.map((chunk: unknown) => ({
         content: chunk.content,
         meeting: {
           title: chunk.meeting_title,
@@ -77,7 +76,7 @@ export const getMeetingInsightsTool = tool({
     const supabase = createClient();
     
     try {
-      let query = supabase
+      const query = supabase
         .from("meetings_insights")
         .select(`
           *,
@@ -173,7 +172,7 @@ export const analyzeMeetingTrendsTool = tool({
           break;
       }
       
-      let query = supabase
+      const query = supabase
         .from("meetings")
         .select(`
           id,
@@ -204,7 +203,7 @@ export const analyzeMeetingTrendsTool = tool({
       }
       
       // Perform different types of analysis
-      let analysis: any = {
+      let analysis: unknown = {
         type: analysisType,
         timeframe,
         meetingCount: meetings?.length || 0,
@@ -219,7 +218,7 @@ export const analyzeMeetingTrendsTool = tool({
           // Extract common topics from meeting insights
           const topics: Record<string, number> = {};
           meetings?.forEach(meeting => {
-            meeting.meetings_insights?.forEach((insight: any) => {
+            meeting.meetings_insights?.forEach((insight: unknown) => {
               if (insight.metadata?.topics) {
                 insight.metadata.topics.forEach((topic: string) => {
                   topics[topic] = (topics[topic] || 0) + 1;
@@ -253,14 +252,14 @@ export const analyzeMeetingTrendsTool = tool({
         case "action_completion":
           // Analyze action items and their completion
           const actionItems = meetings?.flatMap(m => 
-            m.meetings_insights?.filter((i: any) => i.insight_type === "action_items") || []
+            m.meetings_insights?.filter((i: unknown) => i.insight_type === "action_items") || []
           );
           analysis.actionItemStats = {
             totalActionItems: actionItems?.length || 0,
             byMeeting: meetings?.map(m => ({
               meeting: m.title,
               date: m.date,
-              actionItemCount: m.meetings_insights?.filter((i: any) => i.insight_type === "action_items").length || 0,
+              actionItemCount: m.meetings_insights?.filter((i: unknown) => i.insight_type === "action_items").length || 0,
             })),
           };
           break;

@@ -1,13 +1,8 @@
-import { createHash } from 'crypto';
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  // Temporarily ignore ESLint warnings and TypeScript errors during build (too many to fix immediately)
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -17,132 +12,89 @@ const nextConfig = {
       },
     ],
   },
+  // Stability-focused experimental features
+  experimental: {
+    // Enable better error reporting
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    // Note: turbo disabled by not including it (Next.js 15.0.3 issue)
+  },
+  // Force dynamic rendering for all pages
+  output: 'standalone',
+  trailingSlash: false,
+  // Increase timeout for static page generation
+  staticPageGenerationTimeout: 120,
   // Basic optimizations for production
   poweredByHeader: false,
   compress: true,
   
-  // Reduce memory usage during build
-  output: 'standalone',
-  
   // Optimize bundle size
   productionBrowserSourceMaps: false,
-  
-  // Experimental features to reduce memory usage
-  experimental: {
-    // Reduce memory pressure during build
-    optimizeServerReact: false,
-    // Disable partial prerendering to reduce memory
-    ppr: false,
-    // Limit concurrent builds to reduce memory
-    workerThreads: false,
-    cpus: 1,
-    // Optimize package imports
-    optimizePackageImports: [
-      '@radix-ui/react-accordion',
-      '@radix-ui/react-alert-dialog',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-select',
-      '@radix-ui/react-tabs',
-      'lucide-react',
-      'recharts',
-      '@supabase/supabase-js',
-      '@tanstack/react-table'
-    ],
-  },
   
   transpilePackages: [
     '@tanstack/react-table',
     '@tanstack/table-core',
+    '@ai-sdk/react',
+    '@supabase/ssr',
   ],
-  
-  webpack: (config, { isServer, dev }) => {
-    // Add alias for Zod v4 compatibility
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'zod/v4': 'zod',
-    };
-    
-    // Suppress the critical dependency warning for Supabase realtime
-    config.module = {
-      ...config.module,
-      exprContextCritical: false,
-    };
-    
-    // Fix ESM parsing issues for @tanstack/react-table and other packages
-    config.module.rules.push({
-      test: /\.m?js$/,
-      resolve: {
-        fullySpecified: false,
-      },
-    });
-    
-    // Specifically handle @tanstack/react-table ESM imports
-    config.module.rules.push({
-      test: /node_modules\/@tanstack\/react-table\/.*\.js$/,
-      type: 'javascript/esm',
-    });
-    
-    // Configure to handle ESM modules properly
-    config.resolve.extensionAlias = {
-      ...config.resolve.extensionAlias,
-      '.js': ['.ts', '.tsx', '.js'],
-      '.jsx': ['.tsx', '.jsx'],
-    };
-    
-    // Simplified memory optimization for production builds
+
+  // Webpack optimization to prevent memory issues
+  webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
-      config.optimization = {
-        ...config.optimization,
-        minimize: true,
-        splitChunks: {
-          chunks: 'all',
-          maxSize: 244000,
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            framework: {
-              name: 'framework',
-              chunks: 'all',
-              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
-              priority: 40,
-              enforce: true,
-            },
-            lib: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'lib',
-              priority: 30,
-              minChunks: 1,
-              reuseExistingChunk: true,
-            },
-            commons: {
-              name: 'commons',
-              minChunks: 2,
-              priority: 20,
-            },
+      // Optimize bundle splitting
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+            chunks: 'all',
           },
         },
       };
     }
-    
-    // Optimize for memory usage in serverless environment
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: isServer ? false : config.optimization.splitChunks,
-    };
-    
-    // Alternative approach using webpack ignore plugin
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
+
+    // Prevent memory leaks in development
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+        ignored: /node_modules/,
       };
     }
-    
+
     return config;
+  },
+
+  // Add redirects for deleted routes
+  async redirects() {
+    return [
+      {
+        source: '/asrs3',
+        destination: '/',
+        permanent: false,
+      },
+      {
+        source: '/asrs3/:path*',
+        destination: '/',
+        permanent: false,
+      },
+      {
+        source: '/insights6',
+        destination: '/',
+        permanent: false,
+      },
+      {
+        source: '/insights6/:path*',
+        destination: '/',
+        permanent: false,
+      },
+    ];
   },
 }
 

@@ -1,16 +1,20 @@
 "use server";
 
-import { and, eq, gt } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { chats, messages, parts } from "@/lib/db/schema-pg";
-import { MyUIMessage } from "../message-type";
 // import {
-//   mapUIMessagePartsToDBParts,
 //   mapDBPartToUIMessagePart,
+//   mapUIMessagePartsToDBParts,
 // } from "@/utils/message-mapping";
 
-export const createChat = async () => {
-  const [{ id }] = await db.insert(chats).values({ user_id: 'temp' }).returning();
+// Temporary placeholders for disabled functions
+const mapDBPartToUIMessagePart = (part: unknown) => part;
+const mapUIMessagePartsToDBParts = (parts: unknown[], id: string) => [];
+import { and, eq, gt } from "drizzle-orm";
+import { MyUIMessage } from "../message-type";
+
+export const createChat = async (userId: string = 'default-user') => {
+  const [{ id }] = await db.insert(chats).values({ user_id: userId }).returning();
   return id;
 };
 
@@ -23,7 +27,7 @@ export const upsertMessage = async ({
   chatId: string;
   message: MyUIMessage;
 }) => {
-  const mappedDBUIParts: any[] = [];
+  const mappedDBUIParts = mapUIMessagePartsToDBParts(message.parts, id);
 
   await db.transaction(async (tx) => {
     await tx
@@ -61,8 +65,7 @@ export const loadChat = async (chatId: string): Promise<MyUIMessage[]> => {
   return result.map((message) => ({
     id: message.id,
     role: message.role,
-    content: message.content || '',
-    parts: [],
+    parts: message.parts.map((part) => mapDBPartToUIMessagePart(part)),
   }));
 };
 
@@ -83,6 +86,7 @@ export const deleteMessage = async (messageId: string) => {
       .limit(1);
 
     if (!targetMessage) return;
+    if (!targetMessage.created_at) return;
 
     // Delete all messages after this one in the chat
     await tx
@@ -90,7 +94,7 @@ export const deleteMessage = async (messageId: string) => {
       .where(
         and(
           eq(messages.chat_id, targetMessage.chat_id),
-          gt(messages.created_at, targetMessage.created_at || new Date()),
+          gt(messages.created_at, targetMessage.created_at),
         ),
       );
 

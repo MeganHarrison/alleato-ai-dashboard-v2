@@ -14,7 +14,7 @@ import { AlertTriangle, Table, Wand } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 // Helper to generate a Zod schema from the table's column definitions
-function generateZodSchema(table: any): z.ZodObject<any, any, any> {
+function generateZodSchema(table: unknown): z.ZodObject<any, any, any> {
   if (!table || !table.columns) {
     return z.object({})
   }
@@ -55,11 +55,11 @@ function generateZodSchema(table: any): z.ZodObject<any, any, any> {
   return z.object(shape)
 }
 
-const getPrimaryKeys = (table: any): string[] => {
+const getPrimaryKeys = (table: unknown): string[] => {
   if (!table || !table.primary_keys) {
     return []
   }
-  return table.primary_keys.map((pk: any) => pk.name)
+  return table.primary_keys.map((pk: unknown) => pk.name)
 }
 
 function EditRowView({
@@ -69,8 +69,8 @@ function EditRowView({
   onSuccess,
 }: {
   projectRef: string
-  table: any
-  row: any
+  table: unknown
+  row: unknown
   onSuccess: () => void
 }) {
   const { mutate: runUpdateQuery, isPending: isUpdatePending } = useRunQuery()
@@ -102,7 +102,7 @@ function EditRowView({
   }, [table])
 
   const handleFormSubmit = useCallback(
-    (formData: any) => {
+    (formData: unknown) => {
       const pks = getPrimaryKeys(table)
       if (pks.length === 0) {
         toast.error('Cannot update row. This table does not have a primary key.')
@@ -114,7 +114,7 @@ function EditRowView({
           if (JSON.stringify(row[key]) === JSON.stringify(value)) return null
 
           // Find the column type to determine formatting
-          const column = table.columns.find((col: any) => col.name === key)
+          const column = table.columns.find((col: unknown) => col.name === key)
           const dataType = column?.data_type?.toLowerCase() || ''
           const isNullable = column?.is_nullable || false
 
@@ -200,12 +200,12 @@ function EditRowView({
   )
 }
 
-function TableRecordsView({ projectRef, table }: { projectRef: string; table: any }) {
+function TableRecordsView({ projectRef, table }: { projectRef: string; table: unknown }) {
   const { push, pop } = useSheetNavigation()
   const [refetchCounter, setRefetchCounter] = useState(0)
 
   const handleRowClick = useCallback(
-    (row: any) => {
+    (row: unknown) => {
       push({
         title: `Editing row`,
         component: (
@@ -245,7 +245,7 @@ export function DatabaseManager({ projectRef }: { projectRef: string }) {
   const { data: tables, isLoading, isError } = useListTables(projectRef, ['public'])
 
   const handleTableClick = useCallback(
-    (table: any) => {
+    (table: unknown) => {
       push({
         title: table.name,
         component: <TableRecordsView projectRef={projectRef} table={table} />,
@@ -302,7 +302,7 @@ export function DatabaseManager({ projectRef }: { projectRef: string }) {
 
       {tables && tables.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          {tables.map((table: any) => (
+          {tables.map((table: unknown) => (
             <Button
               variant="outline"
               key={table.id}

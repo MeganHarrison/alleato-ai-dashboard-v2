@@ -47,7 +47,7 @@ export function ContactDetailsSheet({ contact, trigger }: ContactDetailsSheetPro
         <SheetHeader className="gap-1">
           <SheetTitle>{fullName}</SheetTitle>
           <SheetDescription>
-            {contact.job_title || "Contact Details"}
+            Contact Details
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto py-4 text-sm">
@@ -87,12 +87,6 @@ export function ContactDetailsSheet({ contact, trigger }: ContactDetailsSheetPro
             <div>
               <h3 className="font-semibold mb-2">Professional Information</h3>
               <div className="space-y-2">
-                {contact.job_title && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Job Title:</span>
-                    <span>{contact.job_title}</span>
-                  </div>
-                )}
                 {contact.company && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Company:</span>
@@ -104,68 +98,14 @@ export function ContactDetailsSheet({ contact, trigger }: ContactDetailsSheetPro
 
             <Separator />
 
-            {/* Social Media */}
-            {(contact.linkedin || contact.facebook || contact.instagram) && (
-              <>
-                <div>
-                  <h3 className="font-semibold mb-2">Social Media</h3>
-                  <div className="space-y-2">
-                    {contact.linkedin && (
-                      <div className="flex items-center gap-2">
-                        <Linkedin className="size-4 text-muted-foreground" />
-                        <a 
-                          href={contact.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          LinkedIn Profile
-                        </a>
-                      </div>
-                    )}
-                    {contact.facebook && (
-                      <div className="flex items-center gap-2">
-                        <Facebook className="size-4 text-muted-foreground" />
-                        <a 
-                          href={contact.facebook}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          Facebook Profile
-                        </a>
-                      </div>
-                    )}
-                    {contact.instagram && (
-                      <div className="flex items-center gap-2">
-                        <Instagram className="size-4 text-muted-foreground" />
-                        <a 
-                          href={contact.instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          Instagram Profile
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <Separator />
-              </>
-            )}
 
             {/* Notes */}
-            {contact.notes && contact.notes.length > 0 && (
+            {contact.notes && (
               <>
                 <div>
                   <h3 className="font-semibold mb-2">Notes</h3>
-                  <div className="space-y-2">
-                    {contact.notes.map((note, index) => (
-                      <div key={index} className="bg-muted p-2 rounded">
-                        <p className="text-sm">{note}</p>
-                      </div>
-                    ))}
+                  <div className="bg-muted p-2 rounded">
+                    <p className="text-sm">{contact.notes}</p>
                   </div>
                 </div>
                 <Separator />
@@ -204,21 +144,6 @@ export function ContactDetailsSheet({ contact, trigger }: ContactDetailsSheetPro
                   id="phone" 
                   type="tel" 
                   defaultValue={contact.phone || ""} 
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="job_title">Job Title</Label>
-                <Input 
-                  id="job_title" 
-                  defaultValue={contact.job_title || ""} 
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="linkedin">LinkedIn</Label>
-                <Input 
-                  id="linkedin" 
-                  type="url" 
-                  defaultValue={contact.linkedin || ""} 
                 />
               </div>
             </form>

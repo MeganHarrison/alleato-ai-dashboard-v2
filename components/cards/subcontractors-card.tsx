@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface SubcontractorCardProps {
-  subcontractor: any
+  subcontractor: unknown
 }
 
 export function SubcontractorCard({ subcontractor }: SubcontractorCardProps) {

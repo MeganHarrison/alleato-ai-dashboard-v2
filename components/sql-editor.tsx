@@ -38,10 +38,10 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 interface SqlEditorProps {
   projectRef: string
   initialSql?: string
-  queryKey?: any
+  queryKey?: unknown
   label?: string
-  onResults?: (data: any[] | undefined) => void
-  onRowClick?: (row: any, queryKey?: any) => void
+  onResults?: (data: unknown[] | undefined) => void
+  onRowClick?: (row: unknown, queryKey?: unknown) => void
   hideSql?: boolean
   readOnly?: boolean
   runAutomatically?: boolean
@@ -113,7 +113,7 @@ export function SqlEditor({
       const { sql: generatedSql } = await response.json()
       setSql(generatedSql)
       runQuery({ projectRef, query: generatedSql, readOnly: true })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error)
       setAiError(error.message)
     } finally {
@@ -384,7 +384,7 @@ export function SqlEditor({
   )
 }
 
-function QueryResultChart({ data, xAxis, yAxis }: { data: any[]; xAxis: string; yAxis: string }) {
+function QueryResultChart({ data, xAxis, yAxis }: { data: unknown[]; xAxis: string; yAxis: string }) {
   const chartConfig = {
     [yAxis]: {
       label: yAxis,

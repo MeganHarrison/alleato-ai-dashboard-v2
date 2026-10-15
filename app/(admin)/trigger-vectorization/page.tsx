@@ -9,7 +9,7 @@ import { Loader2, Play, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react
 export default function TriggerVectorizationPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
-  const [details, setDetails] = useState<any>(null)
+  const [details, setDetails] = useState<Record<string, unknown> | null>(null)
 
   const triggerVectorization = async () => {
     setStatus('loading')
@@ -45,7 +45,7 @@ export default function TriggerVectorizationPage() {
       
       if (response.ok) {
         const data = await response.json()
-        setDetails((prev: any) => ({ ...prev, status: data }))
+        setDetails((prev: unknown) => ({ ...(prev as object), status: data }))
       }
     } catch (error) {
       console.error('Status check failed:', error)

@@ -31,7 +31,7 @@ export function UserProfile() {
         } else {
           // No session, but this is expected on login/signup pages
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         setError(error.message)
       } finally {
         setLoading(false)

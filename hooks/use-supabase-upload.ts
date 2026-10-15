@@ -160,7 +160,7 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
 
     // If the number of files doesn't exceed the maxFiles parameter, remove the error 'Too many files' from each file
     if (files.length <= maxFiles) {
-      let changed = false
+      const changed = false
       const newFiles = files.map((file) => {
         if (file.errors.some((e) => e.code === 'too-many-files')) {
           file.errors = file.errors.filter((e) => e.code !== 'too-many-files')

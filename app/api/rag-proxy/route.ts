@@ -1,53 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Proxy to PM RAG fallback API
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Forward the request to the Render endpoint
-    // Using AbortController with 60 second timeout to handle Render free tier cold starts
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
-    
-    const response = await fetch('https://rag-agent-pm.onrender.com/chat', {
+    // Forward to pm-rag-fallback
+    const response = await fetch(new URL('/api/pm-rag-fallback', request.url).toString(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-      signal: controller.signal,
     });
     
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return NextResponse.json(
-        { error: `Remote server error: ${response.status} - ${errorText}` },
-        { status: response.status }
-      );
-    }
-
     const data = await response.json();
-    return NextResponse.json(data);
     
+    // Map response to expected format for rag-chat page
+    return NextResponse.json({
+      response: data.message,
+      message: data.message,
+      sources: data.sources || [],
+      metadata: data.metadata || {}
+    });
   } catch (error) {
-    console.error('Proxy error:', error);
-    
-    // Check if it's a timeout error
-    if (error instanceof Error && error.name === 'AbortError') {
-      return NextResponse.json(
-        { 
-          error: 'Request timed out. The service might be starting up from a cold state. Please try again in a moment.',
-          details: 'Render free tier instances spin down after inactivity and may take 50+ seconds to restart.'
-        },
-        { status: 504 } // Gateway Timeout
-      );
-    }
-    
+    console.error('RAG Proxy error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Proxy request failed' },
+      { 
+        error: error instanceof Error ? error.message : 'Proxy error',
+        response: 'Sorry, I encountered an error processing your request.'
+      },
       { status: 500 }
+    );
+  }
+}
+
+// Health check
+export async function GET(request: NextRequest) {
+  try {
+    const response = await fetch(new URL('/api/pm-rag-fallback', request.url).toString());
+    const data = await response.json();
+    
+    return NextResponse.json({
+      ...data,
+      endpoint: 'PM RAG Fallback API'
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { 
+        status: 'unhealthy',
+        error: error instanceof Error ? error.message : 'Service unavailable',
+        endpoint: 'PM RAG Fallback API'
+      },
+      { status: 503 }
     );
   }
 }

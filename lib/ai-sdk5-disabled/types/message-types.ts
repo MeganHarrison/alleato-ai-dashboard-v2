@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { DataPart, ProviderMetadata, ReasoningPart, SourceDocumentPart, SourceURLPart, TextPart, ToolCallPart, UIMessage } from "ai";
 
 // Custom data parts for your application

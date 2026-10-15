@@ -7,8 +7,8 @@ export async function integrateSupabaseMCP() {
     
     // Filter for Supabase-specific tools
     const supabaseTools = (tools || []).filter((tool: any) => 
-      tool.name.includes('supabase') || 
-      ['listTables', 'queryTable', 'executeSql'].includes(tool.name)
+      tool?.name?.includes('supabase') || 
+      ['listTables', 'queryTable', 'executeSql'].includes(tool?.name || '')
     );
     
     return supabaseTools;

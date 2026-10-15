@@ -298,9 +298,9 @@ ${transcript}`,
 
   // Generate project insights
   async generateProjectInsights(
-    projectData: any,
-    meetings: any[],
-    documents: any[]
+    projectData: unknown,
+    meetings: unknown[],
+    documents: unknown[]
   ) {
     const messages: OpenAI.ChatCompletionMessageParam[] = [
       {
@@ -333,8 +333,8 @@ Please provide:
 
   // Predict project risks
   async predictRisks(
-    projectData: any,
-    historicalData: any[]
+    projectData: unknown,
+    historicalData: unknown[]
   ) {
     const messages: OpenAI.ChatCompletionMessageParam[] = [
       {
@@ -373,7 +373,7 @@ For each risk, provide:
 
   // Generate executive report
   async generateExecutiveReport(
-    projects: any[],
+    projects: unknown[],
     timeframe: { start: Date; end: Date }
   ) {
     const messages: OpenAI.ChatCompletionMessageParam[] = [
@@ -426,7 +426,7 @@ Format the report professionally with clear sections and bullet points.`,
   // Process natural language query
   async processQuery(
     query: string,
-    context: any,
+    context: unknown,
     options: Partial<GPT5Config> = {}
   ) {
     const messages: OpenAI.ChatCompletionMessageParam[] = [
@@ -456,8 +456,8 @@ export const gpt5Service = new GPT5Service();
 
 // Helper function to handle tool calls
 export async function handleToolCalls(
-  toolCalls: any[],
-  context: any
+  toolCalls: unknown[],
+  context: unknown
 ): Promise<any[]> {
   const results = [];
 

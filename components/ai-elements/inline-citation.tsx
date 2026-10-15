@@ -155,9 +155,8 @@ export const InlineCitationCarouselIndex = ({
   ...props
 }: InlineCitationCarouselIndexProps) => {
   const api = useCarouselApi();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-
+  const [current] = useState(false);
+  const [count] = useState(false);
   useEffect(() => {
     if (!api) {
       return;

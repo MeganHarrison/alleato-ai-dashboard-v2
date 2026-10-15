@@ -3,7 +3,7 @@ const NOTION_VERSION = "2022-06-28"
 
 const token = process.env.NOTION_TOKEN || process.env.NOTION_API_TOKEN
 
-async function notionRequest(path: string, options: RequestInit & { data?: any } = {}) {
+async function notionRequest(path: string, options: RequestInit & { data?: unknown } = {}) {
   if (!token) {
     throw new Error("Notion API token is not set in environment variables")
   }
@@ -31,21 +31,21 @@ async function notionRequest(path: string, options: RequestInit & { data?: any }
   return res.json()
 }
 
-export async function createPage(databaseId: string, properties: any) {
+export async function createPage(databaseId: string, properties: unknown) {
   return notionRequest("/pages", {
     method: "POST",
     data: { parent: { database_id: databaseId }, properties },
   })
 }
 
-export async function updatePage(pageId: string, properties: any) {
+export async function updatePage(pageId: string, properties: unknown) {
   return notionRequest(`/pages/${pageId}`, {
     method: "PATCH",
     data: { properties },
   })
 }
 
-export async function createDatabase(parentPageId: string, title: string, properties: any) {
+export async function createDatabase(parentPageId: string, title: string, properties: unknown) {
   return notionRequest("/databases", {
     method: "POST",
     data: {
@@ -56,7 +56,7 @@ export async function createDatabase(parentPageId: string, title: string, proper
   })
 }
 
-export async function updateDatabase(databaseId: string, properties: any) {
+export async function updateDatabase(databaseId: string, properties: unknown) {
   return notionRequest(`/databases/${databaseId}`, {
     method: "PATCH",
     data: { properties },

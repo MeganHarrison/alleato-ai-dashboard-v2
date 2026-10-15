@@ -132,17 +132,17 @@ export function ProjectTasksDataTable({ tasks }: ProjectTasksDataTableProps) {
 
   // Get unique filter values
   const uniqueStatuses = useMemo(() => {
-    const statuses = Array.from(new Set(tasks.map(task => task.status).filter(Boolean)))
+    const statuses = Array.from(new Set(tasks.map(task => task.status).filter((status): status is string => Boolean(status))))
     return ['all', ...statuses]
   }, [tasks])
 
   const uniquePriorities = useMemo(() => {
-    const priorities = Array.from(new Set(tasks.map(task => task.priority).filter(Boolean)))
+    const priorities = Array.from(new Set(tasks.map(task => task.priority).filter((priority): priority is string => Boolean(priority))))
     return ['all', ...priorities]
   }, [tasks])
 
   const uniqueAssignees = useMemo(() => {
-    const assignees = Array.from(new Set(tasks.map(task => task.assigned_to).filter(Boolean)))
+    const assignees = Array.from(new Set(tasks.map(task => task.assigned_to).filter((assignee): assignee is string => Boolean(assignee))))
     return ['all', ...assignees]
   }, [tasks])
 

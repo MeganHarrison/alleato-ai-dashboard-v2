@@ -13,7 +13,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 interface ContactCardProps {
-  contact: any
+  contact: unknown
 }
 
 export function ContactCard({ contact }: ContactCardProps) {

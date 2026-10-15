@@ -97,7 +97,7 @@ export function EditableMeetingsTable({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Meeting>>({});
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState(false);
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
@@ -119,13 +119,13 @@ export function EditableMeetingsTable({
   }, [meetings]);
 
   const categories = useMemo(() => {
-    const catSet = new Set(meetings.map((m) => m.category).filter(Boolean));
+    const catSet = new Set(meetings.map((m) => m.category).filter((cat): cat is string => Boolean(cat)));
     return ["all", ...Array.from(catSet).sort()];
   }, [meetings]);
 
   // Filter and sort meetings
   const filteredMeetings = useMemo(() => {
-    let filtered = meetings.filter((meeting) => {
+    const filtered = meetings.filter((meeting) => {
       // Year filter
       if (selectedYear !== "all") {
         const meetingYear = new Date(meeting.date).getFullYear().toString();
@@ -154,8 +154,8 @@ export function EditableMeetingsTable({
     // Apply sorting
     if (sortColumn) {
       filtered.sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
+        let aValue: unknown;
+        let bValue: unknown;
 
         switch (sortColumn) {
           case "title":

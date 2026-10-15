@@ -2,7 +2,7 @@
 
 import { createPage, updatePage, createDatabase, updateDatabase } from "@/utils/notion/client"
 
-export async function createNotionPage(databaseId: string, properties: any) {
+export async function createNotionPage(databaseId: string, properties: unknown) {
   try {
     const data = await createPage(databaseId, properties)
     return { success: true, data }
@@ -12,7 +12,7 @@ export async function createNotionPage(databaseId: string, properties: any) {
   }
 }
 
-export async function updateNotionPage(pageId: string, properties: any) {
+export async function updateNotionPage(pageId: string, properties: unknown) {
   try {
     const data = await updatePage(pageId, properties)
     return { success: true, data }
@@ -22,7 +22,7 @@ export async function updateNotionPage(pageId: string, properties: any) {
   }
 }
 
-export async function createNotionDatabase(parentPageId: string, title: string, properties: any) {
+export async function createNotionDatabase(parentPageId: string, title: string, properties: unknown) {
   try {
     const data = await createDatabase(parentPageId, title, properties)
     return { success: true, data }
@@ -32,7 +32,7 @@ export async function createNotionDatabase(parentPageId: string, title: string, 
   }
 }
 
-export async function updateNotionDatabase(databaseId: string, properties: any) {
+export async function updateNotionDatabase(databaseId: string, properties: unknown) {
   try {
     const data = await updateDatabase(databaseId, properties)
     return { success: true, data }

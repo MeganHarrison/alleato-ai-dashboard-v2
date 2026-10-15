@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use server";
 
 import { createClient } from '@supabase/supabase-js';
@@ -51,7 +50,7 @@ export const upsertMessage = async ({
 
   // Insert new parts
   if (message.parts && message.parts.length > 0) {
-    const partsToInsert = message.parts.map((part: UIMessagePart, index: number) => {
+    const partsToInsert = message.parts.map((part: any, index: number) => {
       const base: any = {
         id: generateId(),
         messageId: id,
@@ -61,13 +60,13 @@ export const upsertMessage = async ({
 
       switch (part.type) {
         case 'text':
-          base.text_text = (part as any).text;
+          base.text_text = part.text;
           break;
         case 'reasoning':
-          base.reasoning_text = (part as any).text;
+          base.reasoning_text = part.text;
           break;
         case 'file': {
-          const p: any = part;
+          const p = part;
           base.file_mediaType = p.mediaType;
           base.file_filename = p.filename ?? null;
           base.file_url = p.url;
@@ -107,7 +106,7 @@ export const upsertMessage = async ({
           break;
         }
         case 'data-weather': {
-          const p: any = part;
+          const p: unknown = part;
           const d = p.data || {};
           base.data_weather_id = generateId();
           base.data_weather_location = d.location ?? null;
@@ -142,7 +141,7 @@ export const loadChat = async (chatId: string): Promise<MyUIMessage[]> => {
   if (!messagesData || messagesData.length === 0) return [];
 
   // 2) fetch parts for these messages
-  const messageIds = messagesData.map((m: any) => m.id);
+  const messageIds = messagesData.map((m: unknown) => m.id);
   const { data: partsData, error: partsErr } = await supabase
     .from('parts')
     .select('*')
@@ -151,15 +150,15 @@ export const loadChat = async (chatId: string): Promise<MyUIMessage[]> => {
   if (partsErr) throw partsErr;
 
   const byMessage = new Map<string, any[]>();
-  (partsData || []).forEach((p: any) => {
+  (partsData || []).forEach((p: unknown) => {
     const arr = byMessage.get(p.messageId) || [];
     arr.push(p);
     byMessage.set(p.messageId, arr);
   });
 
-  return messagesData.map((m: any) => {
+  return messagesData.map((m: unknown) => {
     const p = byMessage.get(m.id) || [];
-    const uiParts: UIMessagePart[] = p.map((part: any) => {
+    const uiParts: UIMessagePart[] = p.map((part: unknown) => {
       switch (part.type) {
         case 'text':
           return { type: 'text', text: part.text_text ?? '' } as any;

@@ -1,11 +1,20 @@
+import { AIChat } from "@/components/ai-chat";
 import "@/components/docs/documentation-styles.css";
 import type { Metadata } from "next";
 import React, { type ReactElement } from "react";
 import "./globals.css";
 
+// Force dynamic rendering for entire app to prevent static generation failures
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Alleato - AI Intelligence",
   description: "Transform your data into powerful insights",
+  icons: {
+    icon: '/logos/Alleato Favicon.png',
+    shortcut: '/logos/Alleato Favicon.png',
+    apple: '/logos/Alleato Favicon.png',
+  },
 };
 
 export default function RootLayout({
@@ -15,7 +24,10 @@ export default function RootLayout({
 }>): ReactElement {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased bg-white pb-6">{children}</body>
+      <body className="font-sans antialiased bg-white pb-6">
+        {children}
+        <AIChat />
+      </body>
     </html>
   );
 }

@@ -71,7 +71,8 @@ export default function RAGChatInterface() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/pm-rag-local', {
+      // Use the pm-rag endpoint which now connects to Render API
+      const response = await fetch('/api/pm-rag', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ export default function RAGChatInterface() {
         role: 'assistant',
         content: data.message || data.response || 'I couldn\'t find relevant information for your query.',
         timestamp: new Date(),
-        sources: data.metadata?.sources?.map((source: any) => ({
+        sources: data.metadata?.sources?.map((source: unknown) => ({
           meeting_id: source.meeting_id || source,
           title: source.title || source,
           date: source.date || new Date().toISOString(),

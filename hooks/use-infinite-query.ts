@@ -101,7 +101,7 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
 
     setState({ isFetching: true })
 
-    let query = supabase
+    const query = supabase
       .from(tableName)
       .select(columns, { count: 'exact' }) as unknown as SupabaseSelectBuilder<T>
 
@@ -151,7 +151,7 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
 }
 
 // Empty initial state to avoid hydration errors.
-const initialState: any = {
+const initialState: unknown = {
   data: [],
   count: 0,
   isSuccess: false,

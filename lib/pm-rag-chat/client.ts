@@ -110,7 +110,7 @@ export class PMRAGChatClient {
 
       const decoder = new TextDecoder();
       let sources: string[] = [];
-      let confidence = 0;
+      const confidence = 0;
       let reasoning: string | undefined;
 
       try {

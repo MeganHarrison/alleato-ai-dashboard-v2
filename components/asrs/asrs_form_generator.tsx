@@ -19,7 +19,7 @@ interface FormQuestion {
   id: keyof ASRSFormData;
   type: 'select' | 'number' | 'multiselect' | 'radio';
   question: string;
-  options?: { value: any; label: string; description?: string }[];
+  options?: { value: unknown; label: string; description?: string }[];
   min?: number;
   max?: number;
   step?: number;
@@ -27,15 +27,27 @@ interface FormQuestion {
   required: boolean;
   helpText?: string;
   conditional?: (data: ASRSFormData) => boolean;
-  validation?: (value: any) => string | null;
+  validation?: (value: unknown) => string | null;
 }
 
 const ASRSRequirementsForm: React.FC = () => {
   const [formData, setFormData] = useState<ASRSFormData>({});
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [designResult, setDesignResult] = useState(null);
-  const [costEstimate, setCostEstimate] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isGenerating] = useState(false);
+  const [designResult, setDesignResult] = useState<{
+    applicable_figures: string[];
+    applicable_tables: string[];
+    sprinkler_count: number;
+    protection_scheme: string;
+    estimated_cost: number;
+  } | null>(null);
+  const [costEstimate, setCostEstimate] = useState<{
+    sprinklers: { count: number; unit_cost: number; total: number };
+    piping: { feet: number; unit_cost: number; total: number };
+    labor: { total: number };
+    equipment: { total: number };
+    total: number;
+  } | null>(null);
 
   const questions: FormQuestion[] = [
     {
@@ -184,7 +196,7 @@ const ASRSRequirementsForm: React.FC = () => {
     !q.conditional || q.conditional(formData)
   ).slice(currentStep, currentStep + 1);
 
-  const handleInputChange = (questionId: keyof ASRSFormData, value: any) => {
+  const handleInputChange = (questionId: keyof ASRSFormData, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       [questionId]: value

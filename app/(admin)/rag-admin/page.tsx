@@ -6,19 +6,18 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { Download, Upload, Zap, FileText, Brain, RefreshCw, CheckCircle, AlertCircle, Loader2, Database, Search, Clock, Users, CheckCircle2, XCircle } from "lucide-react"
+import { Download, Upload, Zap, Brain, RefreshCw, CheckCircle, AlertCircle, Loader2, Clock, Users } from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 
 interface ProcessingStatus {
   type: "idle" | "loading" | "success" | "error"
   message?: string
-  details?: any
+  details?: unknown
 }
 
 interface DocumentStatus {
@@ -54,7 +53,6 @@ export default function RAGVectorizationAdmin(): ReactElement {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
   const [recentTranscripts, setRecentTranscripts] = useState<RecentTranscript[]>([])
-  const [syncedMeetingTitles, setSyncedMeetingTitles] = useState<string[]>([])
 
   // Load initial data on mount
   useEffect(() => {
@@ -121,11 +119,11 @@ export default function RAGVectorizationAdmin(): ReactElement {
       }
       
       // Show errors if any
-      let details = { ...data }
+      const details = { ...data }
       if (data.errors && data.errors.length > 0) {
-        details.failedTranscripts = data.errors.map((e: any) => ({
-          id: e.transcript_id,
-          error: e.error
+        details.failedTranscripts = data.errors.map((e: unknown) => ({
+          id: (e as {transcript_id: string}).transcript_id,
+          error: (e as {error: string}).error
         }))
       }
       
@@ -158,10 +156,6 @@ export default function RAGVectorizationAdmin(): ReactElement {
         })
       }
       
-      // Store meeting titles if we can get them from recent transcripts
-      if (syncedCount > 0) {
-        setSyncedMeetingTitles(prev => [...prev])
-      }
       
       // Refresh sync status and recent transcripts after a short delay
       setTimeout(() => {
@@ -247,7 +241,7 @@ export default function RAGVectorizationAdmin(): ReactElement {
       }
       
       const documentsData = await documentsResponse.json()
-      const documentIds = documentsData.documents?.map((doc: any) => doc.id) || []
+      const documentIds = documentsData.documents?.map((doc: unknown) => (doc as {id: string}).id) || []
       
       if (documentIds.length === 0) {
         throw new Error("No recent documents found to generate insights from")

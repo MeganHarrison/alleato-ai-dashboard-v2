@@ -171,7 +171,7 @@ const FMGlobalRAGChat: React.FC = () => {
       // Transform API response to component format
       return {
         content: data.content || 'No response generated',
-        sources: data.sources?.map((s: any) => ({
+        sources: data.sources?.map((s: unknown) => ({
           tableId: s.table_id,
           tableNumber: s.metadata?.table_number || 0,
           title: s.metadata?.table_title || 'FM Global Table',
@@ -180,7 +180,7 @@ const FMGlobalRAGChat: React.FC = () => {
           pageNumber: s.metadata?.page_number
         })) || [],
         recommendations: [],  // API doesn't provide recommendations yet
-        tables: data.sources?.map((s: any) => ({
+        tables: data.sources?.map((s: unknown) => ({
           tableNumber: s.metadata?.table_number || 0,
           title: s.metadata?.table_title || 'FM Global Table',
           applicability: s.metadata?.applicability || 'General ASRS',
@@ -203,7 +203,7 @@ const FMGlobalRAGChat: React.FC = () => {
     const lowerQuery = query.toLowerCase();
 
     // Generate contextual response based on query content
-    let content = "Based on FM Global 8-34 requirements";
+    const content = "Based on FM Global 8-34 requirements";
     let sources: RelevantSource[] = [];
     let recommendations: Recommendation[] = [];
     let tables: TableReference[] = [];

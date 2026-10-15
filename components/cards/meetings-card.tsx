@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface MeetingCardProps {
-  meeting: any
+  meeting: unknown
 }
 
 export function MeetingCard({ meeting }: MeetingCardProps) {
